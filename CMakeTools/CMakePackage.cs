@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.Shell;
 
 namespace CMakeTools
 {
-    [InstalledProductRegistration("#100", "#101", "1.0")]
+    [InstalledProductRegistration("#100", "#101", "1.0", IconResourceID = 400)]
     class CMakePackage : Package
     {
     };
