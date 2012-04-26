@@ -107,7 +107,7 @@ namespace CMakeTools
 
         public bool ScanTokenAndProvideInfoAboutIt(TokenInfo tokenInfo, ref int state)
         {
-            if (state == 1 && _offset < _source.Length)
+            if (GetStringFlag(state) && _offset < _source.Length)
             {
                 // If the line begins inside a string token, begin by scanning the rest
                 // of the string.
@@ -131,6 +131,14 @@ namespace CMakeTools
                     ScanString(tokenInfo, ref state, true);
                     return true;
                 }
+                else if (_source[_offset] == '(')
+                {
+                    IncParenDepth(ref state);
+                }
+                else if (_source[_offset] == ')')
+                {
+                    DecParenDepth(ref state);
+                }
                 else if (char.IsLetter(_source[_offset]) || _source[_offset] == '_')
                 {
                     // Scan a keyword or identifier token.
@@ -150,7 +158,11 @@ namespace CMakeTools
                     // Check whether the string is a keyword or not.
                     int length = tokenInfo.EndIndex - tokenInfo.StartIndex + 1;
                     string tokenText = _source.Substring(tokenInfo.StartIndex, length);
-                    int index = Array.BinarySearch(_keywords, tokenText.ToLower());
+                    int index = -1;
+                    if (!InsideParens(state))
+                    {
+                        index = Array.BinarySearch(_keywords, tokenText.ToLower());
+                    }
                     tokenInfo.Color = index >= 0 ? TokenColor.Keyword :
                         TokenColor.Identifier;
                     return true;
@@ -182,7 +194,7 @@ namespace CMakeTools
                     // An unescaped quotation mark signals the end of the string.
                     tokenInfo.EndIndex = _offset;
                     _offset++;
-                    state = 0;
+                    SetStringFlag(ref state, false);
                     return;
                 }
                 _offset++;
@@ -193,7 +205,54 @@ namespace CMakeTools
             // and set the state to carry over onto the next line.
             _offset = _source.Length;
             tokenInfo.EndIndex = _source.Length - 1;
-            state = 1;
+            SetStringFlag(ref state, true);
+        }
+
+        private bool GetStringFlag(int state)
+        {
+            // Get the flag indicating whether we're inside a string.
+            return ((uint)state & 0x80000000) != 0;
+        }
+
+        private void SetStringFlag(ref int state, bool stringFlag)
+        {
+            // Set the flag indicating whether we're inside a string.
+            uint unsignedState = (uint)state;
+            if (stringFlag)
+            {
+                unsignedState |= 0x80000000;
+            }
+            else
+            {
+                unsignedState &= ~0x80000000;
+            }
+            state = (int)unsignedState;
+        }
+
+        private void IncParenDepth(ref int state)
+        {
+            // Increment the number of parentheses in which we're nested.
+            int depth = state & 0x0FFFFFFF;
+            state &= ~0x0FFFFFFF;
+            state |= depth + 1;
+        }
+
+        private void DecParenDepth(ref int state)
+        {
+            // Decrement the number of parentheses in wihch we're nested.
+            int depth = state & 0x0FFFFFFF;
+            if (depth > 0)
+            {
+                state &= ~0x0FFFFFFF;
+                state |= depth - 1;
+            }
+        }
+
+        private bool InsideParens(int state)
+        {
+            // Check whether we're currently inside parentheses.
+            int depth = state & 0x0FFFFFFF;
+            return depth > 0;
         }
     }
 }
