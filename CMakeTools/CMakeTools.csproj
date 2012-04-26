@@ -34,6 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="CMakeAuthoringScope.cs" />
+    <Compile Include="CMakeKeywords.cs" />
     <Compile Include="CMakeLanguageService.cs" />
     <Compile Include="CMakePackage.cs" />
     <Compile Include="CMakeScanner.cs" />
