@@ -52,7 +52,10 @@ namespace CMakeTools
                 }
                 else if (_source[_offset] == ')')
                 {
-                    DecParenDepth(ref state);
+                    if (DecParenDepth(ref state))
+                    {
+                        SetLastKeyword(ref state, CMakeKeywordId.Unspecified);
+                    }
                 }
                 else if (char.IsLetter(_source[_offset]) || _source[_offset] == '_')
                 {
@@ -77,6 +80,12 @@ namespace CMakeTools
                     if (!InsideParens(state))
                     {
                         isKeyword = CMakeKeywords.IsCommand(tokenText);
+                        SetLastKeyword(ref state, CMakeKeywords.GetKeywordId(tokenText));
+                    }
+                    else
+                    {
+                        isKeyword = CMakeKeywords.IsKeyword(GetLastKeyword(state),
+                            tokenText);
                     }
                     tokenInfo.Color = isKeyword ? TokenColor.Keyword :
                         TokenColor.Identifier;
@@ -147,27 +156,42 @@ namespace CMakeTools
         private void IncParenDepth(ref int state)
         {
             // Increment the number of parentheses in which we're nested.
-            int depth = state & 0x0FFFFFFF;
-            state &= ~0x0FFFFFFF;
+            int depth = state & 0x0000FFFF;
+            state &= ~0x0000FFFF;
             state |= depth + 1;
         }
 
-        private void DecParenDepth(ref int state)
+        private bool DecParenDepth(ref int state)
         {
             // Decrement the number of parentheses in wihch we're nested.
-            int depth = state & 0x0FFFFFFF;
+            int depth = state & 0x0000FFFF;
             if (depth > 0)
             {
-                state &= ~0x0FFFFFFF;
+                state &= ~0x0000FFFF;
                 state |= depth - 1;
             }
+            return depth > 1;
         }
 
         private bool InsideParens(int state)
         {
             // Check whether we're currently inside parentheses.
-            int depth = state & 0x0FFFFFFF;
+            int depth = state & 0x0000FFFF;
             return depth > 0;
+        }
+
+        private CMakeKeywordId GetLastKeyword(int state)
+        {
+            // Get the identifier of the last keyword from the state.
+            int id = (state & 0x0FFF0000) >> 16;
+            return (CMakeKeywordId)id;
+        }
+
+        private void SetLastKeyword(ref int state, CMakeKeywordId id)
+        {
+            // Store the identifier of the last keyword scanned in the state.
+            state &= ~0x0FFF0000;
+            state |= ((int)id << 16) & 0x0FFF0000;
         }
     }
 }
