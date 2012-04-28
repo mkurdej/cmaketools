@@ -27,7 +27,11 @@ namespace CMakeTools
         DefineProperty,
         Else,
         ElseIf,
+        EnableLanguage,
         EndIf,
+        ExecuteProcess,
+        Export,
+        File,
         If
     }
 
@@ -138,7 +142,11 @@ namespace CMakeTools
             { "define_property",        CMakeKeywordId.DefineProperty },
             { "else",                   CMakeKeywordId.Else },
             { "elseif",                 CMakeKeywordId.ElseIf },
+            { "enable_language",        CMakeKeywordId.EnableLanguage },
             { "endif",                  CMakeKeywordId.EndIf },
+            { "execute_process",        CMakeKeywordId.ExecuteProcess },
+            { "export",                 CMakeKeywordId.Export },
+            { "file",                   CMakeKeywordId.File },
             { "if",                     CMakeKeywordId.If }
         };
 
@@ -270,6 +278,96 @@ namespace CMakeTools
             "variable"
         };
 
+        // Array of keywords used with the ENABLE_LANGUAGE command.
+        private static string[] _enableLanguageKeywords = new string[]
+        {
+            "optional"
+        };
+
+        // Array of keywords used with the EXECUTE_PROCESS command.
+        private static string[] _executeProcessKeywords = new string[]
+        {
+            "command",
+            "error_file",
+            "error_quiet",
+            "error_strip_trailing_whitespace",
+            "error_variable",
+            "input_file",
+            "output_file",
+            "output_quiet",
+            "output_strip_trailing_whitespace",
+            "output_variable",
+            "result_variable",
+            "timeout",
+            "working_directory"
+        };
+
+        // Array of keywords used with the EXPORT command.
+        private static string[] _exportKeywords = new string[]
+        {
+            "append",
+            "file",
+            "namespace",
+            "package",
+            "targets"
+        };
+
+        // Array of keywords used with the FILE command.
+        private static string[] _fileKeywords = new string[]
+        {
+            "append",
+            "copy",
+            "destination",
+            "directory_permissions",
+            "download",
+            "exclude",
+            "expected_md5",
+            "file_permissions",
+            "files_matching",
+            "follow_symlinks",
+            "glob",
+            "glob_recurse",
+            "hex",
+            "inactivity_timeout",
+            "install",
+            "length_maximum",
+            "length_minimum",
+            "limit",
+            "limit_count",
+            "limit_input",
+            "limit_output",
+            "log",
+            "make_directory",
+            "md5",
+            "newline_consume",
+            "no_hex_conversion",
+            "no_source_permissions",
+            "offset",
+            "pattern",
+            "permissions",
+            "read",
+            "regex",
+            "relative",
+            "relative_path",
+            "remove",
+            "remove_recurse",
+            "rename",
+            "sha1",
+            "sha224",
+            "sha256",
+            "sha384",
+            "sha512",
+            "show_progress",
+            "status",
+            "strings",
+            "timeout",
+            "to_cmake_path",
+            "to_native_path",
+            "upload",
+            "use_source_permissions",
+            "write"
+        };
+
         // Array of keywords used with the IF command.
         private static string[] _ifKeywords = new string[]
         {
@@ -321,7 +419,11 @@ namespace CMakeTools
             _definePropertyKeywords,
             _elseKeywords,
             _elseIfKeywords,
+            _enableLanguageKeywords,
             _endIfKeywords,
+            _executeProcessKeywords,
+            _exportKeywords,
+            _fileKeywords,
             _ifKeywords
         };
 
