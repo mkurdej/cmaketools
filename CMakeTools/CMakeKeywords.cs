@@ -28,11 +28,45 @@ namespace CMakeTools
         Else,
         ElseIf,
         EnableLanguage,
+        EndForEach,
         EndIf,
+        EndWhile,
         ExecuteProcess,
         Export,
         File,
-        If
+        FindFile,
+        FindLibrary,
+        FindPackage,
+        FindPath,
+        FindProgram,
+        ForEach,
+        GetDirectoryProperty,
+        GetFileNameComponent,
+        GetProperty,
+        If,
+        Include,
+        IncludeDirectories,
+        Install,
+        List,
+        LoadCache,
+        LoadCommand,
+        MarkAsAdvanced,
+        Message,
+        Option,
+        SeparateArguments,
+        Set,
+        SetDirectoryProperties,
+        SetProperty,
+        SetSourceFilesProperties,
+        SetTargetProperties,
+        SetTestsProperties,
+        SourceGroup,
+        String,
+        TargetLinkLibraries,
+        TryCompile,
+        TryRun,
+        Unset,
+        While
     }
 
     /// <summary>
@@ -143,11 +177,43 @@ namespace CMakeTools
             { "else",                   CMakeKeywordId.Else },
             { "elseif",                 CMakeKeywordId.ElseIf },
             { "enable_language",        CMakeKeywordId.EnableLanguage },
+            { "endforeach",             CMakeKeywordId.EndForEach },
             { "endif",                  CMakeKeywordId.EndIf },
+            { "endwhile",               CMakeKeywordId.EndWhile },
             { "execute_process",        CMakeKeywordId.ExecuteProcess },
             { "export",                 CMakeKeywordId.Export },
             { "file",                   CMakeKeywordId.File },
-            { "if",                     CMakeKeywordId.If }
+            { "find_file",              CMakeKeywordId.FindFile },
+            { "find_library",           CMakeKeywordId.FindLibrary },
+            { "find_package",           CMakeKeywordId.FindPackage },
+            { "foreach",                CMakeKeywordId.ForEach },
+            { "get_directory_property", CMakeKeywordId.GetDirectoryProperty },
+            { "get_filename_component", CMakeKeywordId.GetFileNameComponent },
+            { "get_property",           CMakeKeywordId.GetProperty },
+            { "if",                     CMakeKeywordId.If },
+            { "include",                CMakeKeywordId.Include },
+            { "include_directories",    CMakeKeywordId.IncludeDirectories },
+            { "install",                CMakeKeywordId.Install },
+            { "list",                   CMakeKeywordId.List },
+            { "load_cache",             CMakeKeywordId.LoadCache },
+            { "load_command",           CMakeKeywordId.LoadCommand },
+            { "mark_as_advanced",       CMakeKeywordId.MarkAsAdvanced },
+            { "message",                CMakeKeywordId.Message },
+            { "option",                 CMakeKeywordId.Option },
+            { "separate_arguments",     CMakeKeywordId.SeparateArguments },
+            { "set",                    CMakeKeywordId.Set },
+            { "set_directory_properties", CMakeKeywordId.SetDirectoryProperties },
+            { "set_property",           CMakeKeywordId.SetProperty },
+            { "set_source_files_properties", CMakeKeywordId.SetSourceFilesProperties },
+            { "set_target_properties",  CMakeKeywordId.SetTargetProperties },
+            { "set_tests_properties",   CMakeKeywordId.SetTestsProperties },
+            { "source_group",           CMakeKeywordId.SourceGroup },
+            { "string",                 CMakeKeywordId.String },
+            { "target_link_libraries",  CMakeKeywordId.TargetLinkLibraries },
+            { "try_compile",            CMakeKeywordId.TryCompile },
+            { "try_run",                CMakeKeywordId.TryRun },
+            { "unset",                  CMakeKeywordId.Unset },
+            { "while",                  CMakeKeywordId.While }
         };
 
         // Array of keywords used with the ADD_CUSTOM_COMMAND command.
@@ -327,6 +393,9 @@ namespace CMakeTools
             "follow_symlinks",
             "glob",
             "glob_recurse",
+            "group_execute",
+            "group_read",
+            "group_write",
             "hex",
             "inactivity_timeout",
             "install",
@@ -343,6 +412,9 @@ namespace CMakeTools
             "no_hex_conversion",
             "no_source_permissions",
             "offset",
+            "owner_execute",
+            "owner_read",
+            "owner_write",
             "pattern",
             "permissions",
             "read",
@@ -352,6 +424,8 @@ namespace CMakeTools
             "remove",
             "remove_recurse",
             "rename",
+            "setgid",
+            "setuid",
             "sha1",
             "sha224",
             "sha256",
@@ -365,7 +439,109 @@ namespace CMakeTools
             "to_native_path",
             "upload",
             "use_source_permissions",
+            "world_execute",
+            "world_read",
+            "world_write",
             "write"
+        };
+
+        // Array of keywords used with the FIND_FILE command.
+        private static string[] _findFileKeywords = new string[]
+        {
+            "cmake_find_root_path_both",
+            "doc",
+            "env",
+            "hints",
+            "names",
+            "no_cmake_environment_path",
+            "no_cmake_find_root_path",
+            "no_cmake_path",
+            "no_cmake_system_path",
+            "no_default_path",
+            "no_system_environment_path",
+            "only_cmake_find_root_path",
+            "path_suffixes",
+            "paths"
+        };
+
+        private static string[] _findLibraryKeywords = _findFileKeywords;
+        private static string[] _findPathKeywords = _findFileKeywords;
+        private static string[] _findProgramKeywords = _findFileKeywords;
+
+        // Array of keywords used with the FIND_PACKAGE command.
+        private static string[] _findPackageKeywords = new string[]
+        {
+            "cmake_find_root_path_both",
+            "components",
+            "configs",
+            "exact",
+            "hints",
+            "names",
+            "no_cmake_builds_path",
+            "no_cmake_environment_path",
+            "no_cmake_find_root_path",
+            "no_cmake_package_registry",
+            "no_cmake_path",
+            "no_cmake_system_package_registry",
+            "no_cmake_system_path",
+            "no_default_path",
+            "no_module",
+            "no_policy_scope",
+            "no_system_environment_path",
+            "only_cmake_find_root_path",
+            "path_suffixes",
+            "paths",
+            "quiet",
+            "required"
+        };
+
+        // Array of keywords used with the FOREACH command.
+        private static string[] _forEachKeywords = new string[]
+        {
+            "in",
+            "items",
+            "lists",
+            "range"
+        };
+
+        private static string[] _endForEachKeywords = _forEachKeywords;
+
+        // Array of keywords used with the GET_DIRECTORY_PROPERTY command.
+        private static string[] _getDirectoryPropertyKeywords = new string[]
+        {
+            "definition",
+            "directory"
+        };
+        
+        // Array of keywords used with the GET_FILENAME_COMPONENT command.
+        private static string[] _getFileNameComponentKeywords = new string[]
+        {
+            "absolute",
+            "cache",
+            "ext",
+            "name",
+            "name_we",
+            "path",
+            "program",
+            "program_args",
+            "realpath"
+        };
+
+        // Array of keywords used with the GET_PROPERTY command.
+        private static string[] _getPropertyKeywords = new string[]
+        {
+            "brief_docs",
+            "cache",
+            "defined",
+            "directory",
+            "full_docs",
+            "global",
+            "property",
+            "set",
+            "source",
+            "target",
+            "test",
+            "variable"
         };
 
         // Array of keywords used with the IF command.
@@ -398,6 +574,245 @@ namespace CMakeTools
         private static string[] _endIfKeywords = _ifKeywords;
         private static string[] _elseKeywords = _ifKeywords;
         private static string[] _elseIfKeywords = _ifKeywords;
+        private static string[] _whileKeywords = _ifKeywords;
+        private static string[] _endWhileKeywords = _ifKeywords;
+
+        // Array of keywords used with the INCLUDE command.
+        private static string[] _includeKeywords = new string[]
+        {
+            "no_policy_scope",
+            "optional",
+            "result_variable"
+        };
+
+        // Array of keywords used with the INCLUDE_DIRECTORIES command.
+        private static string[] _includeDirectoriesKeywords = new string[]
+        {
+            "after",
+            "before",
+            "system"
+        };
+
+        // Array of keywords used with the INSTALL command.
+        private static string[] _installKeywords = new string[]
+        {
+            "archive",
+            "bundle",
+            "code",
+            "component",
+            "configurations",
+            "destination",
+            "directory",
+            "directory_permissions",
+            "exclude",
+            "export",
+            "file",
+            "file_permissions",
+            "files",
+            "files_matching",
+            "framework",
+            "group_execute",
+            "group_read",
+            "group_write",
+            "library",
+            "namelink_only",
+            "namelink_skip",
+            "namespace",
+            "optional",
+            "owner_execute",
+            "owner_read",
+            "owner_write",
+            "pattern",
+            "permissions",
+            "private_header",
+            "programs",
+            "public_header",
+            "rename",
+            "resource",
+            "runtime",
+            "script",
+            "setgid",
+            "setuid",
+            "targets",
+            "use_source_permissions",
+            "world_execute",
+            "world_read",
+            "world_write"
+        };
+
+        // Array of keywords used with the LIST command.
+        private static string[] _listKeywords = new string[]
+        {
+            "append",
+            "find",
+            "get",
+            "insert",
+            "length",
+            "remove_at",
+            "remove_duplicates",
+            "remove_item",
+            "reverse",
+            "sort"
+        };
+
+        // Array of keywords used with the LOAD_CACHE command.
+        private static string[] _loadCacheKeywords = new string[]
+        {
+            "exclude",
+            "include_internals",
+            "read_with_prefix"
+        };
+
+        // Array of keywords used with the LOAD_COMMAND command.
+        private static string[] _loadCommandKeywords = new string[]
+        {
+            "command_name"
+        };
+
+        // Array of keywords used with the MARK_AS_ADVANCED command.
+        private static string[] _markAsAdvancedKeywords = new string[]
+        {
+            "clear",
+            "force"
+        };
+
+        // Array of keywords used with the MESSAGE command.
+        private static string[] _messageKeywords = new string[]
+        {
+            "author_warning",
+            "fatal_error",
+            "send_error",
+            "status",
+            "warning"
+        };
+
+        // Array of keywords used with the OPTION command.
+        private static string[] _optionKeywords = new string[]
+        {
+            "off",
+            "on"
+        };
+
+        // Array of keywords used with the SEPARATE_ARGUMENTS command.
+        private static string[] _separateArgumentsKeywords = new string[]
+        {
+            "unix_command",
+            "windows_command"
+        };
+
+        // Array of keywords used with the SET command.
+        private static string[] _setKeywords = new string[]
+        {
+            "bool",
+            "cache",
+            "filepath",
+            "force",
+            "internal",
+            "parent_scope",
+            "path",
+            "string"
+        };
+
+        // Array of keywords used with the SET_DIRECTORY_PROPERTIES command.
+        private static string[] _setDirectoryPropertiesKeywords = new string[]
+        {
+            "properties"
+        };
+
+        private static string[] _setSourceFilesPropertiesKeywords =
+            _setDirectoryPropertiesKeywords;
+        private static string[] _setTargetPropertiesKeywords =
+            _setDirectoryPropertiesKeywords;
+        private static string[] _setTestsPropertiesKeywords =
+            _setDirectoryPropertiesKeywords;
+
+        // Array of keywords used with the SET_PROPERTY command.
+        private static string[] _setPropertyKeywords = new string[]
+        {
+            "append",
+            "append_string",
+            "cache",
+            "directory",
+            "global",
+            "property",
+            "source",
+            "target",
+            "test"
+        };
+
+        // Array of keywords used with the SOURCE_GROUP command.
+        private static string[] _sourceGroupKeywords = new string[]
+        {
+            "files",
+            "regular_expression"
+        };
+
+        // Array of keywords used with the STRING command.
+        private static string[] _stringKeywords = new string[]
+        {
+            "alphabet",
+            "ascii",
+            "compare",
+            "configure",
+            "equal",
+            "escape_quotes",
+            "find",
+            "greater",
+            "length",
+            "less",
+            "match",
+            "matchall",
+            "md5",
+            "notequal",
+            "random",
+            "random_seed",
+            "regex",
+            "replace",
+            "reverse",
+            "sha1",
+            "sha224",
+            "sha256",
+            "sha384",
+            "sha512",
+            "strip",
+            "substring",
+            "tolower",
+            "toupper"
+        };
+
+        // Array of keywords used with the TARGET_LINK_LIBRARIES command.
+        private static string[] _targetLinkLibrariesKeywords = new string[]
+        {
+            "link_interface_libraries",
+            "link_private",
+            "link_public"
+        };
+
+        // Array of keywords used with the TRY_COMPILE command.
+        private static string[] _tryCompileKeywords = new string[]
+        {
+            "cmake_flags",
+            "compile_definitions",
+            "copy_file",
+            "output_variable"
+        };
+
+        // Array of keywords used with the TRY_RUN command.
+        private static string[] _tryRunKeywords = new string[]
+        {
+            "args",
+            "cmake_flags",
+            "compile_definitions",
+            "compile_output_variable",
+            "output_variable",
+            "run_output_variable"
+        };
+
+        // Array of keywords used with the UNSET command.
+        private static string[] _unsetKeywords = new string[]
+        {
+            "cache"
+        };
 
         // Arrays of keywords that appear in parentheses after other keywords.
         // The items in this list must be in the same order as the their corresponding
@@ -420,11 +835,45 @@ namespace CMakeTools
             _elseKeywords,
             _elseIfKeywords,
             _enableLanguageKeywords,
+            _endForEachKeywords,
             _endIfKeywords,
+            _endWhileKeywords,
             _executeProcessKeywords,
             _exportKeywords,
             _fileKeywords,
-            _ifKeywords
+            _findFileKeywords,
+            _findLibraryKeywords,
+            _findPackageKeywords,
+            _findPathKeywords,
+            _findProgramKeywords,
+            _forEachKeywords,
+            _getDirectoryPropertyKeywords,
+            _getFileNameComponentKeywords,
+            _getPropertyKeywords,
+            _ifKeywords,
+            _includeKeywords,
+            _includeDirectoriesKeywords,
+            _installKeywords,
+            _listKeywords,
+            _loadCacheKeywords,
+            _loadCommandKeywords,
+            _markAsAdvancedKeywords,
+            _messageKeywords,
+            _optionKeywords,
+            _separateArgumentsKeywords,
+            _setKeywords,
+            _setDirectoryPropertiesKeywords,
+            _setPropertyKeywords,
+            _setSourceFilesPropertiesKeywords,
+            _setTargetPropertiesKeywords,
+            _setTestsPropertiesKeywords,
+            _sourceGroupKeywords,
+            _stringKeywords,
+            _targetLinkLibrariesKeywords,
+            _tryCompileKeywords,
+            _tryRunKeywords,
+            _unsetKeywords,
+            _whileKeywords
         };
 
         /// <summary>
