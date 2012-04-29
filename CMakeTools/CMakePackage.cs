@@ -18,6 +18,7 @@ namespace CMakeTools
     [ProvideLanguageService(typeof(CMakeLanguageService), "CMake", 102,
         RequestStockColors = true)]
     [ProvideLanguageExtension(typeof(CMakeLanguageService), ".cmake")]
+    [ProvideLanguageExtension(typeof(CMakeLanguageService), ".txt")]
     [Guid("2986e95d-f97a-45a7-be3e-f07f1a931950")]
     class CMakePackage : Package
     {

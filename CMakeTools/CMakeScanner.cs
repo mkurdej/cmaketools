@@ -13,6 +13,12 @@ namespace CMakeTools
     {
         private string _source;
         private int _offset;
+        private bool _textFile;
+
+        public CMakeScanner(bool textFile)
+        {
+            _textFile = textFile;
+        }
 
         public void SetSource(string source, int offset)
         {
@@ -22,6 +28,13 @@ namespace CMakeTools
 
         public bool ScanTokenAndProvideInfoAboutIt(TokenInfo tokenInfo, ref int state)
         {
+            if (_textFile)
+            {
+                // Don't perform syntax highlighting if the file is an ordinary text
+                // file.
+                return false;
+            }
+
             if (GetStringFlag(state) && _offset < _source.Length)
             {
                 // If the line begins inside a string token, begin by scanning the rest
