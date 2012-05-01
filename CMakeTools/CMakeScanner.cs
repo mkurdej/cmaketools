@@ -145,10 +145,16 @@ namespace CMakeTools
             SetStringFlag(ref state, true);
         }
 
+        // Masks, flags, and shifts to manipulate state values.
+        private const uint StringFlag       = 0x80000000;
+        private const int ParenDepthMask    = 0x0000FFFF;
+        private const int LastKeywordMask   = 0x0FFF0000;
+        private const int LastKeywordShift  = 16;
+
         private bool GetStringFlag(int state)
         {
             // Get the flag indicating whether we're inside a string.
-            return ((uint)state & 0x80000000) != 0;
+            return ((uint)state & StringFlag) != 0;
         }
 
         private void SetStringFlag(ref int state, bool stringFlag)
@@ -157,11 +163,11 @@ namespace CMakeTools
             uint unsignedState = (uint)state;
             if (stringFlag)
             {
-                unsignedState |= 0x80000000;
+                unsignedState |= StringFlag;
             }
             else
             {
-                unsignedState &= ~0x80000000;
+                unsignedState &= ~StringFlag;
             }
             state = (int)unsignedState;
         }
@@ -169,18 +175,18 @@ namespace CMakeTools
         private void IncParenDepth(ref int state)
         {
             // Increment the number of parentheses in which we're nested.
-            int depth = state & 0x0000FFFF;
-            state &= ~0x0000FFFF;
+            int depth = state & ParenDepthMask;
+            state &= ~ParenDepthMask;
             state |= depth + 1;
         }
 
         private bool DecParenDepth(ref int state)
         {
-            // Decrement the number of parentheses in wihch we're nested.
-            int depth = state & 0x0000FFFF;
+            // Decrement the number of parentheses in which we're nested.
+            int depth = state & ParenDepthMask;
             if (depth > 0)
             {
-                state &= ~0x0000FFFF;
+                state &= ~ParenDepthMask;
                 state |= depth - 1;
             }
             return depth > 1;
@@ -189,22 +195,22 @@ namespace CMakeTools
         private bool InsideParens(int state)
         {
             // Check whether we're currently inside parentheses.
-            int depth = state & 0x0000FFFF;
+            int depth = state & ParenDepthMask;
             return depth > 0;
         }
 
         private CMakeKeywordId GetLastKeyword(int state)
         {
             // Get the identifier of the last keyword from the state.
-            int id = (state & 0x0FFF0000) >> 16;
+            int id = (state & LastKeywordMask) >> LastKeywordShift;
             return (CMakeKeywordId)id;
         }
 
         private void SetLastKeyword(ref int state, CMakeKeywordId id)
         {
             // Store the identifier of the last keyword scanned in the state.
-            state &= ~0x0FFF0000;
-            state |= ((int)id << 16) & 0x0FFF0000;
+            state &= ~LastKeywordMask;
+            state |= ((int)id << LastKeywordShift) & LastKeywordMask;
         }
     }
 }
