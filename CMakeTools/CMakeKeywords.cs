@@ -3,7 +3,6 @@
 // All rights reserved.
 
 using System;
-using System.Collections.Generic;
 
 namespace CMakeTools
 {
@@ -15,10 +14,14 @@ namespace CMakeTools
         Unspecified = 0,
         AddCustomCommand,
         AddCustomTarget,
+        AddDefinitions,
+        AddDependencies,
         AddExecutable,
         AddLibrary,
         AddSubdirectory,
         AddTest,
+        AuxSourceDirectory,
+        Break,
         BuildCommand,
         CMakeMinimumRequired,
         CMakePolicy,
@@ -28,8 +31,11 @@ namespace CMakeTools
         Else,
         ElseIf,
         EnableLanguage,
+        EnableTesting,
         EndForEach,
+        EndFunction,
         EndIf,
+        EndMacro,
         EndWhile,
         ExecuteProcess,
         Export,
@@ -39,20 +45,36 @@ namespace CMakeTools
         FindPackage,
         FindPath,
         FindProgram,
+        FLTKWrapUi,
         ForEach,
+        Function,
+        GetCMakeProperty,
         GetDirectoryProperty,
         GetFileNameComponent,
         GetProperty,
+        GetSourceFileProperty,
+        GetTargetProperty,
+        GetTestProperty,
         If,
         Include,
         IncludeDirectories,
+        IncludeExternalMsProject,
+        IncludeRegularExpression,
         Install,
+        LinkDirectories,
         List,
         LoadCache,
         LoadCommand,
+        Macro,
         MarkAsAdvanced,
+        Math,
         Message,
         Option,
+        Project,
+        QtWrapCpp,
+        QtWrapUi,
+        RemoveDefinitions,
+        Return,
         SeparateArguments,
         Set,
         SetDirectoryProperties,
@@ -60,12 +82,14 @@ namespace CMakeTools
         SetSourceFilesProperties,
         SetTargetProperties,
         SetTestsProperties,
+        SiteName,
         SourceGroup,
         String,
         TargetLinkLibraries,
         TryCompile,
         TryRun,
         Unset,
+        VariableWatch,
         While
     }
 
@@ -74,9 +98,10 @@ namespace CMakeTools
     /// </summary>
     static class CMakeKeywords
     {
-        // Array of CMake commands.
+        // Array of CMake commands.  These should be in alphabetical order.
         private static string[] _keywords = new string[]
         {
+            "<unspecified>",            // Dummy keyword for CMakeKeywordId.Unspecified.
             "add_custom_command",
             "add_custom_target",
             "add_definitions",
@@ -156,64 +181,6 @@ namespace CMakeTools
             "unset",
             "variable_watch",
             "while"
-        };
-
-        // Map from keyword strings to numeric keyword identifier.
-        private static Dictionary<string, CMakeKeywordId> _keywordIdMap =
-            new Dictionary<string, CMakeKeywordId>
-        {
-            { "add_custom_command",     CMakeKeywordId.AddCustomCommand },
-            { "add_custom_target",      CMakeKeywordId.AddCustomTarget },
-            { "add_executable",         CMakeKeywordId.AddExecutable },
-            { "add_library",            CMakeKeywordId.AddLibrary },
-            { "add_subdirectory",       CMakeKeywordId.AddSubdirectory },
-            { "add_test",               CMakeKeywordId.AddTest },
-            { "build_command",          CMakeKeywordId.BuildCommand },
-            { "cmake_minimum_required", CMakeKeywordId.CMakeMinimumRequired },
-            { "cmake_policy",           CMakeKeywordId.CMakePolicy },
-            { "configure_file",         CMakeKeywordId.ConfigureFile },
-            { "create_test_sourcelist", CMakeKeywordId.CreateTestSourcelist },
-            { "define_property",        CMakeKeywordId.DefineProperty },
-            { "else",                   CMakeKeywordId.Else },
-            { "elseif",                 CMakeKeywordId.ElseIf },
-            { "enable_language",        CMakeKeywordId.EnableLanguage },
-            { "endforeach",             CMakeKeywordId.EndForEach },
-            { "endif",                  CMakeKeywordId.EndIf },
-            { "endwhile",               CMakeKeywordId.EndWhile },
-            { "execute_process",        CMakeKeywordId.ExecuteProcess },
-            { "export",                 CMakeKeywordId.Export },
-            { "file",                   CMakeKeywordId.File },
-            { "find_file",              CMakeKeywordId.FindFile },
-            { "find_library",           CMakeKeywordId.FindLibrary },
-            { "find_package",           CMakeKeywordId.FindPackage },
-            { "foreach",                CMakeKeywordId.ForEach },
-            { "get_directory_property", CMakeKeywordId.GetDirectoryProperty },
-            { "get_filename_component", CMakeKeywordId.GetFileNameComponent },
-            { "get_property",           CMakeKeywordId.GetProperty },
-            { "if",                     CMakeKeywordId.If },
-            { "include",                CMakeKeywordId.Include },
-            { "include_directories",    CMakeKeywordId.IncludeDirectories },
-            { "install",                CMakeKeywordId.Install },
-            { "list",                   CMakeKeywordId.List },
-            { "load_cache",             CMakeKeywordId.LoadCache },
-            { "load_command",           CMakeKeywordId.LoadCommand },
-            { "mark_as_advanced",       CMakeKeywordId.MarkAsAdvanced },
-            { "message",                CMakeKeywordId.Message },
-            { "option",                 CMakeKeywordId.Option },
-            { "separate_arguments",     CMakeKeywordId.SeparateArguments },
-            { "set",                    CMakeKeywordId.Set },
-            { "set_directory_properties", CMakeKeywordId.SetDirectoryProperties },
-            { "set_property",           CMakeKeywordId.SetProperty },
-            { "set_source_files_properties", CMakeKeywordId.SetSourceFilesProperties },
-            { "set_target_properties",  CMakeKeywordId.SetTargetProperties },
-            { "set_tests_properties",   CMakeKeywordId.SetTestsProperties },
-            { "source_group",           CMakeKeywordId.SourceGroup },
-            { "string",                 CMakeKeywordId.String },
-            { "target_link_libraries",  CMakeKeywordId.TargetLinkLibraries },
-            { "try_compile",            CMakeKeywordId.TryCompile },
-            { "try_run",                CMakeKeywordId.TryRun },
-            { "unset",                  CMakeKeywordId.Unset },
-            { "while",                  CMakeKeywordId.While }
         };
 
         // Array of keywords used with the ADD_CUSTOM_COMMAND command.
@@ -814,6 +781,33 @@ namespace CMakeTools
             "cache"
         };
 
+        // Dummy arrays for commands that have no associated keywords.
+        private static string[] _addDefinitionsKeywords = null;
+        private static string[] _addDependenciesKeywords = null;
+        private static string[] _auxSourceDirectoriesKeywords = null;
+        private static string[] _breakKeywords = null;
+        private static string[] _enableTestingKeywords = null;
+        private static string[] _endFunctionKeywords = null;
+        private static string[] _endMacroKeywords = null;
+        private static string[] _fltkWrapUiKeywords = null;
+        private static string[] _functionKeywords = null;
+        private static string[] _getCMakePropertyKeywords = null;
+        private static string[] _getSourceFilePropertyKeywords = null;
+        private static string[] _getTargetPropertyKeywords = null;
+        private static string[] _getTestPropertyKeywords = null;
+        private static string[] _includeExternalMsProjectKeywords = null;
+        private static string[] _includeRegularExpressionKeywords = null;
+        private static string[] _linkDirectoryiesKeywords = null;
+        private static string[] _macroKeywords = null;
+        private static string[] _mathKeywords = null;
+        private static string[] _projectKeywords = null;
+        private static string[] _qtWrapCppKeywords = null;
+        private static string[] _qtWrapUiKeywords = null;
+        private static string[] _removeDefinitionsKeywords = null;
+        private static string[] _returnKeywords = null;
+        private static string[] _siteNameKeywords = null;
+        private static string[] _variableWatchKeywords = null;
+
         // Arrays of keywords that appear in parentheses after other keywords.
         // The items in this list must be in the same order as the their corresponding
         // keyword identifier in the CMakeKeywordId enumeration.
@@ -822,10 +816,14 @@ namespace CMakeTools
             null,
             _addCustomCommandKeywords,
             _addCustomTargetKeywords,
+            _addDefinitionsKeywords,
+            _addDependenciesKeywords,
             _addExecutableKeywords,
             _addLibraryKeywords,
             _addSubdirectoryKeywords,
             _addTestKeywords,
+            _auxSourceDirectoriesKeywords,
+            _breakKeywords,
             _buildCommandKeywords,
             _cmakeMinimumRequiredKeywords,
             _cmakePolicyKeywords,
@@ -835,8 +833,11 @@ namespace CMakeTools
             _elseKeywords,
             _elseIfKeywords,
             _enableLanguageKeywords,
+            _enableTestingKeywords,
             _endForEachKeywords,
+            _endFunctionKeywords,
             _endIfKeywords,
+            _endMacroKeywords,
             _endWhileKeywords,
             _executeProcessKeywords,
             _exportKeywords,
@@ -846,20 +847,36 @@ namespace CMakeTools
             _findPackageKeywords,
             _findPathKeywords,
             _findProgramKeywords,
+            _fltkWrapUiKeywords,
             _forEachKeywords,
+            _functionKeywords,
+            _getCMakePropertyKeywords,
             _getDirectoryPropertyKeywords,
             _getFileNameComponentKeywords,
             _getPropertyKeywords,
+            _getSourceFilePropertyKeywords,
+            _getTargetPropertyKeywords,
+            _getTestPropertyKeywords,
             _ifKeywords,
             _includeKeywords,
             _includeDirectoriesKeywords,
+            _includeExternalMsProjectKeywords,
+            _includeRegularExpressionKeywords,
             _installKeywords,
+            _linkDirectoryiesKeywords,
             _listKeywords,
             _loadCacheKeywords,
             _loadCommandKeywords,
+            _macroKeywords,
             _markAsAdvancedKeywords,
+            _mathKeywords,
             _messageKeywords,
             _optionKeywords,
+            _projectKeywords,
+            _qtWrapCppKeywords,
+            _qtWrapUiKeywords,
+            _removeDefinitionsKeywords,
+            _returnKeywords,
             _separateArgumentsKeywords,
             _setKeywords,
             _setDirectoryPropertiesKeywords,
@@ -867,12 +884,14 @@ namespace CMakeTools
             _setSourceFilesPropertiesKeywords,
             _setTargetPropertiesKeywords,
             _setTestsPropertiesKeywords,
+            _siteNameKeywords,
             _sourceGroupKeywords,
             _stringKeywords,
             _targetLinkLibrariesKeywords,
             _tryCompileKeywords,
             _tryRunKeywords,
             _unsetKeywords,
+            _variableWatchKeywords,
             _whileKeywords
         };
 
@@ -884,7 +903,7 @@ namespace CMakeTools
         public static bool IsCommand(string token)
         {
             int index = Array.BinarySearch(_keywords, token.ToLower());
-            return index >= 0;
+            return index > 0;
         }
 
         /// <summary>
@@ -903,6 +922,10 @@ namespace CMakeTools
                 return false;
             }
             string[] keywordArray = _keywordArrays[(int)containingKeyword];
+            if (keywordArray == null)
+            {
+                return false;
+            }
             int index = Array.BinarySearch(keywordArray, token.ToLower());
             return index >= 0;
         }
@@ -914,11 +937,12 @@ namespace CMakeTools
         /// <returns>The keyword identifier.</returns>
         public static CMakeKeywordId GetKeywordId(string token)
         {
-            if (!_keywordIdMap.ContainsKey(token.ToLower()))
+            int index = Array.BinarySearch(_keywords, token.ToLower());
+            if (index < 0)
             {
                 return CMakeKeywordId.Unspecified;
             }
-            return _keywordIdMap[token.ToLower()];
+            return (CMakeKeywordId)index;
         }
     }
 }
