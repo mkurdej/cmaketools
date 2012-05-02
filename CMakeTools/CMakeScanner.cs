@@ -104,6 +104,32 @@ namespace CMakeTools
                         TokenColor.Identifier;
                     return true;
                 }
+                else if (_source[_offset] == '$')
+                {
+                    // Scan a variable token.
+                    tokenInfo.StartIndex = _offset;
+                    _offset++;
+                    if (_source[_offset] == '{')
+                    {
+                        _offset++;
+                        if (char.IsLetter(_source[_offset]) || _source[_offset] == '_')
+                        {
+                            _offset++;
+                            while (char.IsLetterOrDigit(_source[_offset]) ||
+                                _source[_offset] == '_')
+                            {
+                                _offset++;
+                            }
+                            if (_source[_offset] == '}')
+                            {
+                                _offset++;
+                            }
+                        }
+                    }
+                    tokenInfo.EndIndex = _offset - 1;
+                    tokenInfo.Color = TokenColor.Identifier;
+                    return true;
+                }
                 _offset++;
             }
             return false;
