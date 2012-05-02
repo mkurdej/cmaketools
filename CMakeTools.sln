@@ -3,7 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMakeTools", "CMakeTools\CMakeTools.csproj", "{678324F2-4B99-4601-A72A-58B24546A19F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMakeToolsTest", "CMakeToolsTest\CMakeToolsTest.csproj", "{C2F9B23F-4944-4945-BEB2-2428C14B15FE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{27930839-F906-4DA2-8CD5-4F54CB5A6C02}"
+	ProjectSection(SolutionItems) = preProject
+		CMakeTools.vsmdi = CMakeTools.vsmdi
+		Local.testsettings = Local.testsettings
+		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
+	EndProjectSection
+EndProject
 Global
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = CMakeTools.vsmdi
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -13,6 +25,10 @@ Global
 		{678324F2-4B99-4601-A72A-58B24546A19F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{678324F2-4B99-4601-A72A-58B24546A19F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{678324F2-4B99-4601-A72A-58B24546A19F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2F9B23F-4944-4945-BEB2-2428C14B15FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2F9B23F-4944-4945-BEB2-2428C14B15FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2F9B23F-4944-4945-BEB2-2428C14B15FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2F9B23F-4944-4945-BEB2-2428C14B15FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

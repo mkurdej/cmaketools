@@ -9,7 +9,7 @@ namespace CMakeTools
     /// <summary>
     /// Numeric identifiers for CMake keywords.
     /// </summary>
-    enum CMakeKeywordId
+    public enum CMakeKeywordId
     {
         Unspecified = 0,
         AddCustomCommand,
@@ -90,13 +90,14 @@ namespace CMakeTools
         TryRun,
         Unset,
         VariableWatch,
-        While
+        While,
+        KeywordCount
     }
 
     /// <summary>
     /// Utility class to identify CMake keywords.
     /// </summary>
-    static class CMakeKeywords
+    public static class CMakeKeywords
     {
         // Array of CMake commands.  These should be in alphabetical order.
         private static string[] _keywords = new string[]
@@ -943,6 +944,31 @@ namespace CMakeTools
                 return CMakeKeywordId.Unspecified;
             }
             return (CMakeKeywordId)index;
+        }
+
+        /// <summary>
+        /// Get the text of a keyword from its identifier.
+        /// </summary>
+        /// <param name="id">A keyword identifier.</param>
+        /// <returns>The corresponding text.</returns>
+        public static string GetKeywordFromId(CMakeKeywordId id)
+        {
+            return _keywords[(int)id];
+        }
+
+        /// <summary>
+        /// Get the array of command-specific keywords for a given command.
+        /// </summary>
+        /// <param name="id">A command identifier.</param>
+        /// <returns>The corresponding array of command-specific keywords.</returns>
+        public static string[] GetKeywordsForCommand(CMakeKeywordId id)
+        {
+            string[] keywordArray = _keywordArrays[(int)id];
+            if (keywordArray == null)
+            {
+                return null;
+            }
+            return (string[])keywordArray.Clone();
         }
     }
 }
