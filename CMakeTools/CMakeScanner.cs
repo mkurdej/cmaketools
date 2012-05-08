@@ -7,6 +7,20 @@ using Microsoft.VisualStudio.Package;
 namespace CMakeTools
 {
     /// <summary>
+    /// CMake token types.
+    /// </summary>
+    enum CMakeToken
+    {
+        String,
+        Comment,
+        Keyword,
+        Identifier,
+        Variable,
+        OpenParen,
+        CloseParen
+    }
+
+    /// <summary>
     /// Scanner for CMake code.
     /// </summary>
     class CMakeScanner : IScanner
@@ -50,6 +64,7 @@ namespace CMakeTools
                     tokenInfo.StartIndex = _offset;
                     tokenInfo.EndIndex = _source.Length - 1;
                     tokenInfo.Color = TokenColor.Comment;
+                    tokenInfo.Token = (int)CMakeToken.Comment;
                     _offset = _source.Length;
                     return true;
                 }
@@ -61,14 +76,28 @@ namespace CMakeTools
                 }
                 else if (_source[_offset] == '(')
                 {
+                    // Scan an opening parenthesis.
                     IncParenDepth(ref state);
+                    tokenInfo.StartIndex = _offset;
+                    tokenInfo.EndIndex = _offset;
+                    tokenInfo.Color = TokenColor.Text;
+                    tokenInfo.Token = (int)CMakeToken.OpenParen;
+                    _offset++;
+                    return true;
                 }
                 else if (_source[_offset] == ')')
                 {
+                    // Scan a closing parenthesis.
                     if (DecParenDepth(ref state))
                     {
                         SetLastKeyword(ref state, CMakeKeywordId.Unspecified);
                     }
+                    tokenInfo.StartIndex = _offset;
+                    tokenInfo.EndIndex = _offset;
+                    tokenInfo.Color = TokenColor.Text;
+                    tokenInfo.Token = (int)CMakeToken.CloseParen;
+                    _offset++;
+                    return true;
                 }
                 else if (char.IsLetter(_source[_offset]) || _source[_offset] == '_')
                 {
@@ -102,6 +131,8 @@ namespace CMakeTools
                     }
                     tokenInfo.Color = isKeyword ? TokenColor.Keyword :
                         TokenColor.Identifier;
+                    tokenInfo.Token = isKeyword ? (int)CMakeToken.Keyword :
+                        (int)CMakeToken.Identifier;
                     return true;
                 }
                 else if (_source[_offset] == '$')
@@ -128,6 +159,7 @@ namespace CMakeTools
                     }
                     tokenInfo.EndIndex = _offset - 1;
                     tokenInfo.Color = TokenColor.Identifier;
+                    tokenInfo.Token = (int)CMakeToken.Variable;
                     return true;
                 }
                 _offset++;
