@@ -140,26 +140,35 @@ namespace CMakeTools
                     // Scan a variable token.
                     tokenInfo.StartIndex = _offset;
                     _offset++;
-                    if (_source[_offset] == '{')
+                    bool complete = true;
+                    if (_offset < _source.Length && _source[_offset] == '{')
                     {
+                        complete = false;
                         _offset++;
-                        if (char.IsLetter(_source[_offset]) || _source[_offset] == '_')
+                        if (_offset < _source.Length &&
+                            (char.IsLetter(_source[_offset]) || _source[_offset] == '_'))
                         {
                             _offset++;
-                            while (char.IsLetterOrDigit(_source[_offset]) ||
-                                _source[_offset] == '_')
+                            while (_offset < _source.Length &&
+                                (char.IsLetterOrDigit(_source[_offset]) ||
+                                _source[_offset] == '_'))
                             {
                                 _offset++;
                             }
-                            if (_source[_offset] == '}')
+                            if (_offset < _source.Length && _source[_offset] == '}')
                             {
                                 _offset++;
+                                complete = true;
                             }
                         }
                     }
                     tokenInfo.EndIndex = _offset - 1;
                     tokenInfo.Color = TokenColor.Identifier;
                     tokenInfo.Token = (int)CMakeToken.Variable;
+                    if (!complete)
+                    {
+                        tokenInfo.Trigger = TokenTriggers.MemberSelect;
+                    }
                     return true;
                 }
                 _offset++;

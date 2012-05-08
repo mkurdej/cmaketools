@@ -38,6 +38,7 @@
     <Compile Include="CMakeLanguageService.cs" />
     <Compile Include="CMakePackage.cs" />
     <Compile Include="CMakeScanner.cs" />
+    <Compile Include="CMakeVariableDeclarations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

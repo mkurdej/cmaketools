@@ -30,7 +30,17 @@ namespace CMakeTools
 
         public override AuthoringScope ParseSource(ParseRequest req)
         {
-            return new CMakeAuthoringScope();
+            CMakeAuthoringScope scope = new CMakeAuthoringScope();
+            if (req.Reason == ParseReason.MemberSelect)
+            {
+                // Set an appropriate declarations object depending on the token that
+                // triggered member selection.
+                if (req.TokenInfo.Token == (int)CMakeToken.Variable)
+                {
+                    scope.SetDeclarations(new CMakeVariableDeclarations());
+                }
+            }
+            return scope;
         }
 
         public override IScanner GetScanner(IVsTextLines buffer)

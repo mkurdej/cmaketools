@@ -8,8 +8,18 @@ using Microsoft.VisualStudio.TextManager.Interop;
 
 namespace CMakeTools
 {
+    /// <summary>
+    /// Authoring scope object representing the result of a parse operation.
+    /// </summary>
     class CMakeAuthoringScope : AuthoringScope
     {
+        private Declarations _declarations;
+
+        public void SetDeclarations(Declarations declarations)
+        {
+            _declarations = declarations;
+        }
+
         public override string GetDataTipText(int line, int col, out TextSpan span)
         {
             span = new TextSpan();
@@ -19,7 +29,7 @@ namespace CMakeTools
         public override Declarations GetDeclarations(IVsTextView view, int line, int col,
             TokenInfo info, ParseReason reason)
         {
-            return null;
+            return _declarations;
         }
 
         public override Methods GetMethods(int line, int col, string name)
