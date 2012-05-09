@@ -175,7 +175,7 @@ namespace CMakeTools
             {
                 return null;
             }
-            return "${" + _standardVariables[index];
+            return _standardVariables[index];
         }
     }
 }

@@ -35,7 +35,7 @@ namespace CMakeTools
             {
                 // Set an appropriate declarations object depending on the token that
                 // triggered member selection.
-                if (req.TokenInfo.Token == (int)CMakeToken.Variable)
+                if (req.TokenInfo.Token == (int)CMakeToken.VariableStart)
                 {
                     scope.SetDeclarations(new CMakeVariableDeclarations());
                 }

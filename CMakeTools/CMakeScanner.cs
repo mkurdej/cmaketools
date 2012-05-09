@@ -16,6 +16,8 @@ namespace CMakeTools
         Keyword,
         Identifier,
         Variable,
+        VariableStart,
+        VariableEnd,
         OpenParen,
         CloseParen
     }
@@ -56,6 +58,8 @@ namespace CMakeTools
                 ScanString(tokenInfo, ref state, false);
                 return true;
             }
+            bool expectVariable = GetVariableFlag(state);
+            SetVariableFlag(ref state, false);
             while (_offset < _source.Length)
             {
                 if (_source[_offset] == '#')
@@ -115,60 +119,60 @@ namespace CMakeTools
                     tokenInfo.EndIndex = _offset;
                     _offset++;
 
-                    // Check whether the string is a keyword or not.
-                    int length = tokenInfo.EndIndex - tokenInfo.StartIndex + 1;
-                    string tokenText = _source.Substring(tokenInfo.StartIndex, length);
-                    bool isKeyword = false;
-                    if (!InsideParens(state))
+                    if (expectVariable)
                     {
-                        isKeyword = CMakeKeywords.IsCommand(tokenText);
-                        SetLastKeyword(ref state, CMakeKeywords.GetKeywordId(tokenText));
+                        // If we're inside curly braces following a dollar sign, treat
+                        // the identifier as a variable.
+                        tokenInfo.Color = TokenColor.Identifier;
+                        tokenInfo.Token = (int)CMakeToken.Variable;
                     }
                     else
                     {
-                        isKeyword = CMakeKeywords.IsKeyword(GetLastKeyword(state),
-                            tokenText);
+                        // Check whether the string is a keyword or not.
+                        int length = tokenInfo.EndIndex - tokenInfo.StartIndex + 1;
+                        string tokenText = _source.Substring(tokenInfo.StartIndex,
+                            length);
+                        bool isKeyword = false;
+                        if (!InsideParens(state))
+                        {
+                            isKeyword = CMakeKeywords.IsCommand(tokenText);
+                            SetLastKeyword(ref state, CMakeKeywords.GetKeywordId(
+                                tokenText));
+                        }
+                        else
+                        {
+                            isKeyword = CMakeKeywords.IsKeyword(GetLastKeyword(state),
+                                tokenText);
+                        }
+                        tokenInfo.Color = isKeyword ? TokenColor.Keyword :
+                            TokenColor.Identifier;
+                        tokenInfo.Token = isKeyword ? (int)CMakeToken.Keyword :
+                            (int)CMakeToken.Identifier;
                     }
-                    tokenInfo.Color = isKeyword ? TokenColor.Keyword :
-                        TokenColor.Identifier;
-                    tokenInfo.Token = isKeyword ? (int)CMakeToken.Keyword :
-                        (int)CMakeToken.Identifier;
                     return true;
                 }
                 else if (_source[_offset] == '$')
                 {
-                    // Scan a variable token.
+                    // Scan a variable start token.
                     tokenInfo.StartIndex = _offset;
                     _offset++;
-                    bool complete = true;
                     if (_offset < _source.Length && _source[_offset] == '{')
                     {
-                        complete = false;
+                        tokenInfo.Trigger = TokenTriggers.MemberSelect;
                         _offset++;
-                        if (_offset < _source.Length &&
-                            (char.IsLetter(_source[_offset]) || _source[_offset] == '_'))
-                        {
-                            _offset++;
-                            while (_offset < _source.Length &&
-                                (char.IsLetterOrDigit(_source[_offset]) ||
-                                _source[_offset] == '_'))
-                            {
-                                _offset++;
-                            }
-                            if (_offset < _source.Length && _source[_offset] == '}')
-                            {
-                                _offset++;
-                                complete = true;
-                            }
-                        }
                     }
                     tokenInfo.EndIndex = _offset - 1;
                     tokenInfo.Color = TokenColor.Identifier;
-                    tokenInfo.Token = (int)CMakeToken.Variable;
-                    if (!complete)
-                    {
-                        tokenInfo.Trigger = TokenTriggers.MemberSelect;
-                    }
+                    tokenInfo.Token = (int)CMakeToken.VariableStart;
+                    return true;
+                }
+                else if (_source[_offset] == '}')
+                {
+                    // Scan a variable end token.
+                    tokenInfo.StartIndex = _offset;
+                    tokenInfo.EndIndex = _offset;
+                    tokenInfo.Color = TokenColor.Identifier;
+                    _offset++;
                     return true;
                 }
                 _offset++;
@@ -214,6 +218,7 @@ namespace CMakeTools
 
         // Masks, flags, and shifts to manipulate state values.
         private const uint StringFlag       = 0x80000000;
+        private const int VariableFlag      = 0x40000000;
         private const int ParenDepthMask    = 0x0000FFFF;
         private const int LastKeywordMask   = 0x0FFF0000;
         private const int LastKeywordShift  = 16;
@@ -237,6 +242,25 @@ namespace CMakeTools
                 unsignedState &= ~StringFlag;
             }
             state = (int)unsignedState;
+        }
+
+        private bool GetVariableFlag(int state)
+        {
+            // Get the flag indicating whether we're expecting a variable.
+            return (state & VariableFlag) != 0;
+        }
+
+        private void SetVariableFlag(ref int state, bool variableFlag)
+        {
+            // Set the flag indicating whether we're inside a variable.
+            if (variableFlag)
+            {
+                state |= VariableFlag;
+            }
+            else
+            {
+                state &= ~VariableFlag;
+            }
         }
 
         private void IncParenDepth(ref int state)
