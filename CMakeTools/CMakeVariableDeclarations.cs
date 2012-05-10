@@ -2,6 +2,8 @@
 // Copyright (C) 2012 by David Golub.
 // All rights reserved.
 
+using System;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.Package;
 
 namespace CMakeTools
@@ -144,9 +146,19 @@ namespace CMakeTools
             "XCODE_VERSION"
         };
 
+        // Array of variables to be displayed.
+        private List<string> _variables;
+
+        public CMakeVariableDeclarations(List<string> userVariables)
+        {
+            _variables = new List<string>(_standardVariables);
+            _variables.AddRange(userVariables);
+            _variables.Sort();
+        }
+
         public override int GetCount()
         {
-            return _standardVariables.Length;
+            return _variables.Count;
         }
 
         public override string GetDescription(int index)
@@ -156,11 +168,7 @@ namespace CMakeTools
 
         public override string GetDisplayText(int index)
         {
-            if (index < 0 || index >= _standardVariables.Length)
-            {
-                return null;
-            }
-            return _standardVariables[index];
+            return GetName(index);
         }
 
         public override int GetGlyph(int index)
@@ -171,11 +179,23 @@ namespace CMakeTools
 
         public override string GetName(int index)
         {
-            if (index < 0 || index >= _standardVariables.Length)
+            if (index < 0 || index >= _variables.Count)
             {
                 return null;
             }
-            return _standardVariables[index];
+            return _variables[index];
+        }
+
+        /// <summary>
+        /// Check whether the given string names a standard variables.
+        /// </summary>
+        /// <param name="varName">The string to check.</param>
+        /// <returns>
+        /// True if the string names a standard variable or false otherwise.
+        /// </returns>
+        public static bool IsStandardVariable(string varName)
+        {
+            return Array.BinarySearch(_standardVariables, varName.ToUpper()) >= 0;
         }
     }
 }

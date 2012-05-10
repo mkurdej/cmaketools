@@ -31,7 +31,7 @@ namespace CMakeTools
         private int _offset;
         private bool _textFile;
 
-        public CMakeScanner(bool textFile)
+        public CMakeScanner(bool textFile = false)
         {
             _textFile = textFile;
         }
@@ -66,10 +66,23 @@ namespace CMakeTools
                 {
                     // Scan a comment token.
                     tokenInfo.StartIndex = _offset;
-                    tokenInfo.EndIndex = _source.Length - 1;
+                    int endPos = _source.IndexOf('\n', _offset);
+                    if (endPos > _offset)
+                    {
+                        while (endPos < _source.Length - 1 &&
+                            (_source[endPos + 1] == '\r' || _source[endPos + 1] == '\n'))
+                        {
+                            endPos++;
+                        }
+                    }
+                    else
+                    {
+                        endPos = _source.Length - 1;
+                    }
+                    tokenInfo.EndIndex = endPos;
                     tokenInfo.Color = TokenColor.Comment;
                     tokenInfo.Token = (int)CMakeToken.Comment;
-                    _offset = _source.Length;
+                    _offset = endPos + 1;
                     return true;
                 }
                 else if (_source[_offset] == '"')

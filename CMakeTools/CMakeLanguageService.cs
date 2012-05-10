@@ -2,6 +2,7 @@
 // Copyright (C) 2012 by David Golub.
 // All rights reserved.
 
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
@@ -37,7 +38,8 @@ namespace CMakeTools
                 // triggered member selection.
                 if (req.TokenInfo.Token == (int)CMakeToken.VariableStart)
                 {
-                    scope.SetDeclarations(new CMakeVariableDeclarations());
+                    List<string> vars = ParseForVariables(req);
+                    scope.SetDeclarations(new CMakeVariableDeclarations(vars));
                 }
             }
             return scope;
@@ -75,6 +77,51 @@ namespace CMakeTools
                 _preferences.Init();
             }
             return _preferences;
+        }
+
+        private List<string> ParseForVariables(ParseRequest req)
+        {
+            // Parse to find all variables defined in the code.  This code is implemented
+            // as a state machine.  It begins in state 0 and advances to state 1 upon
+            // reading the SET command.  An opening parenthesis in state 1 will cause a
+            // transition to state 2.  An identifier read while in state 2 will be added
+            // as a variable unless it has already been added or is a standard variable.
+            // All other tokens will cause a transition back to state 0.
+            CMakeScanner scanner = new CMakeScanner();
+            scanner.SetSource(req.Text, 0);
+            List<string> vars = new List<string>();
+            TokenInfo tokenInfo = new TokenInfo();
+            int scannerState = 0;
+            int state = 0;
+            while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref scannerState))
+            {
+                if (tokenInfo.Token == (int)CMakeToken.Keyword &&
+                    req.Text.Substring(tokenInfo.StartIndex,
+                    tokenInfo.EndIndex - tokenInfo.StartIndex + 1).ToLower().Equals("set"))
+                {
+                    state = 1;
+                }
+                else if (state == 1 && tokenInfo.Token == (int)CMakeToken.OpenParen)
+                {
+                    state = 2;
+                }
+                else if (state == 2 && tokenInfo.Token == (int)CMakeToken.Identifier)
+                {
+                    state = 0;
+                    string varName = req.Text.Substring(tokenInfo.StartIndex,
+                        tokenInfo.EndIndex - tokenInfo.StartIndex + 1);
+                    if (!CMakeVariableDeclarations.IsStandardVariable(varName) &&
+                        vars.FindIndex(x => x.ToUpper().Equals(varName.ToUpper())) < 0)
+                    {
+                        vars.Add(varName);
+                    }
+                }
+                else
+                {
+                    state = 0;
+                }
+            }
+            return vars;
         }
     }
 }
