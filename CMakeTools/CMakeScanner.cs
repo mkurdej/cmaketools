@@ -94,7 +94,13 @@ namespace CMakeTools
                 else if (_source[_offset] == '(')
                 {
                     // Scan an opening parenthesis.
-                    IncParenDepth(ref state);
+                    if (!IncParenDepth(ref state))
+                    {
+                        if (CMakeKeywords.TriggersMemberSelection(GetLastKeyword(state)))
+                        {
+                            tokenInfo.Trigger = TokenTriggers.MemberSelect;
+                        }
+                    }
                     tokenInfo.StartIndex = _offset;
                     tokenInfo.EndIndex = _offset;
                     tokenInfo.Color = TokenColor.Text;
@@ -276,12 +282,13 @@ namespace CMakeTools
             }
         }
 
-        private void IncParenDepth(ref int state)
+        private bool IncParenDepth(ref int state)
         {
             // Increment the number of parentheses in which we're nested.
             int depth = state & ParenDepthMask;
             state &= ~ParenDepthMask;
             state |= depth + 1;
+            return depth > 0;
         }
 
         private bool DecParenDepth(ref int state)
@@ -303,7 +310,7 @@ namespace CMakeTools
             return depth > 0;
         }
 
-        private CMakeKeywordId GetLastKeyword(int state)
+        public static CMakeKeywordId GetLastKeyword(int state)
         {
             // Get the identifier of the last keyword from the state.
             int id = (state & LastKeywordMask) >> LastKeywordShift;

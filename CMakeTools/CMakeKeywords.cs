@@ -896,6 +896,17 @@ namespace CMakeTools
             _whileKeywords
         };
 
+        // Array of Booleans indicating whether command should trigger member selection.
+        static bool[] _memberSelectionCommands;
+
+        static CMakeKeywords()
+        {
+            // Initialize the array of Booleans to indicate which commands should trigger
+            // member selection.
+            _memberSelectionCommands = new bool[_keywords.Length];
+            _memberSelectionCommands[(int)CMakeKeywordId.File] = true;
+        }
+
         /// <summary>
         /// Check whether the specified token is a CMake command.
         /// </summary>
@@ -905,6 +916,18 @@ namespace CMakeTools
         {
             int index = Array.BinarySearch(_keywords, token.ToLower());
             return index > 0;
+        }
+
+        /// <summary>
+        /// Check whether the specified command should trigger member selection.
+        /// </summary>
+        /// <param name="id">Identifier of the command to check.</param>
+        /// <returns>
+        /// True if member selection should be triggered or false otherwise.
+        /// </returns>
+        public static bool TriggersMemberSelection(CMakeKeywordId id)
+        {
+            return _memberSelectionCommands[(int)id];
         }
 
         /// <summary>

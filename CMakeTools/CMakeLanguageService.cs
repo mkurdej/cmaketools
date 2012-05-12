@@ -41,6 +41,12 @@ namespace CMakeTools
                     List<string> vars = ParseForVariables(req.Text);
                     scope.SetDeclarations(new CMakeVariableDeclarations(vars));
                 }
+                else if (req.TokenInfo.Token == (int)CMakeToken.OpenParen)
+                {
+                    CMakeKeywordId id = ParseForTriggerCommandId(req);
+                    scope.SetDeclarations(
+                        CMakeSubcommandDeclarations.GetSubcommandDeclarations(id));
+                }
             }
             return scope;
         }
@@ -122,6 +128,32 @@ namespace CMakeTools
                 }
             }
             return vars;
+        }
+
+        private CMakeKeywordId ParseForTriggerCommandId(ParseRequest req)
+        {
+            // Parse to find the identifier of the command that triggered the current
+            // member selection parse request.
+            Source source = GetSource(req.FileName);
+            int state = 0;
+            CMakeScanner scanner = new CMakeScanner();
+            TokenInfo tokenInfo = new TokenInfo();
+            for (int lineNum = 0; lineNum <= req.Line; lineNum++)
+            {
+                string line = source.GetLine(lineNum);
+                scanner.SetSource(line, 0);
+                while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state))
+                {
+                    if (lineNum == req.Line)
+                    {
+                        if (tokenInfo.StartIndex == req.TokenInfo.StartIndex)
+                        {
+                            return CMakeScanner.GetLastKeyword(state);
+                        }
+                    }
+                }
+            }
+            return CMakeKeywordId.Unspecified;
         }
     }
 }
