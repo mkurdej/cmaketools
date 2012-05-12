@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace CMakeTools
 {
     /// <summary>
-    /// Tests to ensure the valadity of the data structure in CMakeKeywords.
+    /// Tests to ensure the validity of the data structure in CMakeKeywords.
     /// </summary>
     [TestClass]
     public class CMakeKeywordsTest

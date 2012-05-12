@@ -12,7 +12,7 @@ namespace CMakeTools
     /// <summary>
     /// Language service for CMake.
     /// </summary>
-    class CMakeLanguageService : LanguageService
+    public class CMakeLanguageService : LanguageService
     {
         private LanguagePreferences _preferences;
 
@@ -38,7 +38,7 @@ namespace CMakeTools
                 // triggered member selection.
                 if (req.TokenInfo.Token == (int)CMakeToken.VariableStart)
                 {
-                    List<string> vars = ParseForVariables(req);
+                    List<string> vars = ParseForVariables(req.Text);
                     scope.SetDeclarations(new CMakeVariableDeclarations(vars));
                 }
             }
@@ -79,7 +79,7 @@ namespace CMakeTools
             return _preferences;
         }
 
-        private List<string> ParseForVariables(ParseRequest req)
+        public static List<string> ParseForVariables(string code)
         {
             // Parse to find all variables defined in the code.  This code is implemented
             // as a state machine.  It begins in state 0 and advances to state 1 upon
@@ -88,7 +88,7 @@ namespace CMakeTools
             // as a variable unless it has already been added or is a standard variable.
             // All other tokens will cause a transition back to state 0.
             CMakeScanner scanner = new CMakeScanner();
-            scanner.SetSource(req.Text, 0);
+            scanner.SetSource(code, 0);
             List<string> vars = new List<string>();
             TokenInfo tokenInfo = new TokenInfo();
             int scannerState = 0;
@@ -96,7 +96,7 @@ namespace CMakeTools
             while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref scannerState))
             {
                 if (tokenInfo.Token == (int)CMakeToken.Keyword &&
-                    req.Text.Substring(tokenInfo.StartIndex,
+                    code.Substring(tokenInfo.StartIndex,
                     tokenInfo.EndIndex - tokenInfo.StartIndex + 1).ToLower().Equals("set"))
                 {
                     state = 1;
@@ -108,7 +108,7 @@ namespace CMakeTools
                 else if (state == 2 && tokenInfo.Token == (int)CMakeToken.Identifier)
                 {
                     state = 0;
-                    string varName = req.Text.Substring(tokenInfo.StartIndex,
+                    string varName = code.Substring(tokenInfo.StartIndex,
                         tokenInfo.EndIndex - tokenInfo.StartIndex + 1);
                     if (!CMakeVariableDeclarations.IsStandardVariable(varName) &&
                         vars.FindIndex(x => x.ToUpper().Equals(varName.ToUpper())) < 0)
