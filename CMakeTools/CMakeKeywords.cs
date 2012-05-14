@@ -904,7 +904,11 @@ namespace CMakeTools
             // Initialize the array of Booleans to indicate which commands should trigger
             // member selection.
             _memberSelectionCommands = new bool[_keywords.Length];
-            _memberSelectionCommands[(int)CMakeKeywordId.File] = true;
+            foreach (CMakeKeywordId id in
+                CMakeSubcommandDeclarations.GetMemberSelectionTriggers())
+            {
+                _memberSelectionCommands[(int)id] = true;
+            }
         }
 
         /// <summary>

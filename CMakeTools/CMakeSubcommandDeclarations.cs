@@ -12,6 +12,35 @@ namespace CMakeTools
     /// </summary>
     class CMakeSubcommandDeclarations : Declarations
     {
+        // Array of subcommands for the CMAKE_POLICY command.
+        private static string[] _cmakePolicySubcommands = new string[]
+        {
+            "GET",
+            "POP",
+            "PUSH",
+            "SET",
+            "VERSION"
+        };
+
+        // Array of subcommands for the DEFINE_PROPERTY command.
+        private static string[] _definePropertySubcommands = new string[]
+        {
+            "CACHED_VARIABLE",
+            "DIRECTORY",
+            "GLOBAL",
+            "SOURCE",
+            "TARGET",
+            "TEST",
+            "VARIABLE",
+        };
+
+        // Array of subcommands for the EXPORT command.
+        private static string[] _exportSubcommands = new string[]
+        {
+            "PACKAGE",
+            "TARGETS"
+        };
+
         // Array of subcommands for the FILE command.
         private static string[] _fileSubcommands = new string[]
         {
@@ -38,11 +67,79 @@ namespace CMakeTools
             "WRITE"
         };
 
+        // Array of subcommands for the INSTALL command.
+        private static string[] _installSubcommands = new string[]
+        {
+            "CODE",
+            "DIRECTORY",
+            "EXPORT",
+            "FILES",
+            "PROGRAMS",
+            "SCRIPT",
+            "TARGETS"
+        };
+
+        // Array of subcommands for the LIST command.
+        private static string[] _listSubcommands = new string[]
+        {
+            "APPEND",
+            "FIND",
+            "GET",
+            "INSERT",
+            "LENGTH",
+            "REMOVE_AT",
+            "REMOVE_DUPLICATES",
+            "REMOVE_ITEM",
+            "REVERSE",
+            "SORT"
+        };
+
+        // Array of subcommands for the SET_PROPERTY command.
+        private static string[] _setPropertySubcommands = new string[]
+        {
+            "CACHE",
+            "DIRECTORY",
+            "GLOBAL",
+            "SOURCE",
+            "TARGET",
+            "TEST"
+        };
+
+        // Array of subcommands for the STRING command.
+        private static string[] _stringSubcommands = new string[]
+        {
+            "ASCII",
+            "COMPARE",
+            "CONFIGURE",
+            "FIND",
+            "LENGTH",
+            "MD5",
+            "RANDOM",
+            "REGEX",
+            "REPLACE",
+            "SHA1",
+            "SHA224",
+            "SHA256",
+            "SHA384",
+            "SHA512",
+            "STRIP",
+            "SUBSTRING",
+            "TOLOWER",
+            "TOUPPER"
+        };
+
         // Map from command identifiers to arrays of subcommands.
         private static Dictionary<CMakeKeywordId, string[]> _subcommandArrays =
             new Dictionary<CMakeKeywordId, string[]>
         {
-            { CMakeKeywordId.File,  _fileSubcommands }
+            { CMakeKeywordId.CMakePolicy,       _cmakePolicySubcommands },
+            { CMakeKeywordId.DefineProperty,    _definePropertySubcommands },
+            { CMakeKeywordId.Export,            _exportSubcommands },
+            { CMakeKeywordId.File,              _fileSubcommands },
+            { CMakeKeywordId.Install,           _installSubcommands },
+            { CMakeKeywordId.List,              _listSubcommands },
+            { CMakeKeywordId.SetProperty,       _setPropertySubcommands },
+            { CMakeKeywordId.String,            _stringSubcommands },
         };
 
         // Array of subcommands to be displayed.
@@ -97,6 +194,16 @@ namespace CMakeTools
                 return null;
             }
             return new CMakeSubcommandDeclarations(_subcommandArrays[id]);
+        }
+
+        /// <summary>
+        /// Get a collection of commands that should trigger member selection because
+        /// they have subcommands.
+        /// </summary>
+        /// <returns>A collection of command identifiers.</returns>
+        public static IEnumerable<CMakeKeywordId> GetMemberSelectionTriggers()
+        {
+            return _subcommandArrays.Keys;
         }
     }
 }
