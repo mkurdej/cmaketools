@@ -96,7 +96,7 @@ namespace CMakeTools
                     // Scan an opening parenthesis.
                     if (!IncParenDepth(ref state))
                     {
-                        if (CMakeKeywords.TriggersMemberSelection(GetLastKeyword(state)))
+                        if (CMakeKeywords.TriggersMemberSelection(GetLastCommand(state)))
                         {
                             tokenInfo.Trigger = TokenTriggers.MemberSelect;
                         }
@@ -113,7 +113,7 @@ namespace CMakeTools
                     // Scan a closing parenthesis.
                     if (DecParenDepth(ref state))
                     {
-                        SetLastKeyword(ref state, CMakeKeywordId.Unspecified);
+                        SetLastCommand(ref state, CMakeCommandId.Unspecified);
                     }
                     tokenInfo.StartIndex = _offset;
                     tokenInfo.EndIndex = _offset;
@@ -155,12 +155,12 @@ namespace CMakeTools
                         if (!InsideParens(state))
                         {
                             isKeyword = CMakeKeywords.IsCommand(tokenText);
-                            SetLastKeyword(ref state, CMakeKeywords.GetKeywordId(
+                            SetLastCommand(ref state, CMakeKeywords.GetCommandId(
                                 tokenText));
                         }
                         else
                         {
-                            isKeyword = CMakeKeywords.IsKeyword(GetLastKeyword(state),
+                            isKeyword = CMakeKeywords.IsKeyword(GetLastCommand(state),
                                 tokenText);
                         }
                         tokenInfo.Color = isKeyword ? TokenColor.Keyword :
@@ -239,8 +239,8 @@ namespace CMakeTools
         private const uint StringFlag       = 0x80000000;
         private const int VariableFlag      = 0x40000000;
         private const int ParenDepthMask    = 0x0000FFFF;
-        private const int LastKeywordMask   = 0x0FFF0000;
-        private const int LastKeywordShift  = 16;
+        private const int LastCommandMask   = 0x0FFF0000;
+        private const int LastCommandShift  = 16;
 
         private bool GetStringFlag(int state)
         {
@@ -310,18 +310,18 @@ namespace CMakeTools
             return depth > 0;
         }
 
-        public static CMakeKeywordId GetLastKeyword(int state)
+        public static CMakeCommandId GetLastCommand(int state)
         {
-            // Get the identifier of the last keyword from the state.
-            int id = (state & LastKeywordMask) >> LastKeywordShift;
-            return (CMakeKeywordId)id;
+            // Get the identifier of the last command scanned from the state.
+            int id = (state & LastCommandMask) >> LastCommandShift;
+            return (CMakeCommandId)id;
         }
 
-        private void SetLastKeyword(ref int state, CMakeKeywordId id)
+        private void SetLastCommand(ref int state, CMakeCommandId id)
         {
-            // Store the identifier of the last keyword scanned in the state.
-            state &= ~LastKeywordMask;
-            state |= ((int)id << LastKeywordShift) & LastKeywordMask;
+            // Store the identifier of the last command scanned in the state.
+            state &= ~LastCommandMask;
+            state |= ((int)id << LastCommandShift) & LastCommandMask;
         }
     }
 }

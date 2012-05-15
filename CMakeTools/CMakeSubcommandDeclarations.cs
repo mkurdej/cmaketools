@@ -129,17 +129,17 @@ namespace CMakeTools
         };
 
         // Map from command identifiers to arrays of subcommands.
-        private static Dictionary<CMakeKeywordId, string[]> _subcommandArrays =
-            new Dictionary<CMakeKeywordId, string[]>
+        private static Dictionary<CMakeCommandId, string[]> _subcommandArrays =
+            new Dictionary<CMakeCommandId, string[]>
         {
-            { CMakeKeywordId.CMakePolicy,       _cmakePolicySubcommands },
-            { CMakeKeywordId.DefineProperty,    _definePropertySubcommands },
-            { CMakeKeywordId.Export,            _exportSubcommands },
-            { CMakeKeywordId.File,              _fileSubcommands },
-            { CMakeKeywordId.Install,           _installSubcommands },
-            { CMakeKeywordId.List,              _listSubcommands },
-            { CMakeKeywordId.SetProperty,       _setPropertySubcommands },
-            { CMakeKeywordId.String,            _stringSubcommands },
+            { CMakeCommandId.CMakePolicy,       _cmakePolicySubcommands },
+            { CMakeCommandId.DefineProperty,    _definePropertySubcommands },
+            { CMakeCommandId.Export,            _exportSubcommands },
+            { CMakeCommandId.File,              _fileSubcommands },
+            { CMakeCommandId.Install,           _installSubcommands },
+            { CMakeCommandId.List,              _listSubcommands },
+            { CMakeCommandId.SetProperty,       _setPropertySubcommands },
+            { CMakeCommandId.String,            _stringSubcommands },
         };
 
         // Array of subcommands to be displayed.
@@ -187,7 +187,7 @@ namespace CMakeTools
         /// <param name="id">The identifier of a CMake command.</param>
         /// <returns>A declarations object or null if there are no subcommands.</returns>
         public static CMakeSubcommandDeclarations GetSubcommandDeclarations(
-            CMakeKeywordId id)
+            CMakeCommandId id)
         {
             if (!_subcommandArrays.ContainsKey(id))
             {
@@ -201,7 +201,7 @@ namespace CMakeTools
         /// they have subcommands.
         /// </summary>
         /// <returns>A collection of command identifiers.</returns>
-        public static IEnumerable<CMakeKeywordId> GetMemberSelectionTriggers()
+        public static IEnumerable<CMakeCommandId> GetMemberSelectionTriggers()
         {
             return _subcommandArrays.Keys;
         }

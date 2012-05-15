@@ -43,7 +43,7 @@ namespace CMakeTools
                 }
                 else if (req.TokenInfo.Token == (int)CMakeToken.OpenParen)
                 {
-                    CMakeKeywordId id = ParseForTriggerCommandId(req);
+                    CMakeCommandId id = ParseForTriggerCommandId(req);
                     scope.SetDeclarations(
                         CMakeSubcommandDeclarations.GetSubcommandDeclarations(id));
                 }
@@ -130,7 +130,7 @@ namespace CMakeTools
             return vars;
         }
 
-        private CMakeKeywordId ParseForTriggerCommandId(ParseRequest req)
+        private CMakeCommandId ParseForTriggerCommandId(ParseRequest req)
         {
             // Parse to find the identifier of the command that triggered the current
             // member selection parse request.
@@ -148,12 +148,12 @@ namespace CMakeTools
                     {
                         if (tokenInfo.StartIndex == req.TokenInfo.StartIndex)
                         {
-                            return CMakeScanner.GetLastKeyword(state);
+                            return CMakeScanner.GetLastCommand(state);
                         }
                     }
                 }
             }
-            return CMakeKeywordId.Unspecified;
+            return CMakeCommandId.Unspecified;
         }
     }
 }

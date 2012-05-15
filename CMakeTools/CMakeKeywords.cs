@@ -7,9 +7,9 @@ using System;
 namespace CMakeTools
 {
     /// <summary>
-    /// Numeric identifiers for CMake keywords.
+    /// Numeric identifiers for CMake commands.
     /// </summary>
-    public enum CMakeKeywordId
+    public enum CMakeCommandId
     {
         Unspecified = 0,
         AddCustomCommand,
@@ -91,7 +91,7 @@ namespace CMakeTools
         Unset,
         VariableWatch,
         While,
-        KeywordCount
+        CommandCount
     }
 
     /// <summary>
@@ -100,7 +100,7 @@ namespace CMakeTools
     public static class CMakeKeywords
     {
         // Array of CMake commands.  These should be in alphabetical order.
-        private static string[] _keywords = new string[]
+        private static string[] _commands = new string[]
         {
             "<unspecified>",            // Dummy keyword for CMakeKeywordId.Unspecified.
             "add_custom_command",
@@ -903,8 +903,8 @@ namespace CMakeTools
         {
             // Initialize the array of Booleans to indicate which commands should trigger
             // member selection.
-            _memberSelectionCommands = new bool[_keywords.Length];
-            foreach (CMakeKeywordId id in
+            _memberSelectionCommands = new bool[_commands.Length];
+            foreach (CMakeCommandId id in
                 CMakeSubcommandDeclarations.GetMemberSelectionTriggers())
             {
                 _memberSelectionCommands[(int)id] = true;
@@ -918,7 +918,7 @@ namespace CMakeTools
         /// <returns>True if the token is command or false otherwise.</returns>
         public static bool IsCommand(string token)
         {
-            int index = Array.BinarySearch(_keywords, token.ToLower());
+            int index = Array.BinarySearch(_commands, token.ToLower());
             return index > 0;
         }
 
@@ -929,7 +929,7 @@ namespace CMakeTools
         /// <returns>
         /// True if member selection should be triggered or false otherwise.
         /// </returns>
-        public static bool TriggersMemberSelection(CMakeKeywordId id)
+        public static bool TriggersMemberSelection(CMakeCommandId id)
         {
             return _memberSelectionCommands[(int)id];
         }
@@ -943,9 +943,9 @@ namespace CMakeTools
         /// </param>
         /// <param name="token">Token to check.</param>
         /// <returns>True if the token is keyword or false otherwise.</returns>
-        public static bool IsKeyword(CMakeKeywordId containingKeyword, string token)
+        public static bool IsKeyword(CMakeCommandId containingKeyword, string token)
         {
-            if (containingKeyword == CMakeKeywordId.Unspecified)
+            if (containingKeyword == CMakeCommandId.Unspecified)
             {
                 return false;
             }
@@ -959,28 +959,28 @@ namespace CMakeTools
         }
 
         /// <summary>
-        /// Get the keyword identifier corresponding to a given token string.
+        /// Get the command identifier corresponding to a given token string.
         /// </summary>
         /// <param name="token">The token string.</param>
         /// <returns>The keyword identifier.</returns>
-        public static CMakeKeywordId GetKeywordId(string token)
+        public static CMakeCommandId GetCommandId(string token)
         {
-            int index = Array.BinarySearch(_keywords, token.ToLower());
+            int index = Array.BinarySearch(_commands, token.ToLower());
             if (index < 0)
             {
-                return CMakeKeywordId.Unspecified;
+                return CMakeCommandId.Unspecified;
             }
-            return (CMakeKeywordId)index;
+            return (CMakeCommandId)index;
         }
 
         /// <summary>
-        /// Get the text of a keyword from its identifier.
+        /// Get the text of a command from its identifier.
         /// </summary>
-        /// <param name="id">A keyword identifier.</param>
-        /// <returns>The corresponding text.</returns>
-        public static string GetKeywordFromId(CMakeKeywordId id)
+        /// <param name="id">A command identifier.</param>
+        /// <returns>The corresponding keyword text.</returns>
+        public static string GetCommandFromId(CMakeCommandId id)
         {
-            return _keywords[(int)id];
+            return _commands[(int)id];
         }
 
         /// <summary>
@@ -988,7 +988,7 @@ namespace CMakeTools
         /// </summary>
         /// <param name="id">A command identifier.</param>
         /// <returns>The corresponding array of command-specific keywords.</returns>
-        public static string[] GetKeywordsForCommand(CMakeKeywordId id)
+        public static string[] GetKeywordsForCommand(CMakeCommandId id)
         {
             string[] keywordArray = _keywordArrays[(int)id];
             if (keywordArray == null)

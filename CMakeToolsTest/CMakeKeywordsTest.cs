@@ -14,16 +14,16 @@ namespace CMakeTools
     public class CMakeKeywordsTest
     {
         /// <summary>
-        /// Test that a couple of the keyword identifiers match their corresponding
+        /// Test that a couple of the command identifiers match their corresponding
         /// keywords.
         /// </summary>
         [TestMethod]
         public void TestKeywordIds()
         {
-            Assert.AreEqual(CMakeKeywords.GetKeywordId("add_custom_command"),
-                CMakeKeywordId.AddCustomCommand);
-            Assert.AreEqual(CMakeKeywords.GetKeywordId("while"),
-                CMakeKeywordId.While);
+            Assert.AreEqual(CMakeKeywords.GetCommandId("add_custom_command"),
+                CMakeCommandId.AddCustomCommand);
+            Assert.AreEqual(CMakeKeywords.GetCommandId("while"),
+                CMakeCommandId.While);
         }
 
         /// <summary>
@@ -32,10 +32,10 @@ namespace CMakeTools
         [TestMethod]
         public void TestCommandsAlphabetical()
         {
-            for (int i = 1; i < (int)CMakeKeywordId.KeywordCount; i++)
+            for (int i = 1; i < (int)CMakeCommandId.CommandCount; i++)
             {
-                string keyword1 = CMakeKeywords.GetKeywordFromId((CMakeKeywordId)(i - 1));
-                string keyword2 = CMakeKeywords.GetKeywordFromId((CMakeKeywordId)i);
+                string keyword1 = CMakeKeywords.GetCommandFromId((CMakeCommandId)(i - 1));
+                string keyword2 = CMakeKeywords.GetCommandFromId((CMakeCommandId)i);
                 Assert.IsTrue(keyword1.CompareTo(keyword2) < 0);
             }
         }
@@ -46,10 +46,10 @@ namespace CMakeTools
         [TestMethod]
         public void TestKeywordsAlphabetical()
         {
-            for (int i = 0; i < (int)CMakeKeywordId.KeywordCount; i++)
+            for (int i = 0; i < (int)CMakeCommandId.CommandCount; i++)
             {
                 string[] keywordArray = CMakeKeywords.GetKeywordsForCommand(
-                    (CMakeKeywordId)i);
+                    (CMakeCommandId)i);
                 if (keywordArray != null)
                 {
                     for (int j = 1; j < keywordArray.Length; j++)
