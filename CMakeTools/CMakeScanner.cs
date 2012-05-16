@@ -15,6 +15,7 @@ namespace CMakeTools
         Comment,
         Keyword,
         Identifier,
+        FileName,
         Variable,
         VariableStart,
         VariableEnd,
@@ -124,12 +125,28 @@ namespace CMakeTools
                 }
                 else if (char.IsLetter(_source[_offset]) || _source[_offset] == '_')
                 {
-                    // Scan a keyword or identifier token.
+                    // Scan a keyword, identifier, or file name token.
+                    bool isFileName = false;
                     tokenInfo.StartIndex = _offset;
                     while (_offset < _source.Length - 1)
                     {
                         char ch = _source[_offset + 1];
-                        if (!char.IsLetterOrDigit(ch) && ch != '_')
+                        if (!expectVariable && ch == '\\')
+                        {
+                            // Skip over escape sequences.
+                            _offset++;
+                            isFileName = true;
+                        }
+                        else if (!expectVariable && (ch == '~' || ch == '`' ||
+                            ch == '!' || ch == '%' || ch == '^' || ch == '&' ||
+                            ch == '*' || ch == '-' || ch == '+' || ch == '=' ||
+                            ch == '[' || ch == ']' || ch == '{' || ch == '}' ||
+                            ch == ':' || ch == '\'' || ch == ',' || ch == '.' ||
+                            ch == '?' || ch == '/'))
+                        {
+                            isFileName = true;
+                        }
+                        else if (!char.IsLetterOrDigit(ch) && ch != '_')
                         {
                             break;
                         }
@@ -144,6 +161,13 @@ namespace CMakeTools
                         // the identifier as a variable.
                         tokenInfo.Color = TokenColor.Identifier;
                         tokenInfo.Token = (int)CMakeToken.Variable;
+                    }
+                    else if (isFileName)
+                    {
+                        // If we found characters that aren't valid in an identifier,
+                        // treat the token as a file name.
+                        tokenInfo.Color = TokenColor.Identifier;
+                        tokenInfo.Token = (int)CMakeToken.FileName;
                     }
                     else
                     {
