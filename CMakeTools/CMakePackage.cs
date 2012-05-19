@@ -17,7 +17,8 @@ namespace CMakeTools
         ServiceName = "CMake Language Service")]
     [ProvideLanguageService(typeof(CMakeLanguageService), "CMake", 102,
         RequestStockColors = true,
-        CodeSense = true)]
+        CodeSense = true,
+        ShowCompletion = true)]
     [ProvideLanguageExtension(typeof(CMakeLanguageService), ".cmake")]
     [ProvideLanguageExtension(typeof(CMakeLanguageService), ".txt")]
     [Guid("2986e95d-f97a-45a7-be3e-f07f1a931950")]

@@ -97,9 +97,14 @@ namespace CMakeTools
                     // Scan an opening parenthesis.
                     if (!IncParenDepth(ref state))
                     {
-                        if (CMakeKeywords.TriggersMemberSelection(GetLastCommand(state)))
+                        CMakeCommandId id = GetLastCommand(state);
+                        if (id != CMakeCommandId.Unspecified)
                         {
-                            tokenInfo.Trigger = TokenTriggers.MemberSelect;
+                            tokenInfo.Trigger |= TokenTriggers.ParameterStart;
+                        }
+                        if (CMakeKeywords.TriggersMemberSelection(id))
+                        {
+                            tokenInfo.Trigger |= TokenTriggers.MemberSelect;
                         }
                     }
                     tokenInfo.StartIndex = _offset;
@@ -115,6 +120,7 @@ namespace CMakeTools
                     if (DecParenDepth(ref state))
                     {
                         SetLastCommand(ref state, CMakeCommandId.Unspecified);
+                        tokenInfo.Trigger = TokenTriggers.ParameterEnd;
                     }
                     tokenInfo.StartIndex = _offset;
                     tokenInfo.EndIndex = _offset;
@@ -327,7 +333,7 @@ namespace CMakeTools
             return depth > 1;
         }
 
-        private bool InsideParens(int state)
+        public static bool InsideParens(int state)
         {
             // Check whether we're currently inside parentheses.
             int depth = state & ParenDepthMask;

@@ -14,10 +14,16 @@ namespace CMakeTools
     class CMakeAuthoringScope : AuthoringScope
     {
         private Declarations _declarations;
+        private Methods _methods;
 
         public void SetDeclarations(Declarations declarations)
         {
             _declarations = declarations;
+        }
+
+        public void SetMethods(Methods methods)
+        {
+            _methods = methods;
         }
 
         public override string GetDataTipText(int line, int col, out TextSpan span)
@@ -34,7 +40,7 @@ namespace CMakeTools
 
         public override Methods GetMethods(int line, int col, string name)
         {
-            return null;
+            return _methods;
         }
 
         public override string Goto(VSConstants.VSStd97CmdID cmd, IVsTextView textView,

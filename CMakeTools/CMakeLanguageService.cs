@@ -48,6 +48,18 @@ namespace CMakeTools
                         CMakeSubcommandDeclarations.GetSubcommandDeclarations(id));
                 }
             }
+            else if (req.Reason == ParseReason.MethodTip)
+            {
+                string commandText = ParseForParameterInfo(req);
+                if (commandText != null)
+                {
+                    CMakeCommandId id = CMakeKeywords.GetCommandId(commandText);
+                    if (id != CMakeCommandId.Unspecified)
+                    {
+                        scope.SetMethods(CMakeMethods.GetCommandParameters(id));
+                    }
+                }
+            }
             return scope;
         }
 
@@ -154,6 +166,84 @@ namespace CMakeTools
                 }
             }
             return CMakeCommandId.Unspecified;
+        }
+
+        private string ParseForParameterInfo(ParseRequest req)
+        {
+            // Parse to find the needed information for the command that triggered the
+            // current parameter information request.
+            Source source = GetSource(req.FileName);
+            int state = 0;
+            CMakeScanner scanner = new CMakeScanner();
+            TokenInfo tokenInfo = new TokenInfo();
+            string line;
+            for (int lineNum = 0; lineNum < req.Line; lineNum++)
+            {
+                line = source.GetLine(lineNum);
+                scanner.SetSource(line, 0);
+                while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            }
+            line = source.GetLine(req.Line);
+            TextSpan lastCommandSpan = new TextSpan();
+            string commandText = null;
+            bool lastWasCommand = false;
+            bool insideCommand = false;
+            int parenDepth = 0;
+            scanner.SetSource(line, 0);
+            while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state))
+            {
+                if (tokenInfo.Token == (int)CMakeToken.Keyword)
+                {
+                    if (!CMakeScanner.InsideParens(state))
+                    {
+                        lastCommandSpan.iStartLine = req.Line;
+                        lastCommandSpan.iStartIndex = tokenInfo.StartIndex;
+                        lastCommandSpan.iEndLine = req.Line;
+                        lastCommandSpan.iEndIndex = tokenInfo.EndIndex;
+                        commandText = line.Substring(tokenInfo.StartIndex,
+                            tokenInfo.EndIndex - tokenInfo.StartIndex + 1);
+                        lastWasCommand = true;
+                    }
+                }
+                else if (tokenInfo.Token == (int)CMakeToken.OpenParen)
+                {
+                    if (lastWasCommand)
+                    {
+                        req.Sink.StartName(lastCommandSpan, "set");
+                        TextSpan parenSpan = new TextSpan();
+                        parenSpan.iStartLine = req.Line;
+                        parenSpan.iStartIndex = tokenInfo.StartIndex;
+                        parenSpan.iEndLine = req.Line;
+                        parenSpan.iEndIndex = tokenInfo.EndIndex;
+                        req.Sink.StartParameters(parenSpan);
+                        lastWasCommand = false;
+                        insideCommand = true;
+                    }
+                    parenDepth++;
+                }
+                else if (tokenInfo.Token == (int)CMakeToken.CloseParen)
+                {
+                    if (parenDepth > 0)
+                    {
+                        parenDepth--;
+                        if (parenDepth == 0 && insideCommand)
+                        {
+                            TextSpan parenSpan = new TextSpan();
+                            parenSpan.iStartLine = req.Line;
+                            parenSpan.iStartIndex = tokenInfo.StartIndex;
+                            parenSpan.iEndLine = req.Line;
+                            parenSpan.iEndIndex = tokenInfo.EndIndex;
+                            req.Sink.EndParameters(parenSpan);
+                            insideCommand = false;
+                        }
+                    }
+                }
+                else
+                {
+                    lastWasCommand = false;
+                }
+            }
+            return commandText;
         }
     }
 }
