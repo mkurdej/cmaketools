@@ -9,7 +9,7 @@ namespace CMakeTools
     /// <summary>
     /// CMake token types.
     /// </summary>
-    enum CMakeToken
+    public enum CMakeToken
     {
         WhiteSpace,
         String,
@@ -27,7 +27,7 @@ namespace CMakeTools
     /// <summary>
     /// Scanner for CMake code.
     /// </summary>
-    class CMakeScanner : IScanner
+    public class CMakeScanner : IScanner
     {
         private string _source;
         private int _offset;
@@ -231,6 +231,7 @@ namespace CMakeTools
                     _offset++;
                     if (_offset < _source.Length && _source[_offset] == '{')
                     {
+                        SetVariableFlag(ref state, true);
                         tokenInfo.Trigger = TokenTriggers.MemberSelect;
                         _offset++;
                     }
@@ -245,6 +246,7 @@ namespace CMakeTools
                     tokenInfo.StartIndex = _offset;
                     tokenInfo.EndIndex = _offset;
                     tokenInfo.Color = TokenColor.Identifier;
+                    tokenInfo.Token = (int)CMakeToken.VariableEnd;
                     _offset++;
                     return true;
                 }
