@@ -342,5 +342,19 @@ namespace CMakeTools
             }
             return new CMakeMethods(id);
         }
+
+        /// <summary>
+        /// Get the number of parameters expected by a given CMake command.
+        /// </summary>
+        /// <param name="id">The identifier of a CMake command.</param>
+        /// <returns>The number of expected parameters.</returns>
+        public static int GetParameterCount(CMakeCommandId id)
+        {
+            if (!_parameters.ContainsKey(id))
+            {
+                return 0;
+            }
+            return _parameters[id].Length;
+        }
     }
 }

@@ -189,6 +189,8 @@ namespace CMakeTools
             bool lastWasCommand = false;
             bool insideCommand = false;
             int parenDepth = 0;
+            int paramCount = 0;
+            int paramIndex = 0;
             scanner.SetSource(line, 0);
             while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state))
             {
@@ -201,7 +203,7 @@ namespace CMakeTools
                         lastCommandSpan.iEndLine = req.Line;
                         lastCommandSpan.iEndIndex = tokenInfo.EndIndex;
                         commandText = line.Substring(tokenInfo.StartIndex,
-                            tokenInfo.EndIndex - tokenInfo.StartIndex + 1);
+                            tokenInfo.EndIndex - tokenInfo.StartIndex + 1).ToLower();
                         lastWasCommand = true;
                     }
                 }
@@ -209,7 +211,9 @@ namespace CMakeTools
                 {
                     if (lastWasCommand)
                     {
-                        req.Sink.StartName(lastCommandSpan, "set");
+                        CMakeCommandId id = CMakeKeywords.GetCommandId(commandText);
+                        paramCount = CMakeMethods.GetParameterCount(id);
+                        req.Sink.StartName(lastCommandSpan, commandText);
                         TextSpan parenSpan = new TextSpan();
                         parenSpan.iStartLine = req.Line;
                         parenSpan.iStartIndex = tokenInfo.StartIndex;
@@ -220,6 +224,25 @@ namespace CMakeTools
                         insideCommand = true;
                     }
                     parenDepth++;
+                }
+                else if (tokenInfo.Token == (int)CMakeToken.WhiteSpace)
+                {
+                    if (parenDepth == 1 && insideCommand)
+                    {
+                        if ((tokenInfo.Trigger & TokenTriggers.ParameterNext) != 0)
+                        {
+                            paramIndex++;
+                            if (paramIndex < paramCount)
+                            {
+                                TextSpan spaceSpan = new TextSpan();
+                                spaceSpan.iStartIndex = req.Line;
+                                spaceSpan.iStartIndex = tokenInfo.StartIndex;
+                                spaceSpan.iEndLine = req.Line;
+                                spaceSpan.iEndIndex = tokenInfo.EndIndex;
+                                req.Sink.NextParameter(spaceSpan);
+                            }
+                        }
+                    }
                 }
                 else if (tokenInfo.Token == (int)CMakeToken.CloseParen)
                 {

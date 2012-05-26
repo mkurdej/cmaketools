@@ -11,6 +11,7 @@ namespace CMakeTools
     /// </summary>
     enum CMakeToken
     {
+        WhiteSpace,
         String,
         Comment,
         Keyword,
@@ -61,9 +62,30 @@ namespace CMakeTools
             }
             bool expectVariable = GetVariableFlag(state);
             SetVariableFlag(ref state, false);
+            bool noSeparator = GetNoSeparatorFlag(state);
+            SetNoSeparatorFlag(ref state, false);
             while (_offset < _source.Length)
             {
-                if (_source[_offset] == '#')
+                if (char.IsWhiteSpace(_source[_offset]))
+                {
+                    // Scan a whitespace token.
+                    tokenInfo.StartIndex = _offset;
+                    while (_offset < _source.Length &&
+                        char.IsWhiteSpace(_source[_offset]))
+                    {
+                        _offset++;
+                    }
+                    tokenInfo.EndIndex = _offset - 1;
+                    tokenInfo.Color = TokenColor.Text;
+                    tokenInfo.Token = (int)CMakeToken.WhiteSpace;
+                    if (!noSeparator && DecSeparatorCount(ref state))
+                    {
+                        tokenInfo.Trigger = TokenTriggers.ParameterNext;
+                    }
+                    SetNoSeparatorFlag(ref state, true);
+                    return true;
+                }
+                else if (_source[_offset] == '#')
                 {
                     // Scan a comment token.
                     tokenInfo.StartIndex = _offset;
@@ -84,6 +106,7 @@ namespace CMakeTools
                     tokenInfo.Color = TokenColor.Comment;
                     tokenInfo.Token = (int)CMakeToken.Comment;
                     _offset = endPos + 1;
+                    SetNoSeparatorFlag(ref state, noSeparator);
                     return true;
                 }
                 else if (_source[_offset] == '"')
@@ -266,11 +289,14 @@ namespace CMakeTools
         }
 
         // Masks, flags, and shifts to manipulate state values.
-        private const uint StringFlag       = 0x80000000;
-        private const int VariableFlag      = 0x40000000;
-        private const int ParenDepthMask    = 0x0000FFFF;
-        private const int LastCommandMask   = 0x0FFF0000;
-        private const int LastCommandShift  = 16;
+        private const uint StringFlag           = 0x80000000;
+        private const int VariableFlag          = 0x40000000;
+        private const int NoSeparatorFlag       = 0x20000000;
+        private const int ParenDepthMask        = 0x000000FF;
+        private const int SeparatorCountMask    = 0x0000FF00;
+        private const int SeparatorCountShift   = 8;
+        private const int LastCommandMask       = 0x0FFF0000;
+        private const int LastCommandShift      = 16;
 
         private bool GetStringFlag(int state)
         {
@@ -312,6 +338,27 @@ namespace CMakeTools
             }
         }
 
+        private bool GetNoSeparatorFlag(int state)
+        {
+            // Get the flag indicating that the next token should not be treated as a
+            // parameter separator.
+            return (state & NoSeparatorFlag) != 0;
+        }
+
+        private void SetNoSeparatorFlag(ref int state, bool noSeparatorFlag)
+        {
+            // Set the flag indicating that the next token should not be treated as a
+            // parameter separator.
+            if (noSeparatorFlag)
+            {
+                state |= NoSeparatorFlag;
+            }
+            else
+            {
+                state &= ~NoSeparatorFlag;
+            }
+        }
+
         private bool IncParenDepth(ref int state)
         {
             // Increment the number of parentheses in which we're nested.
@@ -328,9 +375,24 @@ namespace CMakeTools
             if (depth > 0)
             {
                 state &= ~ParenDepthMask;
-                state |= depth - 1;
+                state |= (depth - 1) & ParenDepthMask;
             }
             return depth > 1;
+        }
+
+        private static bool DecSeparatorCount(ref int state)
+        {
+            // Decrement the number of separators that are expected between the arguments
+            // to the command.  Return false when it reaches zero to indicate that any
+            // additional whitespace should not be treated as separators.
+            int count = (state & SeparatorCountMask) >> SeparatorCountShift;
+            if (count == 0)
+            {
+                return false;
+            }
+            state &= ~SeparatorCountMask;
+            state |= ((count - 1) >> SeparatorCountShift) & SeparatorCountMask;
+            return true;
         }
 
         public static bool InsideParens(int state)
@@ -350,8 +412,14 @@ namespace CMakeTools
         private void SetLastCommand(ref int state, CMakeCommandId id)
         {
             // Store the identifier of the last command scanned in the state.
-            state &= ~LastCommandMask;
+            state &= ~(LastCommandMask | SeparatorCountMask);
             state |= ((int)id << LastCommandShift) & LastCommandMask;
+            int separatorCount = CMakeMethods.GetParameterCount(id);
+            if (separatorCount > 0)
+            {
+                separatorCount--;
+            }
+            state |= (separatorCount << SeparatorCountShift) & SeparatorCountMask;
         }
     }
 }
