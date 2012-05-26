@@ -192,6 +192,13 @@ namespace CMakeTools
             scanner.SetSource(line, 0);
             while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state))
             {
+                if (tokenInfo.StartIndex > req.TokenInfo.EndIndex)
+                {
+                    // Stop parsing once we pass the token that triggered the parsing
+                    // request.  Failure to do this will cause the arrow keys to not
+                    // update the highlighted parameter properly.
+                    break;
+                }
                 if (tokenInfo.Token == (int)CMakeToken.Keyword)
                 {
                     if (!CMakeScanner.InsideParens(state))
