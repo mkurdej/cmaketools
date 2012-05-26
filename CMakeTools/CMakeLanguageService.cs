@@ -189,8 +189,6 @@ namespace CMakeTools
             bool lastWasCommand = false;
             bool insideCommand = false;
             int parenDepth = 0;
-            int paramCount = 0;
-            int paramIndex = 0;
             scanner.SetSource(line, 0);
             while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state))
             {
@@ -212,7 +210,6 @@ namespace CMakeTools
                     if (lastWasCommand)
                     {
                         CMakeCommandId id = CMakeKeywords.GetCommandId(commandText);
-                        paramCount = CMakeMethods.GetParameterCount(id);
                         req.Sink.StartName(lastCommandSpan, commandText);
                         TextSpan parenSpan = new TextSpan();
                         parenSpan.iStartLine = req.Line;
@@ -231,16 +228,12 @@ namespace CMakeTools
                     {
                         if ((tokenInfo.Trigger & TokenTriggers.ParameterNext) != 0)
                         {
-                            paramIndex++;
-                            if (paramIndex < paramCount)
-                            {
-                                TextSpan spaceSpan = new TextSpan();
-                                spaceSpan.iStartIndex = req.Line;
-                                spaceSpan.iStartIndex = tokenInfo.StartIndex;
-                                spaceSpan.iEndLine = req.Line;
-                                spaceSpan.iEndIndex = tokenInfo.EndIndex;
-                                req.Sink.NextParameter(spaceSpan);
-                            }
+                            TextSpan spaceSpan = new TextSpan();
+                            spaceSpan.iStartIndex = req.Line;
+                            spaceSpan.iStartIndex = tokenInfo.StartIndex;
+                            spaceSpan.iEndLine = req.Line;
+                            spaceSpan.iEndIndex = tokenInfo.EndIndex;
+                            req.Sink.NextParameter(spaceSpan);
                         }
                     }
                 }

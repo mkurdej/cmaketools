@@ -64,6 +64,7 @@ namespace CMakeTools
             SetVariableFlag(ref state, false);
             bool noSeparator = GetNoSeparatorFlag(state);
             SetNoSeparatorFlag(ref state, false);
+            tokenInfo.Trigger = 0;
             while (_offset < _source.Length)
             {
                 if (char.IsWhiteSpace(_source[_offset]))
