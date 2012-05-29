@@ -125,6 +125,7 @@ namespace CMakeTools
                         if (id != CMakeCommandId.Unspecified)
                         {
                             tokenInfo.Trigger |= TokenTriggers.ParameterStart;
+                            SetNoSeparatorFlag(ref state, true);
                         }
                         if (CMakeKeywords.TriggersMemberSelection(id))
                         {
@@ -141,7 +142,7 @@ namespace CMakeTools
                 else if (_source[_offset] == ')')
                 {
                     // Scan a closing parenthesis.
-                    if (DecParenDepth(ref state))
+                    if (!DecParenDepth(ref state))
                     {
                         SetLastCommand(ref state, CMakeCommandId.Unspecified);
                         tokenInfo.Trigger = TokenTriggers.ParameterEnd;
@@ -259,6 +260,7 @@ namespace CMakeTools
         {
             tokenInfo.StartIndex = _offset;
             tokenInfo.Color = TokenColor.String;
+            tokenInfo.Token = (int)CMakeToken.String;
             if (startWithQuote)
             {
                 // If the string token began with a quotation mark (as opposed to

@@ -75,7 +75,7 @@ namespace CMakeTools
             Assert.AreEqual(tokenInfo.StartIndex, 18);
             Assert.AreEqual(tokenInfo.EndIndex, 18);
             Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.CloseParen);
-            Assert.AreEqual(tokenInfo.Trigger, (TokenTriggers)0);
+            Assert.AreEqual(tokenInfo.Trigger, TokenTriggers.ParameterEnd);
             Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
             Assert.AreEqual(tokenInfo.StartIndex, 19);
             Assert.AreEqual(tokenInfo.EndIndex, 19);
@@ -86,6 +86,45 @@ namespace CMakeTools
             Assert.AreEqual(tokenInfo.EndIndex, 28);
             Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.Comment);
             Assert.AreEqual(tokenInfo.Trigger, (TokenTriggers)0);
+            Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+
+            scanner.SetSource("set( foo \"bar\")", 0);
+            state = 0;
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(tokenInfo.StartIndex, 0);
+            Assert.AreEqual(tokenInfo.EndIndex, 2);
+            Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.Keyword);
+            Assert.AreEqual(tokenInfo.Trigger, (TokenTriggers)0);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(tokenInfo.StartIndex, 3);
+            Assert.AreEqual(tokenInfo.EndIndex, 3);
+            Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.OpenParen);
+            Assert.AreEqual(tokenInfo.Trigger, TokenTriggers.ParameterStart);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(tokenInfo.StartIndex, 4);
+            Assert.AreEqual(tokenInfo.EndIndex, 4);
+            Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.WhiteSpace);
+            Assert.AreEqual(tokenInfo.Trigger, (TokenTriggers)0);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(tokenInfo.StartIndex, 5);
+            Assert.AreEqual(tokenInfo.EndIndex, 7);
+            Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.Identifier);
+            Assert.AreEqual(tokenInfo.Trigger, (TokenTriggers)0);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(tokenInfo.StartIndex, 8);
+            Assert.AreEqual(tokenInfo.EndIndex, 8);
+            Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.WhiteSpace);
+            Assert.AreEqual(tokenInfo.Trigger, TokenTriggers.ParameterNext);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(tokenInfo.StartIndex, 9);
+            Assert.AreEqual(tokenInfo.EndIndex, 13);
+            Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.String);
+            Assert.AreEqual(tokenInfo.Trigger, (TokenTriggers)0);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(tokenInfo.StartIndex, 14);
+            Assert.AreEqual(tokenInfo.EndIndex, 14);
+            Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.CloseParen);
+            Assert.AreEqual(tokenInfo.Trigger, TokenTriggers.ParameterEnd);
             Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
         }
     }
