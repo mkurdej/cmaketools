@@ -127,5 +127,91 @@ namespace CMakeTools
             Assert.AreEqual(tokenInfo.Trigger, TokenTriggers.ParameterEnd);
             Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
         }
+
+        /// <summary>
+        /// Test the correctness of the scanner with respect to multiline commands.
+        /// </summary>
+        [TestMethod]
+        public void TestScannerMultiLine()
+        {
+            CMakeScanner scanner = new CMakeScanner();
+            TokenInfo tokenInfo = new TokenInfo();
+            int state;
+
+            scanner.SetSource("add_executable(foo", 0);
+            state = 0;
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(tokenInfo.StartIndex, 0);
+            Assert.AreEqual(tokenInfo.EndIndex, 13);
+            Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.Keyword);
+            Assert.AreEqual(tokenInfo.Trigger, (TokenTriggers)0);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(tokenInfo.StartIndex, 14);
+            Assert.AreEqual(tokenInfo.EndIndex, 14);
+            Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.OpenParen);
+            Assert.AreEqual(tokenInfo.Trigger, TokenTriggers.ParameterStart);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(tokenInfo.StartIndex, 15);
+            Assert.AreEqual(tokenInfo.EndIndex, 17);
+            Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.Identifier);
+            Assert.AreEqual(tokenInfo.Trigger, (TokenTriggers)0);
+            Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            scanner.SetSource("foo.cpp WIN32)", 0);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(tokenInfo.StartIndex, 0);
+            Assert.AreEqual(tokenInfo.EndIndex, 6);
+            Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.FileName);
+            Assert.AreEqual(tokenInfo.Trigger, (TokenTriggers)0);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(tokenInfo.StartIndex, 7);
+            Assert.AreEqual(tokenInfo.EndIndex, 7);
+            Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.WhiteSpace);
+            Assert.AreEqual(tokenInfo.Trigger, TokenTriggers.ParameterNext);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(tokenInfo.StartIndex, 8);
+            Assert.AreEqual(tokenInfo.EndIndex, 12);
+            Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.Keyword);
+            Assert.AreEqual(tokenInfo.Trigger, (TokenTriggers)0);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(tokenInfo.StartIndex, 13);
+            Assert.AreEqual(tokenInfo.EndIndex, 13);
+            Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.CloseParen);
+            Assert.AreEqual(tokenInfo.Trigger, TokenTriggers.ParameterEnd);
+            Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+        }
+
+        /// <summary>
+        /// Test correctness of the scanner with respect to multiline strings.
+        /// </summary>
+        [TestMethod]
+        public void TestScannerMultiLineString()
+        {
+            CMakeScanner scanner = new CMakeScanner();
+            TokenInfo tokenInfo = new TokenInfo();
+            int state;
+
+            scanner.SetSource("\"foo bar", 0);
+            state = 0;
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(tokenInfo.StartIndex, 0);
+            Assert.AreEqual(tokenInfo.EndIndex, 7);
+            Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.String);
+            Assert.AreEqual(tokenInfo.Trigger, (TokenTriggers)0);
+            Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            scanner.SetSource("\\\"foo bar\\\"", 0);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(tokenInfo.StartIndex, 0);
+            Assert.AreEqual(tokenInfo.EndIndex, 10);
+            Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.String);
+            Assert.AreEqual(tokenInfo.Trigger, (TokenTriggers)0);
+            Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            scanner.SetSource("end\"", 0);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(tokenInfo.StartIndex, 0);
+            Assert.AreEqual(tokenInfo.EndIndex, 3);
+            Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.String);
+            Assert.AreEqual(tokenInfo.Trigger, (TokenTriggers)0);
+            Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+        }
     }
 }
