@@ -97,46 +97,111 @@ namespace CMakeTools
             return _preferences;
         }
 
+        // Map from commands that define variables to the number of parameter before the
+        // variable defined.
+        private static Dictionary<CMakeCommandId, int> _paramsBeforeVariable =
+            new Dictionary<CMakeCommandId, int>
+        {
+            { CMakeCommandId.AuxSourceDirectory,    1 },
+            { CMakeCommandId.BuildCommand,          0 },
+            { CMakeCommandId.FindFile,              0 },
+            { CMakeCommandId.FindLibrary,           0 },
+            { CMakeCommandId.FindPath,              0 },
+            { CMakeCommandId.FindProgram,           0 },
+            { CMakeCommandId.ForEach,               0 },
+            { CMakeCommandId.GetCMakeProperty,      0 },
+            { CMakeCommandId.GetDirectoryProperty,  0 },
+            { CMakeCommandId.GetFileNameComponent,  0 },
+            { CMakeCommandId.GetProperty,           0 },
+            { CMakeCommandId.GetSourceFileProperty, 0 },
+            { CMakeCommandId.GetTargetProperty,     0 },
+            { CMakeCommandId.GetTestProperty,       2 },
+            { CMakeCommandId.Math,                  1 },
+            { CMakeCommandId.Option,                0 },
+            { CMakeCommandId.SeparateArguments,     0 },
+            { CMakeCommandId.Set,                   0 },
+            { CMakeCommandId.SiteName,              0 }
+        };
+
+        // Internal states of the variable parsing mechanism
+        private enum VariableParseState
+        {
+            NeedCommand,
+            NeedParen,
+            NeedVariable
+        }
+
         public static List<string> ParseForVariables(string code)
         {
-            // Parse to find all variables defined in the code.  This code is implemented
-            // as a state machine.  It begins in state 0 and advances to state 1 upon
-            // reading the SET command.  An opening parenthesis in state 1 will cause a
-            // transition to state 2.  An identifier read while in state 2 will be added
-            // as a variable unless it has already been added or is a standard variable.
-            // All other tokens will cause a transition back to state 0.
+            // Parse to find all variables defined in the code.
             CMakeScanner scanner = new CMakeScanner();
             scanner.SetSource(code, 0);
             List<string> vars = new List<string>();
             TokenInfo tokenInfo = new TokenInfo();
             int scannerState = 0;
-            int state = 0;
+            VariableParseState state = VariableParseState.NeedCommand;
+            bool advanceAtWhiteSpace = false;
+            int paramsBeforeVariable = 0;
             while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref scannerState))
             {
-                if (tokenInfo.Token == (int)CMakeToken.Keyword &&
-                    code.Substring(tokenInfo.StartIndex,
-                    tokenInfo.EndIndex - tokenInfo.StartIndex + 1).ToLower().Equals("set"))
+                string tokenText = code.Substring(tokenInfo.StartIndex,
+                    tokenInfo.EndIndex - tokenInfo.StartIndex + 1);
+                if (state == VariableParseState.NeedCommand &&
+                    tokenInfo.Token == (int)CMakeToken.Keyword)
                 {
-                    state = 1;
-                }
-                else if (state == 1 && tokenInfo.Token == (int)CMakeToken.OpenParen)
-                {
-                    state = 2;
-                }
-                else if (state == 2 && tokenInfo.Token == (int)CMakeToken.Identifier)
-                {
-                    state = 0;
-                    string varName = code.Substring(tokenInfo.StartIndex,
-                        tokenInfo.EndIndex - tokenInfo.StartIndex + 1);
-                    if (!CMakeVariableDeclarations.IsStandardVariable(varName) &&
-                        vars.FindIndex(x => x.ToUpper().Equals(varName.ToUpper())) < 0)
+                    CMakeCommandId id = CMakeKeywords.GetCommandId(tokenText);
+                    if (_paramsBeforeVariable.ContainsKey(id))
                     {
-                        vars.Add(varName);
+                        // We found the name of a command that defines a variable.  Now,
+                        // look for an opening parenthesis.
+                        state = VariableParseState.NeedParen;
+                        advanceAtWhiteSpace = false;
+                        paramsBeforeVariable = _paramsBeforeVariable[id];
+                    }
+                }
+                else if (state == VariableParseState.NeedParen &&
+                    tokenInfo.Token == (int)CMakeToken.OpenParen)
+                {
+                    // We found the opening parenthesis after the command name.  Now,
+                    // look for the variable name, possibly after some other parameters.
+                    state = VariableParseState.NeedVariable;
+                }
+                else if (state == VariableParseState.NeedVariable &&
+                    tokenInfo.Token == (int)CMakeToken.Identifier)
+                {
+                    if (paramsBeforeVariable == 0)
+                    {
+                        // We found the variable name.  Add it to the list if it's not
+                        // already there and isn't a standard variable.
+                        state = VariableParseState.NeedCommand;
+                        if (!CMakeVariableDeclarations.IsStandardVariable(tokenText) &&
+                            vars.FindIndex(x => x.ToUpper().Equals(tokenText.ToUpper())) < 0)
+                        {
+                            vars.Add(tokenText);
+                        }
+                    }
+                    else
+                    {
+                        // We found a parameter.
+                        advanceAtWhiteSpace = true;
+                    }
+                }
+                else if (tokenInfo.Token == (int)CMakeToken.WhiteSpace)
+                {
+                    if (advanceAtWhiteSpace)
+                    {
+                        // We found whitespace after a parameter.  Advance to the next
+                        // parameter.
+                        advanceAtWhiteSpace = false;
+                        if (paramsBeforeVariable > 0)
+                        {
+                            paramsBeforeVariable--;
+                        }
                     }
                 }
                 else
                 {
-                    state = 0;
+                    state = VariableParseState.NeedCommand;
                 }
             }
             return vars;

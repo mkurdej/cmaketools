@@ -30,6 +30,24 @@ namespace CMakeTools
             Assert.AreEqual(vars.Count, 2);
             Assert.AreEqual(vars[0], "FOO");
             Assert.AreEqual(vars[1], "BAR");
+            vars = CMakeLanguageService.ParseForVariables("SET( FOO 1 )");
+            Assert.AreEqual(vars.Count, 1);
+            Assert.AreEqual(vars[0], "FOO");
+            vars = CMakeLanguageService.ParseForVariables("SET(\nFOO\n1)");
+            Assert.AreEqual(vars.Count, 1);
+            Assert.AreEqual(vars[0], "FOO");
+            vars = CMakeLanguageService.ParseForVariables(
+                "option(FOO \"Description.\" ON)");
+            Assert.AreEqual(vars.Count, 1);
+            Assert.AreEqual(vars[0], "FOO");
+            vars = CMakeLanguageService.ParseForVariables(
+                "aux_source_directory(dir FOO)");
+            Assert.AreEqual(vars.Count, 1);
+            Assert.AreEqual(vars[0], "FOO");
+            vars = CMakeLanguageService.ParseForVariables(
+                "get_test_property(some_test SOME_PROPERTY FOO)");
+            Assert.AreEqual(vars.Count, 1);
+            Assert.AreEqual(vars[0], "FOO");
             vars = CMakeLanguageService.ParseForVariables(
                 "add_executable(foo file1.cpp file2.cpp)");
             Assert.AreEqual(vars.Count, 0);
