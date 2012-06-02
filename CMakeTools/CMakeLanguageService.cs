@@ -199,6 +199,24 @@ namespace CMakeTools
                         }
                     }
                 }
+                else if (state == VariableParseState.NeedVariable &&
+                    (tokenInfo.Token == (int)CMakeToken.VariableStart ||
+                    tokenInfo.Token == (int)CMakeToken.Variable ||
+                    tokenInfo.Token == (int)CMakeToken.VariableEnd))
+                {
+                    if (paramsBeforeVariable > 0)
+                    {
+                        // We found a variable as a parameter.  Advance to the next
+                        // parameter at the next whitespace token.
+                        advanceAtWhiteSpace = true;
+                    }
+                    else
+                    {
+                        // We the variable name, and it is itself the value of another
+                        // variable.  Don't add anything to the list.
+                        state = VariableParseState.NeedCommand;
+                    }
+                }
                 else
                 {
                     state = VariableParseState.NeedCommand;

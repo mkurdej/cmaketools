@@ -45,6 +45,10 @@ namespace CMakeTools
             Assert.AreEqual(vars.Count, 1);
             Assert.AreEqual(vars[0], "FOO");
             vars = CMakeLanguageService.ParseForVariables(
+                "aux_source_directory(${DIRNAME} FOO)");
+            Assert.AreEqual(vars.Count, 1);
+            Assert.AreEqual(vars[0], "FOO");
+            vars = CMakeLanguageService.ParseForVariables(
                 "get_test_property(some_test SOME_PROPERTY FOO)");
             Assert.AreEqual(vars.Count, 1);
             Assert.AreEqual(vars[0], "FOO");
@@ -54,6 +58,26 @@ namespace CMakeTools
             vars = CMakeLanguageService.ParseForVariables(
                 "set(${foo} ${bar})");
             Assert.AreEqual(vars.Count, 0);
+            vars = CMakeLanguageService.ParseForVariables(
+                "set(${foo} bar)");
+            Assert.AreEqual(vars.Count, 0);
+        }
+
+        /// <summary>
+        /// Test the correctness of parsing for names of defined variables when there
+        /// are syntax errors.
+        /// </summary>
+        [TestMethod]
+        public void TestParseForVariablesErrors()
+        {
+            List<string> vars = CMakeLanguageService.ParseForVariables(
+                "set foo(bar abc)");
+            Assert.AreEqual(vars.Count, 0);
+            vars = CMakeLanguageService.ParseForVariables("set ${foo}(bar abc)");
+            Assert.AreEqual(vars.Count, 0);
+            vars = CMakeLanguageService.ParseForVariables("foo set(bar abc)");
+            Assert.AreEqual(vars.Count, 1);
+            Assert.AreEqual(vars[0], "bar");
         }
     }
 }
