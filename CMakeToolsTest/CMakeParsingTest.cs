@@ -61,6 +61,12 @@ namespace CMakeTools
             vars = CMakeLanguageService.ParseForVariables(
                 "set(${foo} bar)");
             Assert.AreEqual(vars.Count, 0);
+            vars = CMakeLanguageService.ParseForVariables(
+                "set(foo_${bar} abc)");
+            Assert.AreEqual(vars.Count, 0);
+            vars = CMakeLanguageService.ParseForVariables(
+                "set(${foo}_bar abc)");
+            Assert.AreEqual(vars.Count, 0);
         }
 
         /// <summary>

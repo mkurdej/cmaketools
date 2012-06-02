@@ -142,6 +142,7 @@ namespace CMakeTools
             VariableParseState state = VariableParseState.NeedCommand;
             bool advanceAtWhiteSpace = false;
             int paramsBeforeVariable = 0;
+            string possibleVariable = null;
             while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref scannerState))
             {
                 string tokenText = code.Substring(tokenInfo.StartIndex,
@@ -167,18 +168,32 @@ namespace CMakeTools
                     state = VariableParseState.NeedVariable;
                 }
                 else if (state == VariableParseState.NeedVariable &&
+                    possibleVariable != null &&
+                    (tokenInfo.Token == (int)CMakeToken.WhiteSpace ||
+                    tokenInfo.Token == (int)CMakeToken.CloseParen))
+                {
+                    // We found the variable name.  Add it to the list if it's not
+                    // already there and isn't a standard variable.
+                    state = VariableParseState.NeedCommand;
+                    if (!CMakeVariableDeclarations.IsStandardVariable(possibleVariable))
+                    {
+                        if (vars.FindIndex(x => x.ToUpper().Equals(
+                            possibleVariable.ToUpper())) < 0)
+                        {
+                            vars.Add(possibleVariable);
+                        }
+                    }
+                    possibleVariable = null;
+                }
+                else if (state == VariableParseState.NeedVariable &&
                     tokenInfo.Token == (int)CMakeToken.Identifier)
                 {
                     if (paramsBeforeVariable == 0)
                     {
-                        // We found the variable name.  Add it to the list if it's not
-                        // already there and isn't a standard variable.
-                        state = VariableParseState.NeedCommand;
-                        if (!CMakeVariableDeclarations.IsStandardVariable(tokenText) &&
-                            vars.FindIndex(x => x.ToUpper().Equals(tokenText.ToUpper())) < 0)
-                        {
-                            vars.Add(tokenText);
-                        }
+                        // We found an identifier token where the variable name is
+                        // expected.  If it isn't followed by a variable start token, we
+                        // will add it to the list.
+                        possibleVariable = tokenText;
                     }
                     else
                     {
@@ -215,11 +230,13 @@ namespace CMakeTools
                         // We the variable name, and it is itself the value of another
                         // variable.  Don't add anything to the list.
                         state = VariableParseState.NeedCommand;
+                        possibleVariable = null;
                     }
                 }
                 else
                 {
                     state = VariableParseState.NeedCommand;
+                    possibleVariable = null;
                 }
             }
             return vars;
