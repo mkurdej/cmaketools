@@ -122,14 +122,14 @@ namespace CMakeTools
                     if (!IncParenDepth(ref state))
                     {
                         CMakeCommandId id = GetLastCommand(state);
-                        if (id != CMakeCommandId.Unspecified)
-                        {
-                            tokenInfo.Trigger |= TokenTriggers.ParameterStart;
-                            SetNoSeparatorFlag(ref state, true);
-                        }
                         if (CMakeKeywords.TriggersMemberSelection(id))
                         {
                             tokenInfo.Trigger |= TokenTriggers.MemberSelect;
+                        }
+                        else if (id != CMakeCommandId.Unspecified)
+                        {
+                            tokenInfo.Trigger |= TokenTriggers.ParameterStart;
+                            SetNoSeparatorFlag(ref state, true);
                         }
                     }
                     tokenInfo.StartIndex = _offset;
