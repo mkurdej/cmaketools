@@ -146,13 +146,48 @@ namespace CMakeTools
             "XCODE_VERSION"
         };
 
+        // Array of standard environment variables.  This list was taken from
+        // http://en.wikipedia.org/wiki/Environment_variable.
+        private static string[] _standardEnvVariables = new string[]
+        {
+            "ALLUSERSPROFILE",
+            "APPDATA",
+            "COMPUTERNAME",
+            "COMMONPROGRAMFILES",
+            "COMSPEC",
+            "HOMEDRIVE",
+            "HOMEPATH",
+            "LOCALAPPDATA",
+            "LOGONSERVER",
+            "PATH",
+            "PATHEXT",
+            "PROGRAMDATA",
+            "PROGRAMFILES",
+            "PROMPT",
+            "PSMODULEPATH",
+            "PUBLIC",
+            "SYSTEMDRIVE",
+            "SYSTEMROOT",
+            "TEMP",
+            "TMP",
+            "USERDOMAIN",
+            "USERDATA",
+            "USERNAME",
+            "USERPROFILE",
+            "WINDIR"
+        };
+
         // Array of variables to be displayed.
         private List<string> _variables;
 
-        public CMakeVariableDeclarations(List<string> userVariables)
+        public CMakeVariableDeclarations(List<string> userVariables, bool useEnv = false)
         {
-            _variables = new List<string>(_standardVariables);
-            _variables.AddRange(userVariables);
+            _variables = new List<string>(
+                useEnv ? _standardEnvVariables : _standardVariables);
+            if (userVariables != null)
+            {
+                _variables.AddRange(userVariables);
+            }
             _variables.Sort();
         }
 

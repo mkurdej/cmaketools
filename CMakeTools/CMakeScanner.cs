@@ -19,6 +19,7 @@ namespace CMakeTools
         FileName,
         Variable,
         VariableStart,
+        VariableStartEnv,
         VariableEnd,
         OpenParen,
         CloseParen
@@ -233,12 +234,20 @@ namespace CMakeTools
                     if (_offset < _source.Length && _source[_offset] == '{')
                     {
                         SetVariableFlag(ref state, true);
+                        tokenInfo.Token = (int)CMakeToken.VariableStart;
                         tokenInfo.Trigger = TokenTriggers.MemberSelect;
                         _offset++;
                     }
+                    else if(_offset + 3 < _source.Length &&
+                        _source.Substring(_offset, 4).Equals("ENV{"))
+                    {
+                        SetVariableFlag(ref state, true);
+                        tokenInfo.Token = (int)CMakeToken.VariableStartEnv;
+                        tokenInfo.Trigger = TokenTriggers.MemberSelect;
+                        _offset += 4;
+                    }
                     tokenInfo.EndIndex = _offset - 1;
                     tokenInfo.Color = TokenColor.Identifier;
-                    tokenInfo.Token = (int)CMakeToken.VariableStart;
                     return true;
                 }
                 else if (_source[_offset] == '}')

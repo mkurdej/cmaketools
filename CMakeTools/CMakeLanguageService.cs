@@ -41,6 +41,10 @@ namespace CMakeTools
                     List<string> vars = ParseForVariables(req.Text);
                     scope.SetDeclarations(new CMakeVariableDeclarations(vars));
                 }
+                else if (req.TokenInfo.Token == (int)CMakeToken.VariableStartEnv)
+                {
+                    scope.SetDeclarations(new CMakeVariableDeclarations(null, true));
+                }
                 else if (req.TokenInfo.Token == (int)CMakeToken.OpenParen)
                 {
                     CMakeCommandId id = ParseForTriggerCommandId(req);

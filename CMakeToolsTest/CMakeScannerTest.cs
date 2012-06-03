@@ -126,6 +126,25 @@ namespace CMakeTools
             Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.CloseParen);
             Assert.AreEqual(tokenInfo.Trigger, TokenTriggers.ParameterEnd);
             Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+
+            scanner.SetSource("$ENV{FOO}", 0);
+            state = 0;
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(tokenInfo.StartIndex, 0);
+            Assert.AreEqual(tokenInfo.EndIndex, 4);
+            Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.VariableStartEnv);
+            Assert.AreEqual(tokenInfo.Trigger, TokenTriggers.MemberSelect);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(tokenInfo.StartIndex, 5);
+            Assert.AreEqual(tokenInfo.EndIndex, 7);
+            Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.Variable);
+            Assert.AreEqual(tokenInfo.Trigger, (TokenTriggers)0);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(tokenInfo.StartIndex, 8);
+            Assert.AreEqual(tokenInfo.EndIndex, 8);
+            Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.VariableEnd);
+            Assert.AreEqual(tokenInfo.Trigger, (TokenTriggers)0);
+            Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
         }
 
         /// <summary>
