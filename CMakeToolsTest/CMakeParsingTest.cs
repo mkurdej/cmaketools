@@ -85,5 +85,26 @@ namespace CMakeTools
             Assert.AreEqual(vars.Count, 1);
             Assert.AreEqual(vars[0], "bar");
         }
+
+        /// <summary>
+        /// Test the correctness of parsing for names of defined environment variables.
+        /// </summary>
+        [TestMethod]
+        public void TestParseForEnvVariables()
+        {
+            List<string> vars = CMakeLanguageService.ParseForEnvVariables(
+                "set(ENV{foo} abc)\nset(ENV{bar} def)");
+            Assert.AreEqual(vars.Count, 2);
+            Assert.AreEqual(vars[0], "foo");
+            Assert.AreEqual(vars[1], "bar");
+            
+            // Ensure that ENV is case-sensitive.
+            vars = CMakeLanguageService.ParseForEnvVariables("set(env{foo} abc");
+            Assert.AreEqual(vars.Count, 0);
+            
+            // Ensure that SET(ENV{}) is distinguished from SET($ENV{}).
+            vars = CMakeLanguageService.ParseForEnvVariables("set($ENV{foo} bar");
+            Assert.AreEqual(vars.Count, 0);
+        }
     }
 }

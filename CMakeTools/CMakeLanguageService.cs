@@ -43,7 +43,8 @@ namespace CMakeTools
                 }
                 else if (req.TokenInfo.Token == (int)CMakeToken.VariableStartEnv)
                 {
-                    scope.SetDeclarations(new CMakeVariableDeclarations(null, true));
+                    List<string> vars = ParseForEnvVariables(req.Text);
+                    scope.SetDeclarations(new CMakeVariableDeclarations(vars, true));
                 }
                 else if (req.TokenInfo.Token == (int)CMakeToken.OpenParen)
                 {
@@ -132,6 +133,7 @@ namespace CMakeTools
         {
             NeedCommand,
             NeedParen,
+            NeedSetEnv,
             NeedVariable
         }
 
@@ -241,6 +243,70 @@ namespace CMakeTools
                 {
                     state = VariableParseState.NeedCommand;
                     possibleVariable = null;
+                }
+            }
+            return vars;
+        }
+
+        public static List<string> ParseForEnvVariables(string code)
+        {
+            // Parse to find all environment variables defined in the code.
+            CMakeScanner scanner = new CMakeScanner();
+            scanner.SetSource(code, 0);
+            List<string> vars = new List<string>();
+            TokenInfo tokenInfo = new TokenInfo();
+            int scannerState = 0;
+            VariableParseState state = VariableParseState.NeedCommand;
+            while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref scannerState))
+            {
+                string tokenText = code.Substring(tokenInfo.StartIndex,
+                    tokenInfo.EndIndex - tokenInfo.StartIndex + 1);
+                if (state == VariableParseState.NeedCommand &&
+                    tokenInfo.Token == (int)CMakeToken.Keyword)
+                {
+                    if(CMakeKeywords.GetCommandId(tokenText) == CMakeCommandId.Set)
+                    {
+                        // We found the name of a command that may define an environment
+                        // variable.  Now, look for an opening parenthesis.
+                        state = VariableParseState.NeedParen;
+                    }
+                }
+                else if (state == VariableParseState.NeedParen &&
+                    tokenInfo.Token == (int)CMakeToken.OpenParen)
+                {
+                    // We found the opening parenthesis after the command name.  Now,
+                    // look for ENV{.
+                    state = VariableParseState.NeedSetEnv;
+                }
+                else if (state == VariableParseState.NeedSetEnv &&
+                    tokenInfo.Token == (int)CMakeToken.VariableStartSetEnv)
+                {
+                    // We found ENV{ after the opening parenthesis.  Now, look for the
+                    // environment variable name.
+                    state = VariableParseState.NeedVariable;
+                }
+                else if (state == VariableParseState.NeedVariable &&
+                    tokenInfo.Token == (int)CMakeToken.Variable)
+                {
+                    // We found the variable name.  Add it to the list if it's not
+                    // already there and isn't a standard variable.
+                    state = VariableParseState.NeedCommand;
+                    if (!CMakeVariableDeclarations.IsStandardVariable(tokenText))
+                    {
+                        if (vars.FindIndex(x => x.ToUpper().Equals(
+                            tokenText.ToUpper())) < 0)
+                        {
+                            vars.Add(tokenText);
+                        }
+                    }
+                }
+                else if (tokenInfo.Token == (int)CMakeToken.WhiteSpace)
+                {
+                    // Ignore whitespace.
+                }
+                else
+                {
+                    state = VariableParseState.NeedCommand;
                 }
             }
             return vars;

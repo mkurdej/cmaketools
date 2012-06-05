@@ -20,6 +20,7 @@ namespace CMakeTools
         Variable,
         VariableStart,
         VariableStartEnv,
+        VariableStartSetEnv,
         VariableEnd,
         OpenParen,
         CloseParen
@@ -187,12 +188,26 @@ namespace CMakeTools
                     tokenInfo.EndIndex = _offset;
                     _offset++;
 
+                    CMakeCommandId id = GetLastCommand(state);
+                    string substr = _source.Substring(tokenInfo.StartIndex,
+                        tokenInfo.EndIndex - tokenInfo.StartIndex + 1);
                     if (expectVariable)
                     {
                         // If we're inside curly braces following a dollar sign, treat
                         // the identifier as a variable.
                         tokenInfo.Color = TokenColor.Identifier;
                         tokenInfo.Token = (int)CMakeToken.Variable;
+                    }
+                    else if ((id == CMakeCommandId.Set || id == CMakeCommandId.Unset) &&
+                        substr.StartsWith("ENV{"))
+                    {
+                        // Inside a SET or UNSET command, ENV{ indicates an environment
+                        // variable.  This token is case-sensitive.
+                        SetVariableFlag(ref state, true);
+                        tokenInfo.EndIndex = tokenInfo.StartIndex + 3;
+                        tokenInfo.Color = TokenColor.Identifier;
+                        tokenInfo.Token = (int)CMakeToken.VariableStartSetEnv;
+                        _offset = tokenInfo.EndIndex + 1;
                     }
                     else if (isFileName)
                     {
