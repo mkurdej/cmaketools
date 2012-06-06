@@ -105,6 +105,18 @@ namespace CMakeTools
             // Ensure that SET(ENV{}) is distinguished from SET($ENV{}).
             vars = CMakeLanguageService.ParseForEnvVariables("set($ENV{foo} bar");
             Assert.AreEqual(vars.Count, 0);
+
+            // Ensure that ENV{} elsewhere doesn't define a variable.
+            vars = CMakeLanguageService.ParseForEnvVariables("set(foo ENV{bar})");
+            Assert.AreEqual(vars.Count, 0);
+
+            // Test handling of environment variables defined in terms of other
+            // variables or environment variables.
+            vars = CMakeLanguageService.ParseForEnvVariables("set(ENV{foo_${bar}} abc");
+            Assert.AreEqual(vars.Count, 0);
+            vars = CMakeLanguageService.ParseForEnvVariables(
+                "set(ENV{foo_$ENV{bar}} abc");
+            Assert.AreEqual(vars.Count, 0);
         }
     }
 }

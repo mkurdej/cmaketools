@@ -257,6 +257,7 @@ namespace CMakeTools
             TokenInfo tokenInfo = new TokenInfo();
             int scannerState = 0;
             VariableParseState state = VariableParseState.NeedCommand;
+            string possibleVariable = null;
             while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref scannerState))
             {
                 string tokenText = code.Substring(tokenInfo.StartIndex,
@@ -286,26 +287,37 @@ namespace CMakeTools
                     state = VariableParseState.NeedVariable;
                 }
                 else if (state == VariableParseState.NeedVariable &&
-                    tokenInfo.Token == (int)CMakeToken.Variable)
+                    possibleVariable != null &&
+                    tokenInfo.Token == (int)CMakeToken.VariableEnd)
                 {
                     // We found the variable name.  Add it to the list if it's not
                     // already there and isn't a standard variable.
                     state = VariableParseState.NeedCommand;
-                    if (!CMakeVariableDeclarations.IsStandardVariable(tokenText))
+                    if (!CMakeVariableDeclarations.IsStandardVariable(possibleVariable))
                     {
                         if (vars.FindIndex(x => x.ToUpper().Equals(
-                            tokenText.ToUpper())) < 0)
+                            possibleVariable.ToUpper())) < 0)
                         {
-                            vars.Add(tokenText);
+                            vars.Add(possibleVariable);
                         }
                     }
+                    possibleVariable = null;
+                }
+                else if (state == VariableParseState.NeedVariable &&
+                    tokenInfo.Token == (int)CMakeToken.Variable)
+                {
+                    // We found an identifier token where the variable name is
+                    // expected.  If it's followed by a variable end token, we
+                    // will add it to the list.
+                    possibleVariable = tokenText;
                 }
                 else if (tokenInfo.Token == (int)CMakeToken.WhiteSpace)
                 {
-                    // Ignore whitespace.
+                    possibleVariable = null;
                 }
                 else
                 {
+                    possibleVariable = null;
                     state = VariableParseState.NeedCommand;
                 }
             }
