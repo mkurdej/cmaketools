@@ -1,6 +1,7 @@
 syntax: glob
 **.suo
 **.user
+**.Designer.cs
 bin
 obj
 TestResults

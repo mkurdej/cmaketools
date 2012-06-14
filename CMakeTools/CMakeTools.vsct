@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable">
+    <Extern href="vsshlids.h" />
+    <Commands package="guidCMakeTools">
+        <Buttons>
+            <Button guid="guidCMakeCmdSet" id="cmdidCMake" priority="0x0100" type="Button">
+                <Parent guid="guidSHLMainMenu" id="IDG_VS_TOOLS_EXT_TOOLS" />
+                <Icon guid="guidImages" id="bmpCMakeLogo" />
+                <Strings>
+                    <CommandName>CMake GUI</CommandName>
+                    <ButtonText>CMake GUI</ButtonText>
+                </Strings>
+            </Button>
+        </Buttons>
+        <Bitmaps>
+            <Bitmap guid="guidImages" href="Resources\CMakeLogo.bmp" usedList="bmpCMakeLogo" />
+        </Bitmaps>
+    </Commands>
+    <Symbols>
+        <GuidSymbol name="guidCMakeTools" value="{2986e95d-f97a-45a7-be3e-f07f1a931950}" />
+        <GuidSymbol name="guidCMakeCmdSet" value="{08dcf0dd-678f-4971-b890-05e25674e2fb}">
+            <IDSymbol name="cmdidCMake" value="0x0100" />
+        </GuidSymbol>
+        <GuidSymbol name="guidImages" value="{04fe46f4-4747-486e-81ae-bb9fee1c2ad3}">
+            <IDSymbol name="bmpCMakeLogo" value="1" />
+        </GuidSymbol>
+    </Symbols>
+</CommandTable>
