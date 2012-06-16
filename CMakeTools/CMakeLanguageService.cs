@@ -102,6 +102,11 @@ namespace CMakeTools
             return _preferences;
         }
 
+        public override Source CreateSource(IVsTextLines buffer)
+        {
+            return new CMakeSource(this, buffer, GetColorizer(buffer));
+        }
+
         // Map from commands that define variables to the number of parameter before the
         // variable defined.
         private static Dictionary<CMakeCommandId, int> _paramsBeforeVariable =

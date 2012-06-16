@@ -23,7 +23,8 @@ namespace CMakeTools
     [ProvideLanguageService(typeof(CMakeLanguageService), "CMake", 102,
         RequestStockColors = true,
         CodeSense = true,
-        ShowCompletion = true)]
+        ShowCompletion = true,
+        EnableCommenting = true)]
     [ProvideLanguageExtension(typeof(CMakeLanguageService), ".cmake")]
     [ProvideLanguageExtension(typeof(CMakeLanguageService), ".txt")]
     [ProvideMenuResource("Menus.ctmenu", 1)]
