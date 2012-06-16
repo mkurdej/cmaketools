@@ -338,5 +338,45 @@ namespace CMakeTools
             Assert.AreEqual(tokenInfo.Trigger, TokenTriggers.ParameterEnd);
             Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
         }
+
+        /// <summary>
+        /// Test that the recognition of command-specific keywords is case-sensitive.
+        /// </summary>
+        [TestMethod]
+        public void TestScannerCaseSensitive()
+        {
+            CMakeScanner scanner = new CMakeScanner();
+            TokenInfo tokenInfo = new TokenInfo();
+            int state;
+
+            scanner.SetSource("add_executable(foo win32", 0);
+            state = 0;
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(tokenInfo.StartIndex, 0);
+            Assert.AreEqual(tokenInfo.EndIndex, 13);
+            Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.Keyword);
+            Assert.AreEqual(tokenInfo.Trigger, (TokenTriggers)0);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(tokenInfo.StartIndex, 14);
+            Assert.AreEqual(tokenInfo.EndIndex, 14);
+            Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.OpenParen);
+            Assert.AreEqual(tokenInfo.Trigger, TokenTriggers.ParameterStart);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(tokenInfo.StartIndex, 15);
+            Assert.AreEqual(tokenInfo.EndIndex, 17);
+            Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.Identifier);
+            Assert.AreEqual(tokenInfo.Trigger, (TokenTriggers)0);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(tokenInfo.StartIndex, 18);
+            Assert.AreEqual(tokenInfo.EndIndex, 18);
+            Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.WhiteSpace);
+            Assert.AreEqual(tokenInfo.Trigger, TokenTriggers.ParameterNext);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(tokenInfo.StartIndex, 19);
+            Assert.AreEqual(tokenInfo.EndIndex, 23);
+            Assert.AreEqual(tokenInfo.Token, (int)CMakeToken.Identifier);
+            Assert.AreEqual(tokenInfo.Trigger, (TokenTriggers)0);
+            Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+        }
     }
 }
