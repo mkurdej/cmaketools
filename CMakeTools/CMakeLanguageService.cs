@@ -2,6 +2,7 @@
 // Copyright (C) 2012 by David Golub.
 // All rights reserved.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.VisualStudio.Package;
@@ -32,6 +33,11 @@ namespace CMakeTools
         public override AuthoringScope ParseSource(ParseRequest req)
         {
             CMakeAuthoringScope scope = new CMakeAuthoringScope();
+            if (req.Sink.HiddenRegions)
+            {
+                req.Sink.ProcessHiddenRegions = true;
+                ParseForFunctionBodies(req);
+            }
             if (req.Reason == ParseReason.MemberSelect)
             {
                 // Set an appropriate declarations object depending on the token that
@@ -105,6 +111,18 @@ namespace CMakeTools
         public override Source CreateSource(IVsTextLines buffer)
         {
             return new CMakeSource(this, buffer, GetColorizer(buffer));
+        }
+
+        public override void OnIdle(bool periodic)
+        {
+            // This code must be present in any language service that uses any of the
+            // features that require a ParseReason of Check.
+            Source source = GetSource(LastActiveTextView);
+            if (source != null && source.LastParseTime >= Int32.MaxValue >> 12)
+            {
+                source.LastParseTime = 0;
+            }
+            base.OnIdle(periodic);
         }
 
         // Map from commands that define variables to the number of parameter before the
@@ -454,6 +472,102 @@ namespace CMakeTools
                 }
             }
             return commandText;
+        }
+
+        // Internal states of the function parsing mechanism
+        private enum FunctionParseState
+        {
+            NotInFunction,
+            NeedFunctionArgs,
+            InsideFunctionArgs,
+            InsideFunction,
+            NeedEndFunctionArgs,
+            InsideEndFunctionArgs
+        }
+
+        public void ParseForFunctionBodies(ParseRequest req)
+        {
+            // Parse for the bodies of functions and add them as hidden regions.
+            Source source = GetSource(req.FileName);
+            int lineCount = source.GetLineCount();
+            List<TextSpan> results = new List<TextSpan>();
+            CMakeScanner scanner = new CMakeScanner();
+            TokenInfo tokenInfo = new TokenInfo();
+            FunctionParseState state = FunctionParseState.NotInFunction;
+            int startLine = -1;
+            int startPos = -1;
+            for (int i = 0; i < lineCount; i++)
+            {
+                int scannerState = 0;
+                string line = source.GetLine(i);
+                scanner.SetSource(line, 0);
+                while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo,
+                    ref scannerState))
+                {
+                    string tokenText = line.Substring(tokenInfo.StartIndex,
+                        tokenInfo.EndIndex - tokenInfo.StartIndex + 1);
+                    switch (state)
+                    {
+                    case FunctionParseState.NotInFunction:
+                        if (tokenInfo.Token == (int)CMakeToken.Keyword &&
+                            CMakeKeywords.GetCommandId(tokenText) == CMakeCommandId.Function)
+                        {
+                            state = FunctionParseState.NeedFunctionArgs;
+                        }
+                        break;
+                    case FunctionParseState.NeedFunctionArgs:
+                        if (tokenInfo.Token == (int)CMakeToken.OpenParen)
+                        {
+                            state = FunctionParseState.InsideFunctionArgs;
+                        }
+                        else if (tokenInfo.Token != (int)CMakeToken.WhiteSpace)
+                        {
+                            state = FunctionParseState.NotInFunction;
+                        }
+                        break;
+                    case FunctionParseState.InsideFunctionArgs:
+                        if (tokenInfo.Token == (int)CMakeToken.CloseParen &&
+                            !CMakeScanner.InsideParens(scannerState))
+                        {
+                            state = FunctionParseState.InsideFunction;
+                            startLine = i;
+                            startPos = tokenInfo.EndIndex + 1;
+                        }
+                        break;
+                    case FunctionParseState.InsideFunction:
+                        if (tokenInfo.Token == (int)CMakeToken.Keyword &&
+                            CMakeKeywords.GetCommandId(tokenText) == CMakeCommandId.EndFunction)
+                        {
+                            state = FunctionParseState.NeedEndFunctionArgs;
+                        }
+                        break;
+                    case FunctionParseState.NeedEndFunctionArgs:
+                        if (tokenInfo.Token == (int)CMakeToken.OpenParen)
+                        {
+                            state = FunctionParseState.InsideEndFunctionArgs;
+                        }
+                        else if (tokenInfo.Token != (int)CMakeToken.WhiteSpace)
+                        {
+                            state = FunctionParseState.NotInFunction;
+                        }
+                        break;
+                    case FunctionParseState.InsideEndFunctionArgs:
+                        if (tokenInfo.Token == (int)CMakeToken.CloseParen &&
+                            !CMakeScanner.InsideParens(scannerState))
+                        {
+                            state = FunctionParseState.NotInFunction;
+                            req.Sink.AddHiddenRegion(new TextSpan()
+                            {
+                                iStartLine = startLine,
+                                iStartIndex = startPos,
+                                iEndLine = i,
+                                iEndIndex = tokenInfo.EndIndex + 1
+                            });
+                        }
+                        break;
+                    }
+                }
+            }
         }
     }
 }
