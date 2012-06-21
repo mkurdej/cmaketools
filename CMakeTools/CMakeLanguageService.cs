@@ -479,10 +479,15 @@ namespace CMakeTools
         {
             NotInFunction,
             NeedFunctionArgs,
+            NeedMacroArgs,
             InsideFunctionArgs,
+            InsideMacroArgs,
             InsideFunction,
+            InsideMacro,
             NeedEndFunctionArgs,
-            InsideEndFunctionArgs
+            NeedEndMacroArgs,
+            InsideEndFunctionArgs,
+            InsideEndMacroArgs
         }
 
         public void ParseForFunctionBodies(ParseRequest req)
@@ -490,7 +495,6 @@ namespace CMakeTools
             // Parse for the bodies of functions and add them as hidden regions.
             Source source = GetSource(req.FileName);
             int lineCount = source.GetLineCount();
-            List<TextSpan> results = new List<TextSpan>();
             CMakeScanner scanner = new CMakeScanner();
             TokenInfo tokenInfo = new TokenInfo();
             FunctionParseState state = FunctionParseState.NotInFunction;
@@ -509,16 +513,26 @@ namespace CMakeTools
                     switch (state)
                     {
                     case FunctionParseState.NotInFunction:
-                        if (tokenInfo.Token == (int)CMakeToken.Keyword &&
-                            CMakeKeywords.GetCommandId(tokenText) == CMakeCommandId.Function)
+                        if (tokenInfo.Token == (int)CMakeToken.Keyword)
                         {
-                            state = FunctionParseState.NeedFunctionArgs;
+                            CMakeCommandId id = CMakeKeywords.GetCommandId(tokenText);
+                            if (id == CMakeCommandId.Function)
+                            {
+                                state = FunctionParseState.NeedFunctionArgs;
+                            }
+                            else if (id == CMakeCommandId.Macro)
+                            {
+                                state = FunctionParseState.NeedMacroArgs;
+                            }
                         }
                         break;
                     case FunctionParseState.NeedFunctionArgs:
+                    case FunctionParseState.NeedMacroArgs:
                         if (tokenInfo.Token == (int)CMakeToken.OpenParen)
                         {
-                            state = FunctionParseState.InsideFunctionArgs;
+                            state = (state == FunctionParseState.NeedMacroArgs) ?
+                                FunctionParseState.InsideMacroArgs :
+                                FunctionParseState.InsideFunctionArgs;
                         }
                         else if (tokenInfo.Token != (int)CMakeToken.WhiteSpace)
                         {
@@ -526,10 +540,13 @@ namespace CMakeTools
                         }
                         break;
                     case FunctionParseState.InsideFunctionArgs:
+                    case FunctionParseState.InsideMacroArgs:
                         if (tokenInfo.Token == (int)CMakeToken.CloseParen &&
                             !CMakeScanner.InsideParens(scannerState))
                         {
-                            state = FunctionParseState.InsideFunction;
+                            state = (state == FunctionParseState.InsideMacroArgs) ?
+                                FunctionParseState.InsideMacro :
+                                FunctionParseState.InsideFunction;
                             startLine = i;
                             startPos = tokenInfo.EndIndex + 1;
                         }
@@ -541,10 +558,20 @@ namespace CMakeTools
                             state = FunctionParseState.NeedEndFunctionArgs;
                         }
                         break;
+                    case FunctionParseState.InsideMacro:
+                        if (tokenInfo.Token == (int)CMakeToken.Keyword &&
+                            CMakeKeywords.GetCommandId(tokenText) == CMakeCommandId.EndMacro)
+                        {
+                            state = FunctionParseState.NeedEndMacroArgs;
+                        }
+                        break;
                     case FunctionParseState.NeedEndFunctionArgs:
+                    case FunctionParseState.NeedEndMacroArgs:
                         if (tokenInfo.Token == (int)CMakeToken.OpenParen)
                         {
-                            state = FunctionParseState.InsideEndFunctionArgs;
+                            state = (state == FunctionParseState.NeedEndMacroArgs) ?
+                                FunctionParseState.InsideEndMacroArgs :
+                                FunctionParseState.InsideEndFunctionArgs;
                         }
                         else if (tokenInfo.Token != (int)CMakeToken.WhiteSpace)
                         {
@@ -552,6 +579,7 @@ namespace CMakeTools
                         }
                         break;
                     case FunctionParseState.InsideEndFunctionArgs:
+                    case FunctionParseState.InsideEndMacroArgs:
                         if (tokenInfo.Token == (int)CMakeToken.CloseParen &&
                             !CMakeScanner.InsideParens(scannerState))
                         {
