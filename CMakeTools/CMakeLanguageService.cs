@@ -33,10 +33,15 @@ namespace CMakeTools
         public override AuthoringScope ParseSource(ParseRequest req)
         {
             CMakeAuthoringScope scope = new CMakeAuthoringScope();
+            CMakeSource source = (CMakeSource)GetSource(req.FileName);
             if (req.Sink.HiddenRegions)
             {
                 req.Sink.ProcessHiddenRegions = true;
-                ParseForFunctionBodies(req);
+                List<TextSpan> regions = ParseForFunctionBodies(source.GetLines());
+                foreach (TextSpan textSpan in regions)
+                {
+                    req.Sink.AddHiddenRegion(textSpan);
+                }
             }
             if (req.Reason == ParseReason.MemberSelect)
             {
@@ -490,20 +495,19 @@ namespace CMakeTools
             InsideEndMacroArgs
         }
 
-        public void ParseForFunctionBodies(ParseRequest req)
+        public List<TextSpan> ParseForFunctionBodies(IEnumerable<string> lines)
         {
             // Parse for the bodies of functions and add them as hidden regions.
-            Source source = GetSource(req.FileName);
-            int lineCount = source.GetLineCount();
+            List<TextSpan> results = new List<TextSpan>();
             CMakeScanner scanner = new CMakeScanner();
             TokenInfo tokenInfo = new TokenInfo();
             FunctionParseState state = FunctionParseState.NotInFunction;
             int startLine = -1;
             int startPos = -1;
-            for (int i = 0; i < lineCount; i++)
+            int i = 0;
+            foreach (string line in lines)
             {
                 int scannerState = 0;
-                string line = source.GetLine(i);
                 scanner.SetSource(line, 0);
                 while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo,
                     ref scannerState))
@@ -584,7 +588,7 @@ namespace CMakeTools
                             !CMakeScanner.InsideParens(scannerState))
                         {
                             state = FunctionParseState.NotInFunction;
-                            req.Sink.AddHiddenRegion(new TextSpan()
+                            results.Add(new TextSpan()
                             {
                                 iStartLine = startLine,
                                 iStartIndex = startPos,
@@ -595,7 +599,9 @@ namespace CMakeTools
                         break;
                     }
                 }
+                i++;
             }
+            return results;
         }
     }
 }

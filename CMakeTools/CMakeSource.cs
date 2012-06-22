@@ -2,6 +2,7 @@
 // Copyright (C) 2012 by David Golub.
 // All rights reserved.
 
+using System.Collections.Generic;
 using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
 
@@ -25,6 +26,19 @@ namespace CMakeTools
             info.LineStart = "#";
             info.UseLineComments = true;
             return info;
+        }
+
+        /// <summary>
+        /// Get a collection containing all the lines in the source file.
+        /// </summary>
+        /// <returns>An IEnumerable providing access to all the lines.</returns>
+        public IEnumerable<string> GetLines()
+        {
+            int lineCount = GetLineCount();
+            for (int i = 0; i < lineCount; i++)
+            {
+                yield return GetLine(i);
+            }
         }
     }
 }
