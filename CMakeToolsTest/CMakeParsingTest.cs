@@ -4,6 +4,7 @@
 
 using CMakeTools;
 using System.Collections.Generic;
+using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CMakeTools
@@ -117,6 +118,107 @@ namespace CMakeTools
             vars = CMakeLanguageService.ParseForEnvVariables(
                 "set(ENV{foo_$ENV{bar}} abc");
             Assert.AreEqual(vars.Count, 0);
+        }
+
+        /// <summary>
+        /// Test parsing for function bodies.
+        /// </summary>
+        [TestMethod]
+        public void TestParseForFunctionBodies()
+        {
+            // Test a simple function body.
+            List<string> lines = new List<string>();
+            lines.Add("function(foo)");
+            lines.Add("set(abc def)");
+            lines.Add("endfunction(foo)");
+            List<TextSpan> regions = CMakeLanguageService.ParseForFunctionBodies(lines);
+            Assert.AreEqual(regions.Count, 1);
+            Assert.AreEqual(regions[0].iStartLine, 0);
+            Assert.AreEqual(regions[0].iStartIndex, 13);
+            Assert.AreEqual(regions[0].iEndLine, 2);
+            Assert.AreEqual(regions[0].iEndIndex, 16);
+
+            // Test a simple macro body.
+            lines.Clear();
+            lines.Add("macro(foo)");
+            lines.Add("set(abc def)");
+            lines.Add("endmacro(foo)");
+            regions = CMakeLanguageService.ParseForFunctionBodies(lines);
+            Assert.AreEqual(regions.Count, 1);
+            Assert.AreEqual(regions[0].iStartLine, 0);
+            Assert.AreEqual(regions[0].iStartIndex, 10);
+            Assert.AreEqual(regions[0].iEndLine, 2);
+            Assert.AreEqual(regions[0].iEndIndex, 13);
+
+            // Test a function body with extra whitespace.
+            lines.Clear();
+            lines.Add("function   ( foo )");
+            lines.Add("set ( abc )");
+            lines.Add("endfunction ( foo )");
+            regions = CMakeLanguageService.ParseForFunctionBodies(lines);
+            Assert.AreEqual(regions.Count, 1);
+            Assert.AreEqual(regions[0].iStartLine, 0);
+            Assert.AreEqual(regions[0].iStartIndex, 18);
+            Assert.AreEqual(regions[0].iEndLine, 2);
+            Assert.AreEqual(regions[0].iEndIndex, 19);
+
+            // Test a function body with extra line breaks.
+            lines.Clear();
+            lines.Add("function(");
+            lines.Add("  foo");
+            lines.Add(")");
+            lines.Add("set(abc)");
+            lines.Add("endfunction(");
+            lines.Add("  foo");
+            lines.Add(")");
+            regions = CMakeLanguageService.ParseForFunctionBodies(lines);
+            Assert.AreEqual(regions.Count, 1);
+            Assert.AreEqual(regions[0].iStartLine, 2);
+            Assert.AreEqual(regions[0].iStartIndex, 1);
+            Assert.AreEqual(regions[0].iEndLine, 6);
+            Assert.AreEqual(regions[0].iEndIndex, 1);
+
+            // Test a malformed function body.
+            lines.Clear();
+            lines.Add("function foo(bar)");
+            lines.Add("set(abc def)");
+            lines.Add("endfunction(foo)");
+            regions = CMakeLanguageService.ParseForFunctionBodies(lines);
+            Assert.AreEqual(regions.Count, 0);
+
+            // Test an incomplete function body.
+            lines.Clear();
+            lines.Add("function(foo)");
+            lines.Add("set(abc)");
+            lines.Add("set(def)");
+            regions = CMakeLanguageService.ParseForFunctionBodies(lines);
+            Assert.AreEqual(regions.Count, 0);
+
+            // Test a function body with a double header.
+            lines.Clear();
+            lines.Add("function(foo)");
+            lines.Add("function(bar)");
+            lines.Add("set(abc)");
+            lines.Add("endfunction(bar)");
+            regions = CMakeLanguageService.ParseForFunctionBodies(lines);
+            Assert.AreEqual(regions.Count, 1);
+            Assert.AreEqual(regions[0].iStartLine, 1);
+            Assert.AreEqual(regions[0].iStartIndex, 13);
+            Assert.AreEqual(regions[0].iEndLine, 3);
+            Assert.AreEqual(regions[0].iEndIndex, 16);
+
+            // Test a function body with a double footer.
+            lines.Clear();
+            lines.Add("function(foo)");
+            lines.Add("set(abc)");
+            lines.Add("endfunction(foo)");
+            lines.Add("endfunction(bar)");
+            regions = CMakeLanguageService.ParseForFunctionBodies(lines);
+            Assert.AreEqual(regions.Count, 1);
+            Assert.AreEqual(regions[0].iStartLine, 0);
+            Assert.AreEqual(regions[0].iStartIndex, 13);
+            Assert.AreEqual(regions[0].iEndLine, 2);
+            Assert.AreEqual(regions[0].iEndIndex, 16);
         }
     }
 }

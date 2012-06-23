@@ -495,7 +495,7 @@ namespace CMakeTools
             InsideEndMacroArgs
         }
 
-        public List<TextSpan> ParseForFunctionBodies(IEnumerable<string> lines)
+        public static List<TextSpan> ParseForFunctionBodies(IEnumerable<string> lines)
         {
             // Parse for the bodies of functions and add them as hidden regions.
             List<TextSpan> results = new List<TextSpan>();
@@ -556,17 +556,30 @@ namespace CMakeTools
                         }
                         break;
                     case FunctionParseState.InsideFunction:
-                        if (tokenInfo.Token == (int)CMakeToken.Keyword &&
-                            CMakeKeywords.GetCommandId(tokenText) == CMakeCommandId.EndFunction)
-                        {
-                            state = FunctionParseState.NeedEndFunctionArgs;
-                        }
-                        break;
                     case FunctionParseState.InsideMacro:
-                        if (tokenInfo.Token == (int)CMakeToken.Keyword &&
-                            CMakeKeywords.GetCommandId(tokenText) == CMakeCommandId.EndMacro)
+                        if (tokenInfo.Token == (int)CMakeToken.Keyword)
                         {
-                            state = FunctionParseState.NeedEndMacroArgs;
+                            CMakeCommandId id = CMakeKeywords.GetCommandId(tokenText);
+                            if (id == CMakeCommandId.EndFunction &&
+                                state == FunctionParseState.InsideFunction)
+                            {
+                                state = FunctionParseState.NeedEndFunctionArgs;
+                            }
+                            else if (id == CMakeCommandId.EndMacro &&
+                                state == FunctionParseState.InsideMacro)
+                            {
+                                state = FunctionParseState.NeedEndMacroArgs;
+                            }
+                            else if (id == CMakeCommandId.Function)
+                            {
+                                // Ignore incomplete function or macro.
+                                state = FunctionParseState.NeedFunctionArgs;
+                            }
+                            else if (id == CMakeCommandId.Macro)
+                            {
+                                // Ignore incomplete function or macro.
+                                state = FunctionParseState.NeedMacroArgs;
+                            }
                         }
                         break;
                     case FunctionParseState.NeedEndFunctionArgs:
