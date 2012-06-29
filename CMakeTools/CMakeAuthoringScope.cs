@@ -19,22 +19,22 @@ namespace CMakeTools
         private IEnumerable<string> _lines;
         private string _fileName;
 
-        public void SetDeclarations(Declarations declarations)
+        internal void SetDeclarations(Declarations declarations)
         {
             _declarations = declarations;
         }
 
-        public void SetMethods(Methods methods)
+        internal void SetMethods(Methods methods)
         {
             _methods = methods;
         }
 
-        public void SetLines(IEnumerable<string> lines)
+        internal void SetLines(IEnumerable<string> lines)
         {
             _lines = lines;
         }
 
-        public void SetFileName(string fileName)
+        internal void SetFileName(string fileName)
         {
             _fileName = fileName;
         }
