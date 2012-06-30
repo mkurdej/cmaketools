@@ -20,10 +20,10 @@ namespace CMakeTools
         [TestMethod]
         public void TestKeywordIds()
         {
-            Assert.AreEqual(CMakeKeywords.GetCommandId("add_custom_command"),
-                CMakeCommandId.AddCustomCommand);
-            Assert.AreEqual(CMakeKeywords.GetCommandId("while"),
-                CMakeCommandId.While);
+            Assert.AreEqual(CMakeCommandId.AddCustomCommand,
+                CMakeKeywords.GetCommandId("add_custom_command"));
+            Assert.AreEqual(CMakeCommandId.While,
+                CMakeKeywords.GetCommandId("while"));
         }
 
         /// <summary>
