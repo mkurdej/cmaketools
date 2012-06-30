@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{27930839-F906-4DA2-8CD5-4F54CB5A6C02}"
 	ProjectSection(SolutionItems) = preProject
 		CMakeTools.vsmdi = CMakeTools.vsmdi
+		License.txt = License.txt
 		Local.testsettings = Local.testsettings
 		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
 	EndProjectSection

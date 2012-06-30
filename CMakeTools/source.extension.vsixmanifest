@@ -6,6 +6,7 @@
         <Version>1.0</Version>
         <Description xml:space="preserve">Syntax highlighting for CMake in Visual Studio.</Description>
         <Locale>1033</Locale>
+        <License>License.txt</License>
         <Icon>CMakeLogo.ico</Icon>
         <InstalledByMsi>false</InstalledByMsi>
         <SupportedProducts>
