@@ -29,51 +29,51 @@ namespace CMakeTools
         [TestMethod]
         public void TestParseForVariables()
         {
-            List<string> vars = CMakeLanguageService.ParseForVariables(
+            List<string> vars = CMakeParsing.ParseForVariables(
                 "set(foo 1)\nset(bar 0)\n");
             Assert.AreEqual(2, vars.Count);
             Assert.AreEqual("foo", vars[0]);
             Assert.AreEqual("bar", vars[1]);
-            vars = CMakeLanguageService.ParseForVariables(
+            vars = CMakeParsing.ParseForVariables(
                 "SET(FOO 1)\nSET(BAR 0)\n");
             Assert.AreEqual(2, vars.Count, 2);
             Assert.AreEqual("FOO", vars[0]);
             Assert.AreEqual("BAR", vars[1]);
-            vars = CMakeLanguageService.ParseForVariables("SET( FOO 1 )");
+            vars = CMakeParsing.ParseForVariables("SET( FOO 1 )");
             Assert.AreEqual(1, vars.Count);
             Assert.AreEqual("FOO", vars[0]);
-            vars = CMakeLanguageService.ParseForVariables("SET(\nFOO\n1)");
+            vars = CMakeParsing.ParseForVariables("SET(\nFOO\n1)");
             Assert.AreEqual(1, vars.Count);
             Assert.AreEqual("FOO", vars[0]);
-            vars = CMakeLanguageService.ParseForVariables(
+            vars = CMakeParsing.ParseForVariables(
                 "option(FOO \"Description.\" ON)");
             Assert.AreEqual(1, vars.Count);
             Assert.AreEqual("FOO", vars[0]);
-            vars = CMakeLanguageService.ParseForVariables(
+            vars = CMakeParsing.ParseForVariables(
                 "aux_source_directory(dir FOO)");
             Assert.AreEqual(1, vars.Count);
             Assert.AreEqual("FOO", vars[0]);
-            vars = CMakeLanguageService.ParseForVariables(
+            vars = CMakeParsing.ParseForVariables(
                 "aux_source_directory(${DIRNAME} FOO)");
             Assert.AreEqual(1, vars.Count);
             Assert.AreEqual("FOO", vars[0]);
-            vars = CMakeLanguageService.ParseForVariables(
+            vars = CMakeParsing.ParseForVariables(
                 "get_test_property(some_test SOME_PROPERTY FOO)");
             Assert.AreEqual(1, vars.Count);
             Assert.AreEqual("FOO", vars[0]);
-            vars = CMakeLanguageService.ParseForVariables(
+            vars = CMakeParsing.ParseForVariables(
                 "add_executable(foo file1.cpp file2.cpp)");
             Assert.AreEqual(0, vars.Count);
-            vars = CMakeLanguageService.ParseForVariables(
+            vars = CMakeParsing.ParseForVariables(
                 "set(${foo} ${bar})");
             Assert.AreEqual(0, vars.Count);
-            vars = CMakeLanguageService.ParseForVariables(
+            vars = CMakeParsing.ParseForVariables(
                 "set(${foo} bar)");
             Assert.AreEqual(0, vars.Count);
-            vars = CMakeLanguageService.ParseForVariables(
+            vars = CMakeParsing.ParseForVariables(
                 "set(foo_${bar} abc)");
             Assert.AreEqual(0, vars.Count);
-            vars = CMakeLanguageService.ParseForVariables(
+            vars = CMakeParsing.ParseForVariables(
                 "set(${foo}_bar abc)");
             Assert.AreEqual(0, vars.Count);
         }
@@ -85,12 +85,11 @@ namespace CMakeTools
         [TestMethod]
         public void TestParseForVariablesErrors()
         {
-            List<string> vars = CMakeLanguageService.ParseForVariables(
-                "set foo(bar abc)");
+            List<string> vars = CMakeParsing.ParseForVariables("set foo(bar abc)");
             Assert.AreEqual(0, vars.Count);
-            vars = CMakeLanguageService.ParseForVariables("set ${foo}(bar abc)");
+            vars = CMakeParsing.ParseForVariables("set ${foo}(bar abc)");
             Assert.AreEqual(0, vars.Count);
-            vars = CMakeLanguageService.ParseForVariables("foo set(bar abc)");
+            vars = CMakeParsing.ParseForVariables("foo set(bar abc)");
             Assert.AreEqual(1, vars.Count);
             Assert.AreEqual("bar", vars[0]);
         }
@@ -101,30 +100,29 @@ namespace CMakeTools
         [TestMethod]
         public void TestParseForEnvVariables()
         {
-            List<string> vars = CMakeLanguageService.ParseForEnvVariables(
+            List<string> vars = CMakeParsing.ParseForEnvVariables(
                 "set(ENV{foo} abc)\nset(ENV{bar} def)");
             Assert.AreEqual(2, vars.Count);
             Assert.AreEqual("foo", vars[0]);
             Assert.AreEqual("bar", vars[1]);
             
             // Ensure that ENV is case-sensitive.
-            vars = CMakeLanguageService.ParseForEnvVariables("set(env{foo} abc");
+            vars = CMakeParsing.ParseForEnvVariables("set(env{foo} abc");
             Assert.AreEqual(0, vars.Count);
             
             // Ensure that SET(ENV{}) is distinguished from SET($ENV{}).
-            vars = CMakeLanguageService.ParseForEnvVariables("set($ENV{foo} bar");
+            vars = CMakeParsing.ParseForEnvVariables("set($ENV{foo} bar");
             Assert.AreEqual(0, vars.Count);
 
             // Ensure that ENV{} elsewhere doesn't define a variable.
-            vars = CMakeLanguageService.ParseForEnvVariables("set(foo ENV{bar})");
+            vars = CMakeParsing.ParseForEnvVariables("set(foo ENV{bar})");
             Assert.AreEqual(0, vars.Count);
 
             // Test handling of environment variables defined in terms of other
             // variables or environment variables.
-            vars = CMakeLanguageService.ParseForEnvVariables("set(ENV{foo_${bar}} abc");
+            vars = CMakeParsing.ParseForEnvVariables("set(ENV{foo_${bar}} abc");
             Assert.AreEqual(0, vars.Count);
-            vars = CMakeLanguageService.ParseForEnvVariables(
-                "set(ENV{foo_$ENV{bar}} abc");
+            vars = CMakeParsing.ParseForEnvVariables("set(ENV{foo_$ENV{bar}} abc");
             Assert.AreEqual(0, vars.Count);
         }
 
@@ -139,7 +137,7 @@ namespace CMakeTools
             lines.Add("function(foo)");
             lines.Add("set(abc def)");
             lines.Add("endfunction(foo)");
-            List<TextSpan> regions = CMakeLanguageService.ParseForFunctionBodies(lines);
+            List<TextSpan> regions = CMakeParsing.ParseForFunctionBodies(lines);
             Assert.AreEqual(1, regions.Count);
             Assert.AreEqual(0, regions[0].iStartLine);
             Assert.AreEqual(13, regions[0].iStartIndex);
@@ -151,7 +149,7 @@ namespace CMakeTools
             lines.Add("macro(foo)");
             lines.Add("set(abc def)");
             lines.Add("endmacro(foo)");
-            regions = CMakeLanguageService.ParseForFunctionBodies(lines);
+            regions = CMakeParsing.ParseForFunctionBodies(lines);
             Assert.AreEqual(1, regions.Count);
             Assert.AreEqual(0, regions[0].iStartLine);
             Assert.AreEqual(10, regions[0].iStartIndex);
@@ -163,7 +161,7 @@ namespace CMakeTools
             lines.Add("function   ( foo )");
             lines.Add("set ( abc )");
             lines.Add("endfunction ( foo )");
-            regions = CMakeLanguageService.ParseForFunctionBodies(lines);
+            regions = CMakeParsing.ParseForFunctionBodies(lines);
             Assert.AreEqual(1, regions.Count);
             Assert.AreEqual(0, regions[0].iStartLine);
             Assert.AreEqual(18, regions[0].iStartIndex);
@@ -179,7 +177,7 @@ namespace CMakeTools
             lines.Add("endfunction(");
             lines.Add("  foo");
             lines.Add(")");
-            regions = CMakeLanguageService.ParseForFunctionBodies(lines);
+            regions = CMakeParsing.ParseForFunctionBodies(lines);
             Assert.AreEqual(1, regions.Count);
             Assert.AreEqual(2, regions[0].iStartLine);
             Assert.AreEqual(1, regions[0].iStartIndex);
@@ -191,7 +189,7 @@ namespace CMakeTools
             lines.Add("function foo(bar)");
             lines.Add("set(abc def)");
             lines.Add("endfunction(foo)");
-            regions = CMakeLanguageService.ParseForFunctionBodies(lines);
+            regions = CMakeParsing.ParseForFunctionBodies(lines);
             Assert.AreEqual(0, regions.Count);
 
             // Test an incomplete function body.
@@ -199,7 +197,7 @@ namespace CMakeTools
             lines.Add("function(foo)");
             lines.Add("set(abc)");
             lines.Add("set(def)");
-            regions = CMakeLanguageService.ParseForFunctionBodies(lines);
+            regions = CMakeParsing.ParseForFunctionBodies(lines);
             Assert.AreEqual(0, regions.Count);
 
             // Test a function body with a double header.
@@ -208,7 +206,7 @@ namespace CMakeTools
             lines.Add("function(bar)");
             lines.Add("set(abc)");
             lines.Add("endfunction(bar)");
-            regions = CMakeLanguageService.ParseForFunctionBodies(lines);
+            regions = CMakeParsing.ParseForFunctionBodies(lines);
             Assert.AreEqual(1, regions.Count);
             Assert.AreEqual(1, regions[0].iStartLine);
             Assert.AreEqual(13, regions[0].iStartIndex);
@@ -221,7 +219,7 @@ namespace CMakeTools
             lines.Add("set(abc)");
             lines.Add("endfunction(foo)");
             lines.Add("endfunction(bar)");
-            regions = CMakeLanguageService.ParseForFunctionBodies(lines);
+            regions = CMakeParsing.ParseForFunctionBodies(lines);
             Assert.AreEqual(1, regions.Count, 1);
             Assert.AreEqual(0, regions[0].iStartLine);
             Assert.AreEqual(13, regions[0].iStartIndex);
@@ -239,19 +237,17 @@ namespace CMakeTools
             List<string> lines = new List<string>();
             bool isVariable = false;
             lines.Add("set(foo ${bar}");
-            string identifier = CMakeLanguageService.ParseForIdentifier(lines, 0, 11,
+            string identifier = CMakeParsing.ParseForIdentifier(lines, 0, 11,
                 out isVariable);
             Assert.AreEqual("bar", identifier);
             Assert.IsTrue(isVariable);
-            identifier = CMakeLanguageService.ParseForIdentifier(lines, 0, 1,
-                out isVariable);
+            identifier = CMakeParsing.ParseForIdentifier(lines, 0, 1, out isVariable);
             Assert.IsNull(identifier);
 
             // Test recognition of function/macro names.
             lines.Clear();
             lines.Add("foo(bar)");
-            identifier = CMakeLanguageService.ParseForIdentifier(lines, 0, 1,
-                out isVariable);
+            identifier = CMakeParsing.ParseForIdentifier(lines, 0, 1, out isVariable);
             Assert.AreEqual("foo", identifier);
             Assert.IsFalse(isVariable);
         }
@@ -265,29 +261,29 @@ namespace CMakeTools
             List<string> lines = new List<string>();
             TextSpan span = new TextSpan();
             lines.Add("set(foo bar)");
-            Assert.IsTrue(CMakeLanguageService.ParseForVariableDefinition(lines, "foo",
+            Assert.IsTrue(CMakeParsing.ParseForVariableDefinition(lines, "foo",
                 out span));
             Assert.AreEqual(0, span.iStartLine);
             Assert.AreEqual(4, span.iStartIndex);
             Assert.AreEqual(0, span.iEndLine);
             Assert.AreEqual(6, span.iEndIndex);
-            Assert.IsFalse(CMakeLanguageService.ParseForVariableDefinition(lines, "bar",
+            Assert.IsFalse(CMakeParsing.ParseForVariableDefinition(lines, "bar",
                 out span));
-            Assert.IsFalse(CMakeLanguageService.ParseForVariableDefinition(lines, "set",
+            Assert.IsFalse(CMakeParsing.ParseForVariableDefinition(lines, "set",
                 out span));
 
             // Test a declaration with extra whitespace.
             lines.Clear();
             lines.Add("set ( foo  bar )");
-            Assert.IsTrue(CMakeLanguageService.ParseForVariableDefinition(lines, "foo",
+            Assert.IsTrue(CMakeParsing.ParseForVariableDefinition(lines, "foo",
                 out span));
             Assert.AreEqual(0, span.iStartLine);
             Assert.AreEqual(6, span.iStartIndex);
             Assert.AreEqual(0, span.iEndLine);
             Assert.AreEqual(8, span.iEndIndex);
-            Assert.IsFalse(CMakeLanguageService.ParseForVariableDefinition(lines, "bar",
+            Assert.IsFalse(CMakeParsing.ParseForVariableDefinition(lines, "bar",
                 out span));
-            Assert.IsFalse(CMakeLanguageService.ParseForVariableDefinition(lines, "set",
+            Assert.IsFalse(CMakeParsing.ParseForVariableDefinition(lines, "set",
                 out span));
 
             // Test a declaration spread across multiple lines.
@@ -296,21 +292,21 @@ namespace CMakeTools
             lines.Add("  foo");
             lines.Add("  bar");
             lines.Add(")");
-            Assert.IsTrue(CMakeLanguageService.ParseForVariableDefinition(lines, "foo",
+            Assert.IsTrue(CMakeParsing.ParseForVariableDefinition(lines, "foo",
                 out span));
             Assert.AreEqual(1, span.iStartLine);
             Assert.AreEqual(2, span.iStartIndex);
             Assert.AreEqual(1, span.iEndLine);
             Assert.AreEqual(4, span.iEndIndex);
-            Assert.IsFalse(CMakeLanguageService.ParseForVariableDefinition(lines, "bar",
+            Assert.IsFalse(CMakeParsing.ParseForVariableDefinition(lines, "bar",
                 out span));
-            Assert.IsFalse(CMakeLanguageService.ParseForVariableDefinition(lines, "set",
+            Assert.IsFalse(CMakeParsing.ParseForVariableDefinition(lines, "set",
                 out span));
 
             // Test an arbitrary command.
             lines.Clear();
             lines.Add("message(foo)");
-            Assert.IsFalse(CMakeLanguageService.ParseForVariableDefinition(lines, "foo",
+            Assert.IsFalse(CMakeParsing.ParseForVariableDefinition(lines, "foo",
                 out span));
         }
 
@@ -324,44 +320,44 @@ namespace CMakeTools
             List<string> lines = new List<string>();
             TextSpan span = new TextSpan();
             lines.Add("function(foo bar)");
-            Assert.IsTrue(CMakeLanguageService.ParseForFunctionDefinition(lines, "foo",
+            Assert.IsTrue(CMakeParsing.ParseForFunctionDefinition(lines, "foo",
                 out span));
             Assert.AreEqual(0, span.iStartLine);
             Assert.AreEqual(9, span.iStartIndex);
             Assert.AreEqual(0, span.iEndLine);
             Assert.AreEqual(11, span.iEndIndex);
-            Assert.IsFalse(CMakeLanguageService.ParseForFunctionDefinition(lines, "bar",
+            Assert.IsFalse(CMakeParsing.ParseForFunctionDefinition(lines, "bar",
                 out span));
-            Assert.IsFalse(CMakeLanguageService.ParseForFunctionDefinition(lines,
-                "function", out span));
+            Assert.IsFalse(CMakeParsing.ParseForFunctionDefinition(lines, "function",
+                out span));
 
             // Test a macro definition.
             lines.Clear();
             lines.Add("macro(foo bar)");
-            Assert.IsTrue(CMakeLanguageService.ParseForFunctionDefinition(lines, "foo",
+            Assert.IsTrue(CMakeParsing.ParseForFunctionDefinition(lines, "foo",
                 out span));
             Assert.AreEqual(0, span.iStartLine);
             Assert.AreEqual(6, span.iStartIndex);
             Assert.AreEqual(0, span.iEndLine);
             Assert.AreEqual(8, span.iEndIndex);
-            Assert.IsFalse(CMakeLanguageService.ParseForFunctionDefinition(lines, "bar",
+            Assert.IsFalse(CMakeParsing.ParseForFunctionDefinition(lines, "bar",
                 out span));
-            Assert.IsFalse(CMakeLanguageService.ParseForFunctionDefinition(lines,
+            Assert.IsFalse(CMakeParsing.ParseForFunctionDefinition(lines,
                 "macro", out span));
 
             // Test a definition with extra whitespace.
             lines.Clear();
             lines.Add("function ( foo bar )");
-            Assert.IsTrue(CMakeLanguageService.ParseForFunctionDefinition(lines, "foo",
+            Assert.IsTrue(CMakeParsing.ParseForFunctionDefinition(lines, "foo",
                 out span));
             Assert.AreEqual(0, span.iStartLine);
             Assert.AreEqual(11, span.iStartIndex);
             Assert.AreEqual(0, span.iEndLine);
             Assert.AreEqual(13, span.iEndIndex);
-            Assert.IsFalse(CMakeLanguageService.ParseForFunctionDefinition(lines, "bar",
+            Assert.IsFalse(CMakeParsing.ParseForFunctionDefinition(lines, "bar",
                 out span));
-            Assert.IsFalse(CMakeLanguageService.ParseForFunctionDefinition(lines,
-                "function", out span));
+            Assert.IsFalse(CMakeParsing.ParseForFunctionDefinition(lines, "function",
+                out span));
 
             // Test a definition spread across multiple lines.
             lines.Clear();
@@ -369,16 +365,16 @@ namespace CMakeTools
             lines.Add("  foo");
             lines.Add("  bar");
             lines.Add(")");
-            Assert.IsTrue(CMakeLanguageService.ParseForFunctionDefinition(lines, "foo",
+            Assert.IsTrue(CMakeParsing.ParseForFunctionDefinition(lines, "foo",
                 out span));
             Assert.AreEqual(1, span.iStartLine);
             Assert.AreEqual(2, span.iStartIndex);
             Assert.AreEqual(1, span.iEndLine);
             Assert.AreEqual(4, span.iEndIndex);
-            Assert.IsFalse(CMakeLanguageService.ParseForFunctionDefinition(lines, "bar",
+            Assert.IsFalse(CMakeParsing.ParseForFunctionDefinition(lines, "bar",
                 out span));
-            Assert.IsFalse(CMakeLanguageService.ParseForFunctionDefinition(lines,
-                "function", out span));
+            Assert.IsFalse(CMakeParsing.ParseForFunctionDefinition(lines, "function",
+                out span));
         }
     }
 }

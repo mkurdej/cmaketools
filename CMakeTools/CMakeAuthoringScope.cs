@@ -74,14 +74,14 @@ namespace CMakeTools
                 // find the variable or function definition for that identifier and jump
                 // to it.
                 bool isVariable = false;
-                string identifier = CMakeLanguageService.ParseForIdentifier(_lines, line,
-                    col, out isVariable);
+                string identifier = CMakeParsing.ParseForIdentifier(_lines, line, col,
+                    out isVariable);
                 if (identifier != null)
                 {
                     if (isVariable)
                     {
-                        if (CMakeLanguageService.ParseForVariableDefinition(_lines,
-                            identifier, out span))
+                        if (CMakeParsing.ParseForVariableDefinition(_lines, identifier,
+                            out span))
                         {
                             span.iEndIndex++;
                             return _fileName;
@@ -89,8 +89,8 @@ namespace CMakeTools
                     }
                     else
                     {
-                        if (CMakeLanguageService.ParseForFunctionDefinition(_lines,
-                            identifier, out span))
+                        if (CMakeParsing.ParseForFunctionDefinition(_lines, identifier,
+                            out span))
                         {
                             span.iEndIndex++;
                             return _fileName;
