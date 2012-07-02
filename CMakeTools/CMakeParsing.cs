@@ -423,29 +423,29 @@ namespace CMakeTools
             return false;
         }
 
-        public static CMakeCommandId ParseForTriggerCommandId(ParseRequest req,
-            LanguageService service)
+        public static CMakeCommandId ParseForTriggerCommandId(IEnumerable<string> lines,
+            int lineNum, int startIndex)
         {
             // Parse to find the identifier of the command that triggered the current
             // member selection parse request.
-            Source source = service.GetSource(req.FileName);
             int state = 0;
             CMakeScanner scanner = new CMakeScanner();
             TokenInfo tokenInfo = new TokenInfo();
-            for (int lineNum = 0; lineNum <= req.Line; lineNum++)
+            int i = 0;
+            foreach (string line in lines)
             {
-                string line = source.GetLine(lineNum);
                 scanner.SetSource(line, 0);
                 while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state))
                 {
-                    if (lineNum == req.Line)
+                    if (i == lineNum)
                     {
-                        if (tokenInfo.StartIndex == req.TokenInfo.StartIndex)
+                        if (tokenInfo.StartIndex == startIndex)
                         {
                             return CMakeScanner.GetLastCommand(state);
                         }
                     }
                 }
+                i++;
             }
             return CMakeCommandId.Unspecified;
         }

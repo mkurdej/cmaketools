@@ -68,7 +68,8 @@ namespace CMakeTools
                 }
                 else if (req.TokenInfo.Token == (int)CMakeToken.OpenParen)
                 {
-                    CMakeCommandId id = CMakeParsing.ParseForTriggerCommandId(req, this);
+                    CMakeCommandId id = CMakeParsing.ParseForTriggerCommandId(
+                        source.GetLines(), req.Line, req.TokenInfo.StartIndex);
                     scope.SetDeclarations(
                         CMakeSubcommandDeclarations.GetSubcommandDeclarations(id));
                 }
