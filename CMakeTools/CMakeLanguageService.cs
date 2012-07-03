@@ -76,10 +76,25 @@ namespace CMakeTools
             }
             else if (req.Reason == ParseReason.MethodTip)
             {
-                string commandText = CMakeParsing.ParseForParameterInfo(req, this);
-                if (commandText != null)
+                CMakeParsing.ParameterInfoResult result =
+                    CMakeParsing.ParseForParameterInfo(source.GetLines(), req.Line,
+                    req.TokenInfo.EndIndex);
+                if (result.CommandName != null && result.CommandSpan.HasValue)
                 {
-                    CMakeCommandId id = CMakeKeywords.GetCommandId(commandText);
+                    req.Sink.StartName(result.CommandSpan.Value, result.CommandName);
+                    if (result.BeginSpan.HasValue)
+                    {
+                        req.Sink.StartParameters(result.BeginSpan.Value);
+                    }
+                    foreach (TextSpan span in result.SeparatorSpans)
+                    {
+                            req.Sink.NextParameter(span);
+                    }
+                    if (result.EndSpan.HasValue)
+                    {
+                        req.Sink.EndParameters(result.EndSpan.Value);
+                    }
+                    CMakeCommandId id = CMakeKeywords.GetCommandId(result.CommandName);
                     if (id != CMakeCommandId.Unspecified)
                     {
                         scope.SetMethods(CMakeMethods.GetCommandParameters(id));

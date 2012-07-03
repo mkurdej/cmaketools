@@ -450,32 +450,50 @@ namespace CMakeTools
             return CMakeCommandId.Unspecified;
         }
 
-        public static string ParseForParameterInfo(ParseRequest req,
-            LanguageService service)
+        public struct ParameterInfoResult
+        {
+            public string CommandName;
+            public TextSpan? CommandSpan;
+            public TextSpan? BeginSpan;
+            public List<TextSpan> SeparatorSpans;
+            public TextSpan? EndSpan;
+        }
+
+        public static ParameterInfoResult ParseForParameterInfo(
+            IEnumerable<string> lines, int lineNum, int endIndex)
         {
             // Parse to find the needed information for the command that triggered the
             // current parameter information request.
-            Source source = service.GetSource(req.FileName);
+            ParameterInfoResult result = new ParameterInfoResult();
+            result.SeparatorSpans = new List<TextSpan>();
             int state = 0;
             CMakeScanner scanner = new CMakeScanner();
             TokenInfo tokenInfo = new TokenInfo();
-            string line;
-            for (int lineNum = 0; lineNum < req.Line; lineNum++)
+            int i = 0;
+            string lineFound = null;
+            foreach (string line in lines)
             {
-                line = source.GetLine(lineNum);
                 scanner.SetSource(line, 0);
-                while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state)) ;
+                if (i == lineNum)
+                {
+                    lineFound = line;
+                    break;
+                }
+                while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+                i++;
             }
-            line = source.GetLine(req.Line);
+            if (i != lineNum)
+            {
+                return result;
+            }
             TextSpan lastCommandSpan = new TextSpan();
             string commandText = null;
             bool lastWasCommand = false;
             bool insideCommand = false;
             int parenDepth = 0;
-            scanner.SetSource(line, 0);
             while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state))
             {
-                if (tokenInfo.StartIndex > req.TokenInfo.EndIndex)
+                if (tokenInfo.StartIndex > endIndex)
                 {
                     // Stop parsing once we pass the token that triggered the parsing
                     // request.  Failure to do this will cause the arrow keys to not
@@ -486,11 +504,11 @@ namespace CMakeTools
                 {
                     if (!CMakeScanner.InsideParens(state))
                     {
-                        lastCommandSpan.iStartLine = req.Line;
+                        lastCommandSpan.iStartLine = lineNum;
                         lastCommandSpan.iStartIndex = tokenInfo.StartIndex;
-                        lastCommandSpan.iEndLine = req.Line;
+                        lastCommandSpan.iEndLine = lineNum;
                         lastCommandSpan.iEndIndex = tokenInfo.EndIndex;
-                        commandText = line.Substring(tokenInfo.StartIndex,
+                        commandText = lineFound.Substring(tokenInfo.StartIndex,
                             tokenInfo.EndIndex - tokenInfo.StartIndex + 1).ToLower();
                         lastWasCommand = true;
                     }
@@ -500,13 +518,15 @@ namespace CMakeTools
                     if (lastWasCommand)
                     {
                         CMakeCommandId id = CMakeKeywords.GetCommandId(commandText);
-                        req.Sink.StartName(lastCommandSpan, commandText);
-                        TextSpan parenSpan = new TextSpan();
-                        parenSpan.iStartLine = req.Line;
-                        parenSpan.iStartIndex = tokenInfo.StartIndex;
-                        parenSpan.iEndLine = req.Line;
-                        parenSpan.iEndIndex = tokenInfo.EndIndex;
-                        req.Sink.StartParameters(parenSpan);
+                        result.CommandName = commandText;
+                        result.CommandSpan = lastCommandSpan;
+                        result.BeginSpan = new TextSpan()
+                        {
+                            iStartLine = lineNum,
+                            iStartIndex = tokenInfo.StartIndex,
+                            iEndLine = lineNum,
+                            iEndIndex = tokenInfo.EndIndex
+                        };
                         lastWasCommand = false;
                         insideCommand = true;
                     }
@@ -518,12 +538,14 @@ namespace CMakeTools
                     {
                         if ((tokenInfo.Trigger & TokenTriggers.ParameterNext) != 0)
                         {
-                            TextSpan spaceSpan = new TextSpan();
-                            spaceSpan.iStartIndex = req.Line;
-                            spaceSpan.iStartIndex = tokenInfo.StartIndex;
-                            spaceSpan.iEndLine = req.Line;
-                            spaceSpan.iEndIndex = tokenInfo.EndIndex;
-                            req.Sink.NextParameter(spaceSpan);
+                            TextSpan spaceSpan = new TextSpan()
+                            {
+                                iStartLine = lineNum,
+                                iStartIndex = tokenInfo.StartIndex,
+                                iEndLine = lineNum,
+                                iEndIndex = tokenInfo.EndIndex
+                            };
+                            result.SeparatorSpans.Add(spaceSpan);
                         }
                     }
                 }
@@ -534,12 +556,13 @@ namespace CMakeTools
                         parenDepth--;
                         if (parenDepth == 0 && insideCommand)
                         {
-                            TextSpan parenSpan = new TextSpan();
-                            parenSpan.iStartLine = req.Line;
-                            parenSpan.iStartIndex = tokenInfo.StartIndex;
-                            parenSpan.iEndLine = req.Line;
-                            parenSpan.iEndIndex = tokenInfo.EndIndex;
-                            req.Sink.EndParameters(parenSpan);
+                            result.EndSpan = new TextSpan()
+                            {
+                                iStartLine = lineNum,
+                                iStartIndex = tokenInfo.StartIndex,
+                                iEndLine = lineNum,
+                                iEndIndex = tokenInfo.EndIndex
+                            };
                             insideCommand = false;
                         }
                     }
@@ -549,7 +572,7 @@ namespace CMakeTools
                     lastWasCommand = false;
                 }
             }
-            return commandText;
+            return result;
         }
 
         // Internal states of the function parsing mechanism
