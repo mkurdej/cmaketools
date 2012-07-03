@@ -428,7 +428,7 @@ namespace CMakeTools
                 return false;
             }
             state &= ~SeparatorCountMask;
-            state |= ((count - 1) >> SeparatorCountShift) & SeparatorCountMask;
+            state |= ((count - 1) << SeparatorCountShift) & SeparatorCountMask;
             return true;
         }
 
