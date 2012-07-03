@@ -74,8 +74,7 @@ namespace CMakeTools
             string possibleVariable = null;
             while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref scannerState))
             {
-                string tokenText = code.Substring(tokenInfo.StartIndex,
-                    tokenInfo.EndIndex - tokenInfo.StartIndex + 1);
+                string tokenText = code.ExtractToken(tokenInfo);
                 if (state == VariableParseState.NeedCommand &&
                     tokenInfo.Token == (int)CMakeToken.Keyword)
                 {
@@ -189,8 +188,7 @@ namespace CMakeTools
             string possibleVariable = null;
             while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref scannerState))
             {
-                string tokenText = code.Substring(tokenInfo.StartIndex,
-                    tokenInfo.EndIndex - tokenInfo.StartIndex + 1);
+                string tokenText = code.ExtractToken(tokenInfo);
                 if (state == VariableParseState.NeedCommand &&
                     tokenInfo.Token == (int)CMakeToken.Keyword)
                 {
@@ -282,8 +280,7 @@ namespace CMakeTools
                 scanner.SetSource(line, 0);
                 while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref scannerState))
                 {
-                    string tokenText = line.Substring(tokenInfo.StartIndex,
-                        tokenInfo.EndIndex - tokenInfo.StartIndex + 1);
+                    string tokenText = line.ExtractToken(tokenInfo);
                     if (state == VariableParseState.NeedCommand &&
                         tokenInfo.Token == (int)CMakeToken.Keyword)
                     {
@@ -411,8 +408,7 @@ namespace CMakeTools
                 scanner.SetSource(line, 0);
                 while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref scannerState))
                 {
-                    string tokenText = line.Substring(tokenInfo.StartIndex,
-                        tokenInfo.EndIndex - tokenInfo.StartIndex + 1);
+                    string tokenText = line.ExtractToken(tokenInfo);
                     if (state == VariableParseState.NeedCommand &&
                         tokenInfo.Token == (int)CMakeToken.Keyword)
                     {
@@ -587,8 +583,7 @@ namespace CMakeTools
                         lastCommandSpan.iStartIndex = tokenInfo.StartIndex;
                         lastCommandSpan.iEndLine = lineNum;
                         lastCommandSpan.iEndIndex = tokenInfo.EndIndex;
-                        commandText = lineFound.Substring(tokenInfo.StartIndex,
-                            tokenInfo.EndIndex - tokenInfo.StartIndex + 1).ToLower();
+                        commandText = lineFound.ExtractToken(tokenInfo).ToLower();
                         lastWasCommand = true;
                     }
                 }
@@ -695,8 +690,7 @@ namespace CMakeTools
                 while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo,
                     ref scannerState))
                 {
-                    string tokenText = line.Substring(tokenInfo.StartIndex,
-                        tokenInfo.EndIndex - tokenInfo.StartIndex + 1);
+                    string tokenText = line.ExtractToken(tokenInfo);
                     switch (state)
                     {
                     case FunctionParseState.NotInFunction:
@@ -831,8 +825,7 @@ namespace CMakeTools
                         tokenInfo.EndIndex >= col)
                     {
                         // We found the token.
-                        string tokenText = line.Substring(tokenInfo.StartIndex,
-                            tokenInfo.EndIndex - tokenInfo.StartIndex + 1);
+                        string tokenText = line.ExtractToken(tokenInfo);
                         if (tokenInfo.Token == (int)CMakeToken.Variable)
                         {
                             isVariable = true;

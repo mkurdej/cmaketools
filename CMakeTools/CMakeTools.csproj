@@ -51,6 +51,7 @@
     <Compile Include="CMakeVariableDeclarations.cs" />
     <Compile Include="CMakeGuids.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StringHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="source.extension.vsixmanifest">

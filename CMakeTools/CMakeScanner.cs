@@ -197,8 +197,7 @@ namespace CMakeTools
                     _offset++;
 
                     CMakeCommandId id = GetLastCommand(state);
-                    string substr = _source.Substring(tokenInfo.StartIndex,
-                        tokenInfo.EndIndex - tokenInfo.StartIndex + 1);
+                    string substr = _source.ExtractToken(tokenInfo);
                     if (expectVariable)
                     {
                         // If we're inside curly braces following a dollar sign, treat
@@ -227,9 +226,7 @@ namespace CMakeTools
                     else
                     {
                         // Check whether the string is a keyword or not.
-                        int length = tokenInfo.EndIndex - tokenInfo.StartIndex + 1;
-                        string tokenText = _source.Substring(tokenInfo.StartIndex,
-                            length);
+                        string tokenText = _source.ExtractToken(tokenInfo);
                         bool isKeyword = false;
                         if (!InsideParens(state))
                         {
