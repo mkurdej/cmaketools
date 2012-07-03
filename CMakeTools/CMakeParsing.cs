@@ -56,9 +56,13 @@ namespace CMakeTools
             NeedVariable
         }
 
+        /// <summary>
+        /// Parse to find all variables defined in the code.
+        /// </summary>
+        /// <param name="code">The code to parse.</param>
+        /// <returns>A list containing all variables defined in the code.</returns>
         public static List<string> ParseForVariables(string code)
         {
-            // Parse to find all variables defined in the code.
             CMakeScanner scanner = new CMakeScanner();
             scanner.SetSource(code, 0);
             List<string> vars = new List<string>();
@@ -167,9 +171,15 @@ namespace CMakeTools
             return vars;
         }
 
+        /// <summary>
+        /// Parse to find all environment variables defined in the code.
+        /// </summary>
+        /// <param name="code">The code to parse.</param>
+        /// <returns>
+        /// A list containing all environment variables defined in the code.
+        /// </returns>
         public static List<string> ParseForEnvVariables(string code)
         {
-            // Parse to find all environment variables defined in the code.
             CMakeScanner scanner = new CMakeScanner();
             scanner.SetSource(code, 0);
             List<string> vars = new List<string>();
@@ -243,10 +253,21 @@ namespace CMakeTools
             return vars;
         }
 
+        /// <summary>
+        /// Parse to find the definition of a given variable.
+        /// </summary>
+        /// <param name="lines">A collection of lines of code to parse.</param>
+        /// <param name="variable">The name of the variable to find.</param>
+        /// <param name="textSpan">
+        /// A text span object that will be set to the range of text containing the name
+        /// of the variable in its definition.
+        /// </param>
+        /// <returns>
+        /// True if the definition of the variable was found or false otherwise.
+        /// </returns>
         public static bool ParseForVariableDefinition(IEnumerable<string> lines,
             string variable, out TextSpan textSpan)
         {
-            // Parse to find the definition of a given variable.
             textSpan = new TextSpan();
             CMakeScanner scanner = new CMakeScanner();
             TokenInfo tokenInfo = new TokenInfo();
@@ -364,10 +385,21 @@ namespace CMakeTools
             return false;
         }
 
+        /// <summary>
+        /// Parse to find the definition of a given function or macro.
+        /// </summary>
+        /// <param name="lines">A collection of lines of code to parse.</param>
+        /// <param name="function">The name of the function or macro to find.</param>
+        /// <param name="textSpan">
+        /// A text span object that will be set to the range of text containing the name
+        /// of the function or macro in its definition.
+        /// </param>
+        /// <returns>
+        /// True if the definition of the function or macro was found or false otherwise.
+        /// </returns>
         public static bool ParseForFunctionDefinition(IEnumerable<string> lines,
             string function, out TextSpan textSpan)
         {
-            // Parse to find the definition of a function or macro.
             textSpan = new TextSpan();
             CMakeScanner scanner = new CMakeScanner();
             TokenInfo tokenInfo = new TokenInfo();
@@ -423,11 +455,23 @@ namespace CMakeTools
             return false;
         }
 
+        /// <summary>
+        /// Parse to find the identifier of the command that triggered a member
+        /// selection parse request.
+        /// </summary>
+        /// <param name="lines">A collection of lines of code to parse.</param>
+        /// <param name="lineNum">
+        /// The line number of the token that triggered the parse request.
+        /// </param>
+        /// <param name="startIndex">
+        /// The start index of the token that triggered the parse request.
+        /// </param>
+        /// <returns>
+        /// The command identifier of the command that triggered the parse request.
+        /// </returns>
         public static CMakeCommandId ParseForTriggerCommandId(IEnumerable<string> lines,
             int lineNum, int startIndex)
         {
-            // Parse to find the identifier of the command that triggered the current
-            // member selection parse request.
             int state = 0;
             CMakeScanner scanner = new CMakeScanner();
             TokenInfo tokenInfo = new TokenInfo();
@@ -450,20 +494,55 @@ namespace CMakeTools
             return CMakeCommandId.Unspecified;
         }
 
+        /// <summary>
+        /// Structure to hold the results of a parameter information parsing operation.
+        /// </summary>
         public struct ParameterInfoResult
         {
+            /// <summary>
+            /// The name of the command whose parameters were parsed.
+            /// </summary>
             public string CommandName;
+
+            /// <summary>
+            /// The range of text containing the name of the command.
+            /// </summary>
             public TextSpan? CommandSpan;
+
+            /// <summary>
+            /// The range of text containing the opening parenthesis denoting the
+            /// beginning of the command's parameters.
+            /// </summary>
             public TextSpan? BeginSpan;
+
+            /// <summary>
+            /// A list of text span objects for the ranges of text containing the
+            /// whitespace tokens separating the command's parameter.
+            /// </summary>
             public List<TextSpan> SeparatorSpans;
+
+            /// <summary>
+            /// The range of text containing the closing parenthesis denoting the
+            /// end of the command's parameters.
+            /// </summary>
             public TextSpan? EndSpan;
         }
 
+        /// <summary>
+        /// Parse to find the needed information for the command that triggered a
+        /// parameter information parse request.
+        /// </summary>
+        /// <param name="lines">A collection of lines of code to parse.</param>
+        /// <param name="lineNum">
+        /// The line number of the token that triggered the parse request.
+        /// </param>
+        /// <param name="endIndex">
+        /// The end index of the token that triggered the parse request.
+        /// </param>
+        /// <returns>A structure containing the result of the parse operation.</returns>
         public static ParameterInfoResult ParseForParameterInfo(
             IEnumerable<string> lines, int lineNum, int endIndex)
         {
-            // Parse to find the needed information for the command that triggered the
-            // current parameter information request.
             ParameterInfoResult result = new ParameterInfoResult();
             result.SeparatorSpans = new List<TextSpan>();
             int state = 0;
@@ -591,6 +670,14 @@ namespace CMakeTools
             InsideEndMacroArgs
         }
 
+        /// <summary>
+        /// Parse for the bodies of functions and macros defined in the given code.
+        /// </summary>
+        /// <param name="lines">A collection of lines of code to parse.</param>
+        /// <returns>
+        /// A list of text span objects for the ranges of text containg the function
+        /// bodies in the code.
+        /// </returns>
         public static List<TextSpan> ParseForFunctionBodies(IEnumerable<string> lines)
         {
             // Parse for the bodies of functions and add them as hidden regions.
@@ -713,6 +800,21 @@ namespace CMakeTools
             return results;
         }
 
+        /// <summary>
+        /// Parse to see if there is an identifier at a given position.
+        /// </summary>
+        /// <param name="lines">A collection of lines to parse.</param>
+        /// <param name="lineNum">
+        /// The line number at which to look for an identifier.
+        /// </param>
+        /// <param name="col">The column at which to look for an identifier.</param>
+        /// <param name="isVariable">
+        /// A Boolean value that will be set to true is the identifier names a variable
+        /// or false if it names a function or macro.
+        /// </param>
+        /// <returns>
+        /// The text of the identifier if one was found or null otherwise.
+        /// </returns>
         public static string ParseForIdentifier(IEnumerable<string> lines, int lineNum,
             int col, out bool isVariable)
         {
