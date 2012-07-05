@@ -376,5 +376,110 @@ namespace CMakeTools
             Assert.IsFalse(CMakeParsing.ParseForFunctionDefinition(lines, "function",
                 out span));
         }
+
+        /// <summary>
+        /// Test parsing for the command that triggered a parse request.
+        /// </summary>
+        [TestMethod]
+        public void TestParseForTriggerCommandId()
+        {
+            List<string> lines = new List<string>();
+            lines.Add("add_executable(foo foo.cpp bar.cpp)");
+            Assert.AreEqual(CMakeCommandId.AddExecutable,
+                CMakeParsing.ParseForTriggerCommandId(lines, 0, 14));
+            lines.Clear();
+            lines.Add("add_executable ( foo foo.cpp bar.cpp )");
+            Assert.AreEqual(CMakeCommandId.AddExecutable,
+                CMakeParsing.ParseForTriggerCommandId(lines, 0, 15));
+        }
+
+        /// <summary>
+        /// Test parsing for parameter information.
+        /// </summary>
+        [TestMethod]
+        public void TestParseForParameterInfo()
+        {
+            List<string> lines = new List<string>();
+            lines.Add("add_executable(foo foo.cpp bar.cpp)");
+            CMakeParsing.ParameterInfoResult result = CMakeParsing.ParseForParameterInfo(
+                lines, 0, 34);
+            Assert.IsNotNull(result.CommandName);
+            Assert.AreEqual("add_executable", result.CommandName);
+            Assert.IsTrue(result.CommandSpan.HasValue);
+            Assert.AreEqual(0, result.CommandSpan.Value.iStartLine);
+            Assert.AreEqual(0, result.CommandSpan.Value.iStartIndex);
+            Assert.AreEqual(0, result.CommandSpan.Value.iEndLine);
+            Assert.AreEqual(13, result.CommandSpan.Value.iEndIndex);
+            Assert.IsTrue(result.BeginSpan.HasValue);
+            Assert.AreEqual(0, result.BeginSpan.Value.iStartLine);
+            Assert.AreEqual(14, result.BeginSpan.Value.iStartIndex);
+            Assert.AreEqual(0, result.BeginSpan.Value.iEndLine);
+            Assert.AreEqual(14, result.BeginSpan.Value.iEndIndex);
+            Assert.AreEqual(1, result.SeparatorSpans.Count);
+            Assert.AreEqual(0, result.SeparatorSpans[0].iStartLine);
+            Assert.AreEqual(18, result.SeparatorSpans[0].iStartIndex);
+            Assert.AreEqual(0, result.SeparatorSpans[0].iEndLine);
+            Assert.AreEqual(18, result.SeparatorSpans[0].iEndIndex);
+            Assert.IsTrue(result.EndSpan.HasValue);
+            Assert.AreEqual(0, result.EndSpan.Value.iStartLine);
+            Assert.AreEqual(34, result.EndSpan.Value.iStartIndex);
+            Assert.AreEqual(0, result.EndSpan.Value.iEndLine);
+            Assert.AreEqual(34, result.EndSpan.Value.iEndIndex);
+
+            // Test that moving back the trigger token location prevents tokens after
+            // the trigger token from being included in the results.
+            result = CMakeParsing.ParseForParameterInfo(lines, 0, 14);
+            Assert.IsNotNull(result.CommandName);
+            Assert.AreEqual("add_executable", result.CommandName);
+            Assert.IsTrue(result.CommandSpan.HasValue);
+            Assert.AreEqual(0, result.CommandSpan.Value.iStartLine);
+            Assert.AreEqual(0, result.CommandSpan.Value.iStartIndex);
+            Assert.AreEqual(0, result.CommandSpan.Value.iEndLine);
+            Assert.AreEqual(13, result.CommandSpan.Value.iEndIndex);
+            Assert.IsTrue(result.BeginSpan.HasValue);
+            Assert.AreEqual(0, result.BeginSpan.Value.iStartLine);
+            Assert.AreEqual(14, result.BeginSpan.Value.iStartIndex);
+            Assert.AreEqual(0, result.BeginSpan.Value.iEndLine);
+            Assert.AreEqual(14, result.BeginSpan.Value.iEndIndex);
+            Assert.AreEqual(0, result.SeparatorSpans.Count);
+            Assert.IsFalse(result.EndSpan.HasValue);
+
+            // Test a command with extra whitespace.
+            lines.Clear();
+            lines.Add("add_executable( foo  foo.cpp  bar.cpp )");
+            result = CMakeParsing.ParseForParameterInfo(lines, 0, 38);
+            Assert.IsNotNull(result.CommandName);
+            Assert.AreEqual("add_executable", result.CommandName);
+            Assert.IsTrue(result.CommandSpan.HasValue);
+            Assert.AreEqual(0, result.CommandSpan.Value.iStartLine);
+            Assert.AreEqual(0, result.CommandSpan.Value.iStartIndex);
+            Assert.AreEqual(0, result.CommandSpan.Value.iEndLine);
+            Assert.AreEqual(13, result.CommandSpan.Value.iEndIndex);
+            Assert.IsTrue(result.BeginSpan.HasValue);
+            Assert.AreEqual(0, result.BeginSpan.Value.iStartLine);
+            Assert.AreEqual(14, result.BeginSpan.Value.iStartIndex);
+            Assert.AreEqual(0, result.BeginSpan.Value.iEndLine);
+            Assert.AreEqual(14, result.BeginSpan.Value.iEndIndex);
+            Assert.AreEqual(1, result.SeparatorSpans.Count);
+            Assert.AreEqual(0, result.SeparatorSpans[0].iStartLine);
+            Assert.AreEqual(19, result.SeparatorSpans[0].iStartIndex);
+            Assert.AreEqual(0, result.SeparatorSpans[0].iEndLine);
+            Assert.AreEqual(20, result.SeparatorSpans[0].iEndIndex);
+            Assert.IsTrue(result.EndSpan.HasValue);
+            Assert.AreEqual(0, result.EndSpan.Value.iStartLine);
+            Assert.AreEqual(38, result.EndSpan.Value.iStartIndex);
+            Assert.AreEqual(0, result.EndSpan.Value.iEndLine);
+            Assert.AreEqual(38, result.EndSpan.Value.iEndIndex);
+
+            // Ensure that an undefined function gives all null results.
+            lines.Clear();
+            lines.Add("foo(bar)");
+            result = CMakeParsing.ParseForParameterInfo(lines, 0, 7);
+            Assert.IsNull(result.CommandName);
+            Assert.IsFalse(result.CommandSpan.HasValue);
+            Assert.IsFalse(result.BeginSpan.HasValue);
+            Assert.AreEqual(0, result.SeparatorSpans.Count);
+            Assert.IsFalse(result.EndSpan.HasValue);
+        }
     }
 }
