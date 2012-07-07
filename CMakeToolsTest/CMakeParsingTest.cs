@@ -394,6 +394,62 @@ namespace CMakeTools
         }
 
         /// <summary>
+        /// Test parsing for parameter names.
+        /// </summary>
+        [TestMethod]
+        public void TestParseForParameterNames()
+        {
+            List<string> lines = new List<string>();
+            lines.Add("function(foo a b c)");
+            lines.Add("something()");
+            lines.Add("endfunction(foo)");
+            lines.Add("function(bar x y z w)");
+            lines.Add("something_else()");
+            lines.Add("endfunction(bar)");
+            List<string> result = CMakeParsing.ParseForParameterNames(lines, "foo");
+            Assert.IsNotNull(result);
+            Assert.AreEqual(3, result.Count);
+            Assert.AreEqual("a", result[0]);
+            Assert.AreEqual("b", result[1]);
+            Assert.AreEqual("c", result[2]);
+            result = CMakeParsing.ParseForParameterNames(lines, "bar");
+            Assert.IsNotNull(result);
+            Assert.AreEqual(4, result.Count);
+            Assert.AreEqual("x", result[0]);
+            Assert.AreEqual("y", result[1]);
+            Assert.AreEqual("z", result[2]);
+            Assert.AreEqual("w", result[3]);
+            result = CMakeParsing.ParseForParameterNames(lines, "something");
+            Assert.IsNull(result);
+
+            // Test a macro.
+            lines.Clear();
+            lines.Add("macro(foo a b c)");
+            lines.Add("something()");
+            lines.Add("endmacro(foo)");
+            result = CMakeParsing.ParseForParameterNames(lines, "foo");
+            Assert.IsNotNull(result);
+            Assert.AreEqual(3, result.Count);
+            Assert.AreEqual("a", result[0]);
+            Assert.AreEqual("b", result[1]);
+            Assert.AreEqual("c", result[2]);
+
+            // Test a function definition spread across multiple lines.
+            lines.Clear();
+            lines.Add("function(");
+            lines.Add("  foo");
+            lines.Add("  a # first parameter");
+            lines.Add("  b # second parameter");
+            lines.Add("  c)");
+            result = CMakeParsing.ParseForParameterNames(lines, "foo");
+            Assert.IsNotNull(result);
+            Assert.AreEqual(3, result.Count);
+            Assert.AreEqual("a", result[0]);
+            Assert.AreEqual("b", result[1]);
+            Assert.AreEqual("c", result[2]);
+        }
+
+        /// <summary>
         /// Test parsing for parameter information.
         /// </summary>
         [TestMethod]
