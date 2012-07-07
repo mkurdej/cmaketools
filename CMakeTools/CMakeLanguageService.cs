@@ -95,7 +95,19 @@ namespace CMakeTools
                         req.Sink.EndParameters(result.EndSpan.Value);
                     }
                     CMakeCommandId id = CMakeKeywords.GetCommandId(result.CommandName);
-                    if (id != CMakeCommandId.Unspecified)
+                    if (id == CMakeCommandId.Unspecified)
+                    {
+                        // If it's a user-defined function or macro, parse to try to find
+                        // its parameters.
+                        List<string> parameters = CMakeParsing.ParseForParameterNames(
+                            source.GetLines(), result.CommandName);
+                        if (parameters != null)
+                        {
+                            scope.SetMethods(new CMakeUserMethods(result.CommandName,
+                                parameters));
+                        }
+                    }
+                    else
                     {
                         scope.SetMethods(CMakeMethods.GetCommandParameters(id));
                     }

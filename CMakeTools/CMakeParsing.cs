@@ -524,6 +524,98 @@ namespace CMakeTools
             public TextSpan? EndSpan;
         }
 
+        // Internal states of the parameter name parsing mechanism
+        private enum ParameterParseState
+        {
+            NeedCommand,
+            NeedParen,
+            NeedFunction,
+            NeedParams
+        }
+
+        /// <summary>
+        /// Parse to find the names of the parameters to a given function.
+        /// </summary>
+        /// <param name="lines">A collection of lines to parse.</param>
+        /// <param name="function">
+        /// The name of the function for which to find parameters.
+        /// </param>
+        /// <returns>
+        /// A list of the function's parameters or null if the function could not be
+        /// found.
+        /// </returns>
+        public static List<string> ParseForParameterNames(IEnumerable<string> lines,
+            string function)
+        {
+            List<string> parameters = new List<string>();
+            int scannerState = 0;
+            CMakeScanner scanner = new CMakeScanner();
+            TokenInfo tokenInfo = new TokenInfo();
+            ParameterParseState state = ParameterParseState.NeedCommand;
+            foreach (string line in lines)
+            {
+                scanner.SetSource(line, 0);
+                while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo,
+                    ref scannerState))
+                {
+                    string tokenText = line.ExtractToken(tokenInfo);
+                    if (state == ParameterParseState.NeedCommand &&
+                        tokenInfo.Token == (int)CMakeToken.Keyword)
+                    {
+                        CMakeCommandId id = CMakeKeywords.GetCommandId(tokenText);
+                        if (id == CMakeCommandId.Function || id == CMakeCommandId.Macro)
+                        {
+                            // We found the FUNCTION keyword or the MACRO keyword.  Now,
+                            // look for the opening parenthesis.
+                            state = ParameterParseState.NeedParen;
+                        }
+                    }
+                    else if (state == ParameterParseState.NeedParen &&
+                        tokenInfo.Token == (int)CMakeToken.OpenParen)
+                    {
+                        // We found the opening parenthesis of a function or macro
+                        // definition.  Now, look for the function or macro name.
+                        state = ParameterParseState.NeedFunction;
+                    }
+                    else if (state == ParameterParseState.NeedFunction &&
+                        tokenInfo.Token == (int)CMakeToken.Identifier)
+                    {
+                        // We found the function or macro name.  If it's the one that
+                        // we're looking for, look for parameters.  Otherwise, ignore the
+                        // rest of the function or macro definition.
+                        if (tokenText.ToUpper().Equals(function.ToUpper()))
+                        {
+                            state = ParameterParseState.NeedParams;
+                        }
+                        else
+                        {
+                            state = ParameterParseState.NeedCommand;
+                        }
+                    }
+                    else if (state == ParameterParseState.NeedParams &&
+                        tokenInfo.Token == (int)CMakeToken.Identifier)
+                    {
+                        // We found a parameter.  Add it to the list and continue.
+                        parameters.Add(tokenText);
+                    }
+                    else if (state == ParameterParseState.NeedParams &&
+                        tokenInfo.Token == (int)CMakeToken.CloseParen)
+                    {
+                        // We found the closing parenthesis marking the end of the
+                        // function or macro definition.  All the parameters have now
+                        // been parsed, so return them.
+                        return parameters;
+                    }
+                    else if (tokenInfo.Token != (int)CMakeToken.WhiteSpace &&
+                        tokenInfo.Token != (int)CMakeToken.Comment)
+                    {
+                        state = ParameterParseState.NeedCommand;
+                    }
+                }
+            }
+            return null;
+        }
+
         /// <summary>
         /// Parse to find the needed information for the command that triggered a
         /// parameter information parse request.
@@ -575,7 +667,8 @@ namespace CMakeTools
                     // update the highlighted parameter properly.
                     break;
                 }
-                if (tokenInfo.Token == (int)CMakeToken.Keyword)
+                if (tokenInfo.Token == (int)CMakeToken.Keyword ||
+                    tokenInfo.Token == (int)CMakeToken.Identifier)
                 {
                     if (!CMakeScanner.InsideParens(state))
                     {
@@ -583,7 +676,7 @@ namespace CMakeTools
                         lastCommandSpan.iStartIndex = tokenInfo.StartIndex;
                         lastCommandSpan.iEndLine = lineNum;
                         lastCommandSpan.iEndIndex = tokenInfo.EndIndex;
-                        commandText = lineFound.ExtractToken(tokenInfo).ToLower();
+                        commandText = lineFound.ExtractToken(tokenInfo);
                         lastWasCommand = true;
                     }
                 }
@@ -591,7 +684,6 @@ namespace CMakeTools
                 {
                     if (lastWasCommand)
                     {
-                        CMakeCommandId id = CMakeKeywords.GetCommandId(commandText);
                         result.CommandName = commandText;
                         result.CommandSpan = lastCommandSpan;
                         result.BeginSpan = new TextSpan()

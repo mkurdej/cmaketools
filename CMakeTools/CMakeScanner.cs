@@ -74,7 +74,7 @@ namespace CMakeTools
             SetVariableFlag(ref state, false);
             bool noSeparator = GetNoSeparatorFlag(state);
             SetNoSeparatorFlag(ref state, false);
-            tokenInfo.Trigger = 0;
+            tokenInfo.Trigger = TokenTriggers.None;
             while (_offset < _source.Length)
             {
                 if (char.IsWhiteSpace(_source[_offset]))
@@ -89,7 +89,9 @@ namespace CMakeTools
                     tokenInfo.EndIndex = _offset - 1;
                     tokenInfo.Color = TokenColor.Text;
                     tokenInfo.Token = (int)CMakeToken.WhiteSpace;
-                    if (!noSeparator && DecSeparatorCount(ref state))
+                    bool userCommand = InsideParens(state) &&
+                        GetLastCommand(state) == CMakeCommandId.Unspecified;
+                    if (!noSeparator && (userCommand || DecSeparatorCount(ref state)))
                     {
                         tokenInfo.Trigger = TokenTriggers.ParameterNext;
                     }
@@ -136,7 +138,7 @@ namespace CMakeTools
                         {
                             tokenInfo.Trigger |= TokenTriggers.MemberSelect;
                         }
-                        else if (id != CMakeCommandId.Unspecified)
+                        else
                         {
                             tokenInfo.Trigger |= TokenTriggers.ParameterStart;
                             SetNoSeparatorFlag(ref state, true);

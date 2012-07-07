@@ -471,15 +471,36 @@ namespace CMakeTools
             Assert.AreEqual(0, result.EndSpan.Value.iEndLine);
             Assert.AreEqual(38, result.EndSpan.Value.iEndIndex);
 
-            // Ensure that an undefined function gives all null results.
+            // Test a user-defined function.
             lines.Clear();
-            lines.Add("foo(bar)");
-            result = CMakeParsing.ParseForParameterInfo(lines, 0, 7);
-            Assert.IsNull(result.CommandName);
-            Assert.IsFalse(result.CommandSpan.HasValue);
-            Assert.IsFalse(result.BeginSpan.HasValue);
-            Assert.AreEqual(0, result.SeparatorSpans.Count);
-            Assert.IsFalse(result.EndSpan.HasValue);
+            lines.Add("foo(a b c)");
+            result = CMakeParsing.ParseForParameterInfo(lines, 0, 9);
+            Assert.IsNotNull(result.CommandName);
+            Assert.AreEqual("foo", result.CommandName);
+            Assert.IsTrue(result.CommandSpan.HasValue);
+            Assert.AreEqual(0, result.CommandSpan.Value.iStartLine);
+            Assert.AreEqual(0, result.CommandSpan.Value.iStartIndex);
+            Assert.AreEqual(0, result.CommandSpan.Value.iEndLine);
+            Assert.AreEqual(2, result.CommandSpan.Value.iEndIndex);
+            Assert.IsTrue(result.BeginSpan.HasValue);
+            Assert.AreEqual(0, result.BeginSpan.Value.iStartLine);
+            Assert.AreEqual(3, result.BeginSpan.Value.iStartIndex);
+            Assert.AreEqual(0, result.BeginSpan.Value.iEndLine);
+            Assert.AreEqual(3, result.BeginSpan.Value.iEndIndex);
+            Assert.AreEqual(2, result.SeparatorSpans.Count);
+            Assert.AreEqual(0, result.SeparatorSpans[0].iStartLine);
+            Assert.AreEqual(5, result.SeparatorSpans[0].iStartIndex);
+            Assert.AreEqual(0, result.SeparatorSpans[0].iEndLine);
+            Assert.AreEqual(5, result.SeparatorSpans[0].iEndIndex);
+            Assert.AreEqual(0, result.SeparatorSpans[1].iStartLine);
+            Assert.AreEqual(7, result.SeparatorSpans[1].iStartIndex);
+            Assert.AreEqual(0, result.SeparatorSpans[1].iEndLine);
+            Assert.AreEqual(7, result.SeparatorSpans[1].iEndIndex);
+            Assert.IsTrue(result.EndSpan.HasValue);
+            Assert.AreEqual(0, result.EndSpan.Value.iStartLine);
+            Assert.AreEqual(9, result.EndSpan.Value.iStartIndex);
+            Assert.AreEqual(0, result.EndSpan.Value.iEndLine);
+            Assert.AreEqual(9, result.EndSpan.Value.iEndIndex);
         }
     }
 }
