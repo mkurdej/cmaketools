@@ -36,6 +36,26 @@ namespace CMakeTools
             return info;
         }
 
+        public override void Completion(IVsTextView textView, TokenInfo info,
+            ParseReason reason)
+        {
+            bool oldValue = LanguageService.Preferences.EnableAsyncCompletion;
+            if (reason == ParseReason.MemberSelect ||
+                reason == ParseReason.MemberSelectAndHighlightBraces)
+            {
+                if (info.Token == (int)CMakeToken.VariableStart ||
+                    info.Token == (int)CMakeToken.VariableStartEnv)
+                {
+                    // Disable asynchronous parsing for member selection requests
+                    // involving variables.  It doesn't work properly when a parameter
+                    // information tool tip is visible.
+                    LanguageService.Preferences.EnableAsyncCompletion = false;
+                }
+            }
+            base.Completion(textView, info, reason);
+            LanguageService.Preferences.EnableAsyncCompletion = oldValue;
+        }
+
         /// <summary>
         /// Get a collection containing all the lines in the source file.
         /// </summary>
