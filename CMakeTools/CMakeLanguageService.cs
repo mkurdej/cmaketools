@@ -81,14 +81,22 @@ namespace CMakeTools
                     req.TokenInfo.EndIndex);
                 if (result.CommandName != null && result.CommandSpan.HasValue)
                 {
-                    req.Sink.StartName(result.CommandSpan.Value, result.CommandName);
+                    if (result.SubcommandName == null)
+                    {
+                        req.Sink.StartName(result.CommandSpan.Value, result.CommandName);
+                    }
+                    else
+                    {
+                        req.Sink.StartName(result.CommandSpan.Value,
+                            result.CommandSpan + "(" + result.SubcommandName);
+                    }
                     if (result.BeginSpan.HasValue)
                     {
                         req.Sink.StartParameters(result.BeginSpan.Value);
                     }
                     foreach (TextSpan span in result.SeparatorSpans)
                     {
-                            req.Sink.NextParameter(span);
+                        req.Sink.NextParameter(span);
                     }
                     if (result.EndSpan.HasValue)
                     {
@@ -109,7 +117,8 @@ namespace CMakeTools
                     }
                     else
                     {
-                        scope.SetMethods(CMakeMethods.GetCommandParameters(id));
+                        scope.SetMethods(CMakeMethods.GetCommandParameters(id,
+                            result.SubcommandName));
                     }
                 }
             }

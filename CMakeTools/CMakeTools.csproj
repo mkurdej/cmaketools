@@ -48,6 +48,7 @@
       <DependentUpon>CMakeStrings.resx</DependentUpon>
     </Compile>
     <Compile Include="CMakeSubcommandDeclarations.cs" />
+    <Compile Include="CMakeSubcommandMethods.cs" />
     <Compile Include="CMakeUserMethods.cs" />
     <Compile Include="CMakeVariableDeclarations.cs" />
     <Compile Include="CMakeGuids.cs" />

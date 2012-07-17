@@ -501,6 +501,11 @@ namespace CMakeTools
             public string CommandName;
 
             /// <summary>
+            /// The name of the subcommand whose parameters were parsed.
+            /// </summary>
+            public string SubcommandName;
+
+            /// <summary>
             /// The range of text containing the name of the command.
             /// </summary>
             public TextSpan? CommandSpan;
@@ -655,8 +660,10 @@ namespace CMakeTools
             }
             TextSpan lastCommandSpan = new TextSpan();
             string commandText = null;
+            string subcommandText = null;
             bool lastWasCommand = false;
             bool insideCommand = false;
+            bool needSubcommand = false;
             int parenDepth = 0;
             while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state))
             {
@@ -670,6 +677,7 @@ namespace CMakeTools
                 if (tokenInfo.Token == (int)CMakeToken.Keyword ||
                     tokenInfo.Token == (int)CMakeToken.Identifier)
                 {
+                    // Handle commands and subcommands.
                     if (!CMakeScanner.InsideParens(state))
                     {
                         lastCommandSpan.iStartLine = lineNum;
@@ -679,20 +687,40 @@ namespace CMakeTools
                         commandText = lineFound.ExtractToken(tokenInfo);
                         lastWasCommand = true;
                     }
+                    else if (needSubcommand && subcommandText == null)
+                    {
+                        lastCommandSpan.iEndLine = lineNum;
+                        lastCommandSpan.iEndIndex = tokenInfo.EndIndex;
+                        subcommandText = lineFound.ExtractToken(tokenInfo);
+                    }
                 }
                 else if (tokenInfo.Token == (int)CMakeToken.OpenParen)
                 {
                     if (lastWasCommand)
                     {
-                        result.CommandName = commandText;
-                        result.CommandSpan = lastCommandSpan;
-                        result.BeginSpan = new TextSpan()
+                        // If the command takes subcommands, the subcommand will appear
+                        // after the opening parenthesis before the parameters.
+                        // Otherwise, the opening parenthesis marks the beginning of the
+                        // parameters.
+                        if (CMakeSubcommandMethods.HasSubcommands(
+                            CMakeScanner.GetLastCommand(state)))
                         {
-                            iStartLine = lineNum,
-                            iStartIndex = tokenInfo.StartIndex,
-                            iEndLine = lineNum,
-                            iEndIndex = tokenInfo.EndIndex
-                        };
+                            subcommandText = null;
+                            needSubcommand = true;
+                        }
+                        else
+                        {
+                            result.CommandName = commandText;
+                            result.CommandSpan = lastCommandSpan;
+                            result.BeginSpan = new TextSpan()
+                            {
+                                iStartLine = lineNum,
+                                iStartIndex = tokenInfo.StartIndex,
+                                iEndLine = lineNum,
+                                iEndIndex = tokenInfo.EndIndex
+                            };
+                            needSubcommand = false;
+                        }
                         lastWasCommand = false;
                         insideCommand = true;
                     }
@@ -702,6 +730,9 @@ namespace CMakeTools
                 {
                     if (parenDepth == 1 && insideCommand)
                     {
+                        // Whitespace following a subcommand name marks the beginning
+                        // of the parameters.  Otherwise, it may be a parameter
+                        // separator.
                         if ((tokenInfo.Trigger & TokenTriggers.ParameterNext) != 0)
                         {
                             TextSpan spaceSpan = new TextSpan()
@@ -712,6 +743,20 @@ namespace CMakeTools
                                 iEndIndex = tokenInfo.EndIndex
                             };
                             result.SeparatorSpans.Add(spaceSpan);
+                        }
+                        else if ((tokenInfo.Trigger & TokenTriggers.ParameterStart) != 0)
+                        {
+                            result.CommandName = commandText;
+                            result.SubcommandName = subcommandText;
+                            result.CommandSpan = lastCommandSpan;
+                            result.BeginSpan = new TextSpan()
+                            {
+                                iStartLine = lineNum,
+                                iStartIndex = tokenInfo.StartIndex,
+                                iEndLine = lineNum,
+                                iEndIndex = tokenInfo.EndIndex
+                            };
+                            needSubcommand = false;
                         }
                     }
                 }

@@ -89,11 +89,29 @@ namespace CMakeTools
                     tokenInfo.EndIndex = _offset - 1;
                     tokenInfo.Color = TokenColor.Text;
                     tokenInfo.Token = (int)CMakeToken.WhiteSpace;
-                    bool userCommand = InsideParens(state) &&
-                        GetLastCommand(state) == CMakeCommandId.Unspecified;
-                    if (!noSeparator && (userCommand || DecSeparatorCount(ref state)))
+                    CMakeCommandId id = GetLastCommand(state);
+                    if (!noSeparator && InsideParens(state))
                     {
-                        tokenInfo.Trigger = TokenTriggers.ParameterNext;
+                        if (CMakeSubcommandMethods.HasSubcommands(id))
+                        {
+                            // The first whitespace token after a subcommand marks the
+                            // beginning of the parameters.  The remaining whitespace
+                            // parameters separate consecutive parameters.
+                            if (GetNeedSubcommandFlag(state))
+                            {
+                                SetNeedSubcommandFlag(ref state, false);
+                                tokenInfo.Trigger = TokenTriggers.ParameterStart;
+                            }
+                            else
+                            {
+                                tokenInfo.Trigger = TokenTriggers.ParameterNext;
+                            }
+                        }
+                        else if (id == CMakeCommandId.Unspecified ||
+                            DecSeparatorCount(ref state))
+                        {
+                            tokenInfo.Trigger = TokenTriggers.ParameterNext;
+                        }
                     }
                     SetNoSeparatorFlag(ref state, true);
                     return true;
@@ -137,6 +155,8 @@ namespace CMakeTools
                         if (CMakeKeywords.TriggersMemberSelection(id))
                         {
                             tokenInfo.Trigger |= TokenTriggers.MemberSelect;
+                            SetNeedSubcommandFlag(ref state, true);
+                            SetNoSeparatorFlag(ref state, true);
                         }
                         else
                         {
@@ -328,6 +348,7 @@ namespace CMakeTools
         private const uint StringFlag           = 0x80000000;
         private const int VariableFlag          = 0x40000000;
         private const int NoSeparatorFlag       = 0x20000000;
+        private const int NeedSubcommandFlag    = 0x10000000;
         private const int ParenDepthMask        = 0x000000FF;
         private const int SeparatorCountMask    = 0x0000FF00;
         private const int SeparatorCountShift   = 8;
@@ -392,6 +413,25 @@ namespace CMakeTools
             else
             {
                 state &= ~NoSeparatorFlag;
+            }
+        }
+
+        private bool GetNeedSubcommandFlag(int state)
+        {
+            // Get the flag indicating that the current command takes subcommands.
+            return (state & NeedSubcommandFlag) != 0;
+        }
+
+        private void SetNeedSubcommandFlag(ref int state, bool needSubcommand)
+        {
+            // Set the flag indicating that the current command takes subcommands.
+            if (needSubcommand)
+            {
+                state |= NeedSubcommandFlag;
+            }
+            else
+            {
+                state &= ~NeedSubcommandFlag;
             }
         }
 

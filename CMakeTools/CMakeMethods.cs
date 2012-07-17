@@ -283,7 +283,7 @@ namespace CMakeTools
         // parameters.
         private CMakeCommandId _id;
 
-        public CMakeMethods(CMakeCommandId id)
+        private CMakeMethods(CMakeCommandId id)
         {
             _id = id;
         }
@@ -336,14 +336,19 @@ namespace CMakeTools
         }
 
         /// <summary>
-        /// Get a methods object containing the subcommands for a given CMake command.
+        /// Get a methods object containing the parameters for a given CMake command.
         /// </summary>
         /// <param name="id">The identifier of a CMake command.</param>
+        /// <param name="subcommand">The name of a subcommand or null if none.</param>
         /// <returns>
         /// A methods object or null if there is no parameter information.
         /// </returns>
-        public static Methods GetCommandParameters(CMakeCommandId id)
+        public static Methods GetCommandParameters(CMakeCommandId id, string subcommand)
         {
+            if (subcommand != null)
+            {
+                return CMakeSubcommandMethods.GetSubcommandParameters(id, subcommand);
+            }
             if (!_parameters.ContainsKey(id))
             {
                 return null;
