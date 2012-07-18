@@ -137,6 +137,86 @@ namespace CMakeTools
             { "WRITE",          _fileWriteParams }
         };
 
+        // Parameters to the LIST(APPEND) command.
+        private static string[] _listAppendParams = new string[]
+        {
+            "list",
+            "element1 element2 ..."
+        };
+
+        // Parameters to the LIST(FIND) command.
+        private static string[] _listFindParams = new string[]
+        {
+            "list",
+            "value",
+            "output_variable"
+        };
+
+        // Parameters to the LIST(GET) command.
+        private static string[] _listGetParams = new string[]
+        {
+            "list",
+            "index",
+            "output_variable"
+        };
+
+        // Parameters to the LIST(INSERT) command.
+        private static string[] _listInsertParams = new string[]
+        {
+            "list",
+            "index",
+            "element1 element2 ..."
+        };
+
+        // Parameters to the LIST(LENGTH) command.
+        private static string[] _listLengthParams = new string[]
+        {
+            "list",
+            "output_variable"
+        };
+
+        // Parameters to the LIST(REMOVE_AT) command.
+        private static string[] _listRemoveAtParams = new string[]
+        {
+            "list",
+            "index1 index2 ..."
+        };
+
+        // Parameters to the LIST(REMOVE_DUPLICATES) command.
+        private static string[] _listRemoveDuplicatesParams = new string[]
+        {
+            "list"
+        };
+
+        // Parameters to the LIST(REMOVE_ITEM) command.
+        private static string[] _listRemoveItemParams = new string[]
+        {
+            "list",
+            "value1 value2 ..."
+        };
+
+        // Parameters to the LIST(REVERSE) command.
+        private static string[] _listReverseParams = _listRemoveDuplicatesParams;
+
+        // Parameters to the LIST(SORT) command.
+        private static string[] _listSortParams = _listRemoveDuplicatesParams;
+
+        // Map from subcommands of the LIST command to parameters.
+        private static Dictionary<string, string[]> _listSubcommands =
+            new Dictionary<string, string[]>
+        {
+            { "APPEND",             _listAppendParams },
+            { "FIND",               _listFindParams },
+            { "GET",                _listGetParams },
+            { "INSERT",             _listInsertParams },
+            { "LENGTH",             _listLengthParams },
+            { "REMOVE_AT",          _listRemoveAtParams },
+            { "REMOVE_DUPLICATES",  _listRemoveDuplicatesParams },
+            { "REMOVE_ITEM",        _listRemoveItemParams },
+            { "REVERSE",            _listReverseParams },
+            { "SORT",               _listSortParams }
+        };
+
         // Parameters to the STRING(ASCII) command.
         private static string[] _stringAsciiParams = new string[]
         {
@@ -233,6 +313,7 @@ namespace CMakeTools
             new Dictionary<CMakeCommandId, Dictionary<string, string[]>>
         {
             { CMakeCommandId.File,      _fileSubcommands },
+            { CMakeCommandId.List,      _listSubcommands },
             { CMakeCommandId.String,    _stringSubcommands }
         };
 
