@@ -24,18 +24,216 @@ namespace CMakeTools
             "message"
         };
 
+        // Parameters to the FILE(DOWNLOAD) command.
+        private static string[] _fileDownloadParams = new string[]
+        {
+            "url",
+            "filename"
+        };
+
+        // Parameters to the FILE(GLOB) command.
+        private static string[] _fileGlobParams = new string[]
+        {
+            "variable",
+            "glob1 glob2 ..."
+        };
+
+        // Parameters to the FILE(GLOB_RECURSE) command.
+        private static string[] _fileGlobRecurseParams = _fileGlobParams;
+
+        // Parameters to the FILE(MAKE_DIRECTORY) command.
+        private static string[] _fileMakeDirectoryParams = new string[]
+        {
+            "directory1 directory2 ..."
+        };
+
+        // Parameters to the FILE(READ) command.
+        private static string[] _fileReadParams = new string[]
+        {
+            "filename",
+            "variable"
+        };
+
+        // Parameters to the FILE(MD5) command and the various other hashing
+        // commands.
+        private static string[] _fileMD5Params = _fileReadParams;
+        private static string[] _fileSHA1Params = _fileReadParams;
+        private static string[] _fileSHA224Params = _fileReadParams;
+        private static string[] _fileSHA256Params = _fileReadParams;
+        private static string[] _fileSHA384Params = _fileReadParams;
+        private static string[] _fileSHA512Params = _fileReadParams;
+
+        // Parameters to the FILE(RELATIVE_PATH) command.
+        private static string[] _fileRelativePathParams = new string[]
+        {
+            "variable",
+            "directory",
+            "filename"
+        };
+
+        // Parameters to the FILE(REMOVE) command.
+        private static string[] _fileRemoveParams = new string[]
+        {
+            "filename1 filename2 ..."
+        };
+
+        // Parameters to the FILE(REMOVE_RECURSE) command.
+        private static string[] _fileRemoveRecurseParams = _fileRemoveParams;
+
+        // Parameters to the FILE(RENAME) command.
+        private static string[] _fileRenameParams = new string[]
+        {
+            "old_name",
+            "new_name"
+        };
+
+        // Parameters to the FILE(STRINGS) command.
+        private static string[] _fileStringsParams = _fileReadParams;
+
+        // Parameters to the FILE(TO_CMAKE_PATH) command.
+        private static string[] _fileToCMakePathParams = new string[]
+        {
+            "path",
+            "variable"
+        };
+
+        // Parameters to the FILE(TO_NATIVE_PATH) command.
+        private static string[] _fileToNativePathParams = _fileToCMakePathParams;
+
+        // Parameters to the FILE(UPLOAD) command.
+        private static string[] _fileUploadParams = new string[]
+        {
+            "filename",
+            "url"
+        };
+
+        // Parameters to the FILE(WRITE) command.
+        private static string[] _fileWriteParams = _fileAppendParams;
+
         // Map from subcommands of FILE command to parameters.
         private static Dictionary<string, string[]> _fileSubcommands =
             new Dictionary<string, string[]>
         {
-            { "APPEND",     _fileAppendParams }
+            { "APPEND",         _fileAppendParams },
+            { "DOWNLOAD",       _fileDownloadParams },
+            { "GLOB",           _fileGlobParams },
+            { "GLOB_RECURSE",   _fileGlobRecurseParams },
+            { "MAKE_DIRECTORY", _fileMakeDirectoryParams },
+            { "MD5",            _fileMD5Params },
+            { "READ",           _fileReadParams },
+            { "RELATIVE_PATH",  _fileRelativePathParams },
+            { "REMOVE",         _fileRemoveParams },
+            { "REMOVE_RECURSE", _fileRemoveRecurseParams },
+            { "RENAME",         _fileRenameParams },
+            { "SHA1",           _fileSHA1Params },
+            { "SHA224",         _fileSHA224Params },
+            { "SHA256",         _fileSHA256Params },
+            { "SHA384",         _fileSHA384Params },
+            { "SHA512",         _fileSHA512Params },
+            { "STRINGS",        _fileStringsParams },
+            { "TO_CMAKE_PATH",  _fileToCMakePathParams },
+            { "TO_NATIVE_PATH", _fileToNativePathParams },
+            { "UPLOAD",         _fileUploadParams },
+            { "WRITE",          _fileWriteParams }
+        };
+
+        // Parameters to the STRING(ASCII) command.
+        private static string[] _stringAsciiParams = new string[]
+        {
+            "number",
+            "output_variable"
+        };
+
+        // Parameters to the STRING(CONFIGURE) command.
+        private static string[] _stringConfigureParams = new string[]
+        {
+            "string",
+            "output_variable"
+        };
+
+        // Parameters to the STRING(FIND) command.
+        private static string[] _stringFindParams = new string[]
+        {
+            "string",
+            "substring",
+            "output_variable"
+        };
+
+        // Parameters to the STRING(LENGTH) command.
+        private static string[] _stringLengthParams = _stringConfigureParams;
+
+        // Parameters to the STRING(MD5) command and the various other hashing
+        // commands.
+        private static string[] _stringMD5Params = new string[]
+        {
+            "output_variable",
+            "input"
+        };
+        private static string[] _stringSHA1Params = _stringMD5Params;
+        private static string[] _stringSHA224Params = _stringMD5Params;
+        private static string[] _stringSHA256Params = _stringMD5Params;
+        private static string[] _stringSHA384Params = _stringMD5Params;
+        private static string[] _stringSHA512Params = _stringMD5Params;
+
+        // Parameters to the STRING(RANDOM) command.
+        private static string[] _stringRandomParams = new string[]
+        {
+            "output_variable"
+        };
+
+        // Parameters to the STRING(REPLACE) command.
+        private static string[] _stringReplaceParams = new string[]
+        {
+            "match_string",
+            "replace_string",
+            "output_variable",
+            "input1 input2 ..."
+        };
+
+        // Parameters to the STRING(STRIP) command.
+        private static string[] _stringStripParams = _stringConfigureParams;
+
+        // Parameters to the STRING(SUBSTRING) command.
+        private static string[] _stringSubstringParams = new string[]
+        {
+            "string",
+            "begin_index",
+            "length",
+            "output_variable"
+        };
+
+        // Parameters to the STRING(TOLOWER) and STRING(TOUPPER) commands.
+        private static string[] _stringToLowerParams = _stringConfigureParams;
+        private static string[] _stringToUpperParams = _stringConfigureParams;
+
+        // Map from subcommands of the STRING command to parameters.
+        private static Dictionary<string, string[]> _stringSubcommands =
+            new Dictionary<string, string[]>
+        {
+            { "ASCII",      _stringAsciiParams },
+            { "CONFIGURE",  _stringConfigureParams },
+            { "FIND",       _stringFindParams },
+            { "LENGTH",     _stringLengthParams },
+            { "MD5",        _stringMD5Params },
+            { "RANDOM",     _stringRandomParams },
+            { "REPLACE",    _stringReplaceParams },
+            { "SHA1",       _stringSHA1Params },
+            { "SHA224",     _stringSHA224Params },
+            { "SHA256",     _stringSHA256Params },
+            { "SHA384",     _stringSHA384Params },
+            { "SHA512",     _stringSHA512Params },
+            { "STRIP",      _stringStripParams },
+            { "SUBSTRING",  _stringSubstringParams },
+            { "TOLOWER",    _stringToLowerParams },
+            { "TOUPPER",    _stringToUpperParams }
         };
 
         // Map from commands to subcommands.
         private static Dictionary<CMakeCommandId, Dictionary<string, string[]>> _allSubcommands =
             new Dictionary<CMakeCommandId, Dictionary<string, string[]>>
         {
-            { CMakeCommandId.File,  _fileSubcommands }
+            { CMakeCommandId.File,      _fileSubcommands },
+            { CMakeCommandId.String,    _stringSubcommands }
         };
 
         // The command and subcommand for which the given instance will provie
