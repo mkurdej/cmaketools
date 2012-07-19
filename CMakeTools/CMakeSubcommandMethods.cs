@@ -17,6 +17,54 @@ namespace CMakeTools
 {
     class CMakeSubcommandMethods : Methods
     {
+        // Parameters to the CMAKE_POLICY(GET) command.
+        private static string[] _cmakePolicyGetParams = new string[]
+        {
+            "policy_number",
+            "output_variable"
+        };
+
+        // Parameters to the CMAKE_POLICY(PUSH) and CMAKE_POLICY(POP) commands.
+        private static string[] _cmakePolicyPush = new string[] {};
+        private static string[] _cmakePolicyPop = _cmakePolicyPush;
+
+        // Parameters to the CMAKE_POLICY(SET) command.
+        private static string[] _cmakePolicySetParams = new string[]
+        {
+            "policy_number",
+            "behavior"
+        };
+
+        // Parameters to the CMAKE_POLICY(VERSION) command.
+        private static string[] _cmakePolicyVersionParams = new string[]
+        {
+            "version_number"
+        };
+
+        // Map from subcommands of the CMAKE_POLICY command to parameters.
+        private static Dictionary<string, string[]> _cmakePolicySubcommands =
+            new Dictionary<string, string[]>
+        {
+            { "GET",        _cmakePolicyGetParams },
+            { "POP",        _cmakePolicyPop },
+            { "PUSH",       _cmakePolicyPush },
+            { "SET",        _cmakePolicySetParams },
+            { "VERSION",    _cmakePolicyVersionParams }
+        };
+
+        // Parameters to the EXPORT(PACKAGE) command.
+        private static string[] _exportPackageParams = new string[]
+        {
+            "name"
+        };
+
+        // Map from subcommands of the EXPORT command to parameters.
+        private static Dictionary<string, string[]> _exportSubcommands =
+            new Dictionary<string, string[]>
+        {
+            { "PACKAGE",    _exportPackageParams }
+        };
+
         // Parameters to the FILE(APPEND) command.
         private static string[] _fileAppendParams = new string[]
         {
@@ -312,9 +360,11 @@ namespace CMakeTools
         private static Dictionary<CMakeCommandId, Dictionary<string, string[]>> _allSubcommands =
             new Dictionary<CMakeCommandId, Dictionary<string, string[]>>
         {
-            { CMakeCommandId.File,      _fileSubcommands },
-            { CMakeCommandId.List,      _listSubcommands },
-            { CMakeCommandId.String,    _stringSubcommands }
+            { CMakeCommandId.CMakePolicy,   _cmakePolicySubcommands },
+            { CMakeCommandId.Export,        _exportSubcommands },
+            { CMakeCommandId.File,          _fileSubcommands },
+            { CMakeCommandId.List,          _listSubcommands },
+            { CMakeCommandId.String,        _stringSubcommands }
         };
 
         // The command and subcommand for which the given instance will provie
