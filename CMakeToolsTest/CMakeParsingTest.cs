@@ -76,6 +76,12 @@ namespace CMakeTools
             vars = CMakeParsing.ParseForVariables(
                 "set(${foo}_bar abc)");
             Assert.AreEqual(0, vars.Count);
+            vars = CMakeParsing.ParseForVariables("set(8 abc)");
+            Assert.AreEqual(1, vars.Count);
+            Assert.AreEqual("8", vars[0]);
+            vars = CMakeParsing.ParseForVariables("set(8xy abc)");
+            Assert.AreEqual(1, vars.Count);
+            Assert.AreEqual("8xy", vars[0]);
         }
 
         /// <summary>
@@ -307,6 +313,33 @@ namespace CMakeTools
             lines.Clear();
             lines.Add("message(foo)");
             Assert.IsFalse(CMakeParsing.ParseForVariableDefinition(lines, "foo",
+                out span));
+
+            // Test a declaration of a variable whose name is just a number.
+            lines.Clear();
+            lines.Add("set(8 abc)");
+            Assert.IsTrue(CMakeParsing.ParseForVariableDefinition(lines, "8", out span));
+            Assert.AreEqual(0, span.iStartLine);
+            Assert.AreEqual(4, span.iStartIndex);
+            Assert.AreEqual(0, span.iEndLine);
+            Assert.AreEqual(4, span.iEndIndex);
+            Assert.IsFalse(CMakeParsing.ParseForVariableDefinition(lines, "abc",
+                out span));
+            Assert.IsFalse(CMakeParsing.ParseForVariableDefinition(lines, "set",
+                out span));
+
+            // Test a declaration of a variable whose name starts with a number.
+            lines.Clear();
+            lines.Add("set(8xy abc)");
+            Assert.IsTrue(CMakeParsing.ParseForVariableDefinition(lines, "8xy",
+                out span));
+            Assert.AreEqual(0, span.iStartLine);
+            Assert.AreEqual(4, span.iStartIndex);
+            Assert.AreEqual(0, span.iEndLine);
+            Assert.AreEqual(6, span.iEndIndex);
+            Assert.IsFalse(CMakeParsing.ParseForVariableDefinition(lines, "abc",
+                out span));
+            Assert.IsFalse(CMakeParsing.ParseForVariableDefinition(lines, "set",
                 out span));
         }
 

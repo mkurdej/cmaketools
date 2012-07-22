@@ -114,7 +114,8 @@ namespace CMakeTools
                     possibleVariable = null;
                 }
                 else if (state == VariableParseState.NeedVariable &&
-                    tokenInfo.Token == (int)CMakeToken.Identifier)
+                    (tokenInfo.Token == (int)CMakeToken.Identifier ||
+                    tokenInfo.Token == (int)CMakeToken.NumericIdentifier))
                 {
                     if (paramsBeforeVariable == 0)
                     {
@@ -312,7 +313,8 @@ namespace CMakeTools
                         return true;
                     }
                     else if (state == VariableParseState.NeedVariable &&
-                        tokenInfo.Token == (int)CMakeToken.Identifier)
+                        (tokenInfo.Token == (int)CMakeToken.Identifier ||
+                        tokenInfo.Token == (int)CMakeToken.NumericIdentifier))
                     {
                         if (paramsBeforeVariable == 0)
                         {

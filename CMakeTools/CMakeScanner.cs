@@ -24,6 +24,7 @@ namespace CMakeTools
         Comment,
         Keyword,
         Identifier,
+        NumericIdentifier,
         FileName,
         Variable,
         VariableStart,
@@ -268,6 +269,28 @@ namespace CMakeTools
                     }
                     return true;
                 }
+                else if (char.IsDigit(_source[_offset]))
+                {
+                    // Variable names can start with numbers in CMake, but function names
+                    // can't.  We'll call these tokens "numeric identifiers" here and
+                    // treat them accordingly when parsing.
+                    tokenInfo.StartIndex = _offset;
+                    while (_offset < _source.Length - 1)
+                    {
+                        char ch = _source[_offset + 1];
+                        if (!char.IsLetterOrDigit(ch) && ch != '_')
+                        {
+                            break;
+                        }
+                        _offset++;
+                    }
+                    tokenInfo.EndIndex = _offset;
+                    _offset++;
+                    tokenInfo.Color = TokenColor.Identifier;
+                    tokenInfo.Token = expectVariable ? (int)CMakeToken.Variable :
+                        (int)CMakeToken.NumericIdentifier;
+                    return true;
+                }
                 else if (_source[_offset] == '$')
                 {
                     // Scan a variable start token.
@@ -280,7 +303,7 @@ namespace CMakeTools
                         tokenInfo.Trigger = TokenTriggers.MemberSelect;
                         _offset++;
                     }
-                    else if(_offset + 3 < _source.Length &&
+                    else if (_offset + 3 < _source.Length &&
                         _source.Substring(_offset, 4).Equals("ENV{"))
                     {
                         SetVariableFlag(ref state, true);
