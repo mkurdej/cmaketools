@@ -195,18 +195,7 @@ namespace CMakeTools
                     while (_offset < _source.Length - 1)
                     {
                         char ch = _source[_offset + 1];
-                        if (!expectVariable && ch == '\\')
-                        {
-                            // Skip over escape sequences.
-                            _offset++;
-                            isFileName = true;
-                        }
-                        else if (!expectVariable && (ch == '~' || ch == '`' ||
-                            ch == '!' || ch == '%' || ch == '^' || ch == '&' ||
-                            ch == '*' || ch == '-' || ch == '+' || ch == '=' ||
-                            ch == '[' || ch == ']' || ch == '{' || ch == '}' ||
-                            ch == ':' || ch == '\'' || ch == ',' || ch == '.' ||
-                            ch == '?' || ch == '/'))
+                        if (!expectVariable && ScanFileNameChar())
                         {
                             isFileName = true;
                         }
@@ -275,10 +264,15 @@ namespace CMakeTools
                     // can't.  We'll call these tokens "numeric identifiers" here and
                     // treat them accordingly when parsing.
                     tokenInfo.StartIndex = _offset;
+                    bool isFileName = false;
                     while (_offset < _source.Length - 1)
                     {
                         char ch = _source[_offset + 1];
-                        if (!char.IsLetterOrDigit(ch) && ch != '_')
+                        if (!expectVariable && ScanFileNameChar())
+                        {
+                            isFileName = true;
+                        }
+                        else if (!char.IsLetterOrDigit(ch) && ch != '_')
                         {
                             break;
                         }
@@ -287,8 +281,18 @@ namespace CMakeTools
                     tokenInfo.EndIndex = _offset;
                     _offset++;
                     tokenInfo.Color = TokenColor.Identifier;
-                    tokenInfo.Token = expectVariable ? (int)CMakeToken.Variable :
-                        (int)CMakeToken.NumericIdentifier;
+                    if (expectVariable)
+                    {
+                        tokenInfo.Token = (int)CMakeToken.Variable;
+                    }
+                    else if (isFileName)
+                    {
+                        tokenInfo.Token = (int)CMakeToken.FileName;
+                    }
+                    else
+                    {
+                        tokenInfo.Token = (int)CMakeToken.NumericIdentifier;
+                    }
                     return true;
                 }
                 else if (_source[_offset] == '$')
@@ -365,6 +369,28 @@ namespace CMakeTools
             _offset = _source.Length;
             tokenInfo.EndIndex = _source.Length - 1;
             SetStringFlag(ref state, true);
+        }
+
+        private bool ScanFileNameChar()
+        {
+            // Attempt to scan a single character that may be valid in a file name but
+            // not in an identifier.  Return true if such a character was found or false
+            // otherwise.
+            char ch = _source[_offset + 1];
+            if (ch == '\\')
+            {
+                // Skip over escape sequences.
+                _offset++;
+                return true;
+            }
+            else if (ch == '~' || ch == '`' || ch == '!' || ch == '%' || ch == '^' ||
+                ch == '&' || ch == '*' || ch == '-' || ch == '+' || ch == '=' ||
+                ch == '[' || ch == ']' || ch == '{' || ch == '}' || ch == ':' ||
+                ch == '\'' || ch == ',' || ch == '.' || ch == '?' || ch == '/')
+            {
+                return true;
+            }
+            return false;
         }
 
         // Masks, flags, and shifts to manipulate state values.

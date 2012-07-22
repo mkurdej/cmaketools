@@ -98,6 +98,10 @@ namespace CMakeTools
             vars = CMakeParsing.ParseForVariables("foo set(bar abc)");
             Assert.AreEqual(1, vars.Count);
             Assert.AreEqual("bar", vars[0]);
+            vars = CMakeParsing.ParseForVariables("set(foo.txt)");
+            Assert.AreEqual(0, vars.Count);
+            vars = CMakeParsing.ParseForVariables("set(8xy.txt)");
+            Assert.AreEqual(0, vars.Count);
         }
 
         /// <summary>

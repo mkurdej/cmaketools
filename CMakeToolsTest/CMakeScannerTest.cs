@@ -506,6 +506,17 @@ namespace CMakeTools
             Assert.AreEqual(CMakeToken.VariableEnd, (CMakeToken)tokenInfo.Token);
             Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
             Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+
+            // Test that a file name starting with a digit is identified as a file name
+            // and not as a numeric identifier or something else.
+            scanner.SetSource("8xy.txt", 0);
+            state = 0;
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(0, tokenInfo.StartIndex);
+            Assert.AreEqual(6, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.FileName, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+            Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
         }
     }
 }
