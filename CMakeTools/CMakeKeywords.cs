@@ -913,7 +913,7 @@ namespace CMakeTools
             // member selection.
             _memberSelectionCommands = new bool[_commands.Length];
             foreach (CMakeCommandId id in
-                CMakeSubcommandDeclarations.GetMemberSelectionTriggers())
+                CMakeSubcommandMethods.GetMemberSelectionTriggers())
             {
                 _memberSelectionCommands[(int)id] = true;
             }

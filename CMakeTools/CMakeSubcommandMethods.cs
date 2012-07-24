@@ -52,6 +52,19 @@ namespace CMakeTools
             { "VERSION",    _cmakePolicyVersionParams }
         };
 
+        // Map from subcommands of the DEFINE_PROPERTY command to parameters.
+        private static Dictionary<string, string[]> _definePropertySubcommands =
+            new Dictionary<string, string[]>
+        {
+            { "CACHED_VARIABLE",    null },
+            { "DIRECTORY",          null },
+            { "GLOBAL",             null },
+            { "SOURCE",             null },
+            { "TARGET",             null },
+            { "TEST",               null },
+            { "VARIABLE",           null }
+        };
+
         // Parameters to the EXPORT(PACKAGE) command.
         private static string[] _exportPackageParams = new string[]
         {
@@ -62,7 +75,8 @@ namespace CMakeTools
         private static Dictionary<string, string[]> _exportSubcommands =
             new Dictionary<string, string[]>
         {
-            { "PACKAGE",    _exportPackageParams }
+            { "PACKAGE",    _exportPackageParams },
+            { "TARGETS",    null }
         };
 
         // Parameters to the FILE(APPEND) command.
@@ -158,7 +172,7 @@ namespace CMakeTools
         // Parameters to the FILE(WRITE) command.
         private static string[] _fileWriteParams = _fileAppendParams;
 
-        // Map from subcommands of FILE command to parameters.
+        // Map from subcommands of the FILE command to parameters.
         private static Dictionary<string, string[]> _fileSubcommands =
             new Dictionary<string, string[]>
         {
@@ -183,6 +197,19 @@ namespace CMakeTools
             { "TO_NATIVE_PATH", _fileToNativePathParams },
             { "UPLOAD",         _fileUploadParams },
             { "WRITE",          _fileWriteParams }
+        };
+
+        // Map from subcommands of the INSTALL command to parameters.
+        private static Dictionary<string, string[]> _installSubcommands =
+            new Dictionary<string, string[]>
+        {
+            { "CODE",       null },
+            { "DIRECTORY",  null },
+            { "EXPORT",     null },
+            { "FILES",      null },
+            { "PROGRAMS",   null },
+            { "SCRIPTS",    null },
+            { "TARGETS",    null }
         };
 
         // Parameters to the LIST(APPEND) command.
@@ -265,6 +292,18 @@ namespace CMakeTools
             { "SORT",               _listSortParams }
         };
 
+        // Map from subcommands of the SET_PROPERTY command to parameters.
+        private static Dictionary<string, string[]> _setPropertySubcommands =
+            new Dictionary<string, string[]>
+        {
+            { "CACHE",      null },
+            { "DIRECTORY",  null },
+            { "GLOBAL",     null },
+            { "SOURCE",     null },
+            { "TARGET",     null },
+            { "TEST",       null }
+        };
+
         // Parameters to the STRING(ASCII) command.
         private static string[] _stringAsciiParams = new string[]
         {
@@ -344,6 +383,7 @@ namespace CMakeTools
             { "LENGTH",     _stringLengthParams },
             { "MD5",        _stringMD5Params },
             { "RANDOM",     _stringRandomParams },
+            { "REGEX",      null },
             { "REPLACE",    _stringReplaceParams },
             { "SHA1",       _stringSHA1Params },
             { "SHA224",     _stringSHA224Params },
@@ -360,11 +400,14 @@ namespace CMakeTools
         private static Dictionary<CMakeCommandId, Dictionary<string, string[]>> _allSubcommands =
             new Dictionary<CMakeCommandId, Dictionary<string, string[]>>
         {
-            { CMakeCommandId.CMakePolicy,   _cmakePolicySubcommands },
-            { CMakeCommandId.Export,        _exportSubcommands },
-            { CMakeCommandId.File,          _fileSubcommands },
-            { CMakeCommandId.List,          _listSubcommands },
-            { CMakeCommandId.String,        _stringSubcommands }
+            { CMakeCommandId.CMakePolicy,       _cmakePolicySubcommands },
+            { CMakeCommandId.DefineProperty,    _definePropertySubcommands },
+            { CMakeCommandId.Export,            _exportSubcommands },
+            { CMakeCommandId.File,              _fileSubcommands },
+            { CMakeCommandId.Install,           _installSubcommands },
+            { CMakeCommandId.List,              _listSubcommands },
+            { CMakeCommandId.SetProperty,       _setPropertySubcommands },
+            { CMakeCommandId.String,            _stringSubcommands }
         };
 
         // The command and subcommand for which the given instance will provie
@@ -478,6 +521,30 @@ namespace CMakeTools
                 return null;
             }
             return new CMakeSubcommandMethods(id, subcommand);
+        }
+
+        /// <summary>
+        /// Get the subcommands of a given command.
+        /// </summary>
+        /// <param name="id">The identifier of a CMake command.</param>
+        /// <returns>A collection of names of subcommands.</returns>
+        public static IEnumerable<string> GetSubcommands(CMakeCommandId id)
+        {
+            if (!_allSubcommands.ContainsKey(id))
+            {
+                return null;
+            }
+            return _allSubcommands[id].Keys;
+        }
+
+        /// <summary>
+        /// Get a collection of commands that should trigger member selection because
+        /// they have subcommands.
+        /// </summary>
+        /// <returns>A collection of command identifiers.</returns>
+        public static IEnumerable<CMakeCommandId> GetMemberSelectionTriggers()
+        {
+            return _allSubcommands.Keys;
         }
     }
 }
