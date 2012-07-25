@@ -8,6 +8,7 @@
         <Locale>1033</Locale>
         <License>License.txt</License>
         <Icon>CMakeLogo.ico</Icon>
+        <PreviewImage>CMakeLogoBig.png</PreviewImage>
         <InstalledByMsi>false</InstalledByMsi>
         <SupportedProducts>
             <VisualStudio Version="10.0">
