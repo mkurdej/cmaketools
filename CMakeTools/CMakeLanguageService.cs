@@ -70,8 +70,16 @@ namespace CMakeTools
                 {
                     CMakeCommandId id = CMakeParsing.ParseForTriggerCommandId(
                         source.GetLines(), req.Line, req.TokenInfo.StartIndex);
-                    scope.SetDeclarations(
-                        CMakeSubcommandDeclarations.GetSubcommandDeclarations(id));
+                    if (id == CMakeCommandId.Include)
+                    {
+                        scope.SetDeclarations(
+                            new CMakeIncludeDeclarations(req.FileName));
+                    }
+                    else
+                    {
+                        scope.SetDeclarations(
+                            CMakeSubcommandDeclarations.GetSubcommandDeclarations(id));
+                    }
                 }
             }
             else if (req.Reason == ParseReason.MethodTip)
