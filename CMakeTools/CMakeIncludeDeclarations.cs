@@ -22,8 +22,14 @@ namespace CMakeTools
     /// </summary>
     class CMakeIncludeDeclarations : Declarations
     {
+        // Default set of CMake modules to show in list if CMake is not installed.
+        private static string[] _defaultModules =
+        {
+            "CPack"
+        };
+
         // Array of include files to be displayed.
-        private string[] _includeFiles;
+        private List<string> _includeFiles;
 
         public CMakeIncludeDeclarations(string sourceFilePath)
         {
@@ -34,12 +40,49 @@ namespace CMakeTools
             IEnumerable<string> files = Directory.EnumerateFiles(dirPath, "*.cmake");
             files = files.Select(Path.GetFileName);
             files = files.Where(x => !x.Equals("cmake_install.cmake"));
-            _includeFiles = files.ToArray();
+            _includeFiles = files.ToList();
+
+            // Find all *.cmake files in the Modules directory inside the CMake
+            // installation, if there is one.
+            string pathToCMake = CMakePath.FindCMake();
+            bool foundModules = false;
+            if (pathToCMake != null)
+            {
+                try
+                {
+                    string pathToShare = Path.Combine(pathToCMake, "share");
+                    IEnumerable<string> dirs = Directory.EnumerateDirectories(
+                        pathToShare, "cmake-*.*");
+                    foreach (string dir in dirs)
+                    {
+                        string pathToModules = Path.Combine(pathToShare, dir, "Modules");
+                        if (Directory.Exists(pathToModules))
+                        {
+                            foundModules = true;
+                            files = Directory.EnumerateFiles(pathToModules, "*.cmake");
+                            files = files.Select(Path.GetFileNameWithoutExtension);
+                            _includeFiles.AddRange(files);
+                        }
+                    }
+                }
+                catch (DirectoryNotFoundException)
+                {
+                    // This exception will occur if the CMake installation is missing
+                    // expected subdirectories.  Proceed as if CMake had not been found.
+                }
+            }
+            if (!foundModules)
+            {
+                // If we couldn't find modules in a CMake installation, show a default
+                // hard-code listing.
+                _includeFiles.AddRange(_defaultModules);
+            }
+            _includeFiles.Sort();
         }
 
         public override int GetCount()
         {
-            return _includeFiles.Length;
+            return _includeFiles.Count;
         }
 
         public override string GetDescription(int index)
@@ -54,13 +97,19 @@ namespace CMakeTools
 
         public override int GetGlyph(int index)
         {
-            // Always return the index for a reference.
-            return 193;
+            // If the item is for a module, return the icon index for a module.
+            // Otherwise, return the index for a reference.
+            if (index >= 0 && index < _includeFiles.Count &&
+                _includeFiles[index].EndsWith(".cmake"))
+            {
+                return 193;
+            }
+            return 84;
         }
 
         public override string GetName(int index)
         {
-            if (index < 0 || index >= _includeFiles.Length)
+            if (index < 0 || index >= _includeFiles.Count)
             {
                 return null;
             }

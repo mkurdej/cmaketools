@@ -85,29 +85,7 @@ namespace CMakeTools
         private void CMakeMenuCallback(object sender, EventArgs e)
         {
             // Attempt to find CMake in the registry.
-            string location = null;
-            RegistryKey localMachine = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine,
-                RegistryView.Registry32);
-            RegistryKey kitwareKey = localMachine.OpenSubKey("Software\\Kitware");
-            if (kitwareKey != null)
-            {
-                foreach (string keyName in kitwareKey.GetSubKeyNames())
-                {
-                    if (!keyName.StartsWith("CMake"))
-                    {
-                        continue;
-                    }
-                    RegistryKey cmakeKey = kitwareKey.OpenSubKey(keyName);
-                    if (cmakeKey.GetValueKind(null) == RegistryValueKind.String)
-                    {
-                        location = cmakeKey.GetValue(null) as string;
-                        if (location != null)
-                        {
-                            break;
-                        }
-                    }
-                }
-            }
+            string location = CMakePath.FindCMake();
 
             // If we found CMake, attempt to spawn it.
             if (location != null)
