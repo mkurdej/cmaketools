@@ -10,6 +10,7 @@
  * 
  * **************************************************************************/
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -61,8 +62,6 @@ namespace CMakeTools
             "CMakeDetermineASM_NASMCompiler",
             "CMakeDetermineASMCompiler",
             "CMakeDetermineCCompiler",
-            "CMakeDetermineCompilerABI",
-            "CMakeDetermineCompilerId",
             "CMakeDetermineCXXCompiler",
             "CMakeDetermineFortranCompiler",
             "CMakeDetermineJavaCompiler",
@@ -89,7 +88,6 @@ namespace CMakeTools
             "CMakeMSYSFindMake",
             "CMakeNMakeFindMake",
             "CMakeParseArguments",
-            "CMakeParseImplicitLinkInfo",
             "CMakePrintSystemInformation",
             "CMakePushCheckState",
             "CMakeRCInformation",
@@ -298,6 +296,15 @@ namespace CMakeTools
             "WriteBasicConfigVersionFile"
         };
 
+        // Modules used internally by CMake that should be excluded from the
+        // member selection list.
+        private static string[] _internalModules =
+        {
+            "CMakeDetermineCompilerABI",
+            "CMakeDetermineCompilerId",
+            "CMakeParseImplicitLinkInfo"
+        };
+
         // Array of include files to be displayed.
         private List<string> _includeFiles;
 
@@ -348,6 +355,11 @@ namespace CMakeTools
                 _includeFiles.AddRange(_defaultModules);
             }
             _includeFiles.Sort();
+
+            // Remove certain modules that are used internally by CMake and shouldn't be
+            // included by user code.
+            _includeFiles = _includeFiles.Where(
+                x => Array.BinarySearch(_internalModules, x) < 0).ToList();
         }
 
         public override int GetCount()
