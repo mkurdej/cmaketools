@@ -47,7 +47,7 @@ namespace CMakeTools
         public override int GetGlyph(int index)
         {
             // Always return the index for a keyword.
-            return 207;
+            return 206;
         }
 
         public override string GetName(int index)
