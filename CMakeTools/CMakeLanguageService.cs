@@ -78,7 +78,7 @@ namespace CMakeTools
                     else if (id == CMakeCommandId.FindPackage)
                     {
                         scope.SetDeclarations(
-                            new CMakeIncludeDeclarations(req.FileName, true));
+                            new CMakePackageDeclarations(req.FileName));
                     }
                     else
                     {
