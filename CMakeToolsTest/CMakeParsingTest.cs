@@ -12,6 +12,7 @@
 
 using CMakeTools;
 using System.Collections.Generic;
+using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -627,6 +628,44 @@ namespace CMakeTools
             Assert.AreEqual(25, result.EndSpan.Value.iStartIndex);
             Assert.AreEqual(0, result.EndSpan.Value.iEndLine);
             Assert.AreEqual(25, result.EndSpan.Value.iEndIndex);
+        }
+
+        /// <summary>
+        /// Test parsing for the token at a given position.
+        /// </summary>
+        [TestMethod]
+        public void TestParseForToken()
+        {
+            List<string> lines = new List<string>();
+            lines.Add("SET(ABC");
+            lines.Add("  X");
+            lines.Add("  Y");
+            lines.Add("  Z)");
+
+            bool inParens;
+            TokenInfo tokenInfo;
+            Assert.IsTrue(CMakeParsing.ParseForToken(lines, 0, 1, out tokenInfo,
+                out inParens));
+            Assert.IsFalse(inParens);
+            Assert.AreEqual(CMakeToken.Keyword, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(0, tokenInfo.StartIndex);
+            Assert.AreEqual(2, tokenInfo.EndIndex);
+            Assert.IsTrue(CMakeParsing.ParseForToken(lines, 0, 4, out tokenInfo,
+                out inParens));
+            Assert.IsTrue(inParens);
+            Assert.AreEqual(CMakeToken.Identifier, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(4, tokenInfo.StartIndex);
+            Assert.AreEqual(6, tokenInfo.EndIndex);
+            Assert.IsFalse(CMakeParsing.ParseForToken(lines, 0, 10, out tokenInfo,
+                out inParens));
+            Assert.IsTrue(CMakeParsing.ParseForToken(lines, 1, 2, out tokenInfo,
+                out inParens));
+            Assert.IsTrue(inParens);
+            Assert.AreEqual(CMakeToken.Identifier, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(2, tokenInfo.StartIndex);
+            Assert.AreEqual(2, tokenInfo.EndIndex);
+            Assert.IsFalse(CMakeParsing.ParseForToken(lines, 10, 0, out tokenInfo,
+                out inParens));
         }
     }
 }
