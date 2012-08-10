@@ -34,7 +34,8 @@ namespace CMakeTools
         CodeSense = true,
         ShowCompletion = true,
         EnableCommenting = true,
-        AutoOutlining = true)]
+        AutoOutlining = true,
+        QuickInfo = true)]
     [ProvideLanguageExtension(typeof(CMakeLanguageService), ".cmake")]
     [ProvideLanguageExtension(typeof(CMakeLanguageService), ".txt")]
     [ProvideMenuResource("Menus.ctmenu", 1)]

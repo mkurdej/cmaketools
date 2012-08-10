@@ -369,5 +369,20 @@ namespace CMakeTools
             }
             return _parameters[id].Length;
         }
+
+        /// <summary>
+        /// Get the Quick Info tip for a given CMake command.
+        /// </summary>
+        /// <param name="id">The identifier of a CMake command.</param>
+        /// <returns>The Quick Info tip.</returns>
+        public static string GetCommandQuickInfoTip(CMakeCommandId id)
+        {
+            if (!_parameters.ContainsKey(id))
+            {
+                return null;
+            }
+            return string.Format("{0}({1})", CMakeKeywords.GetCommandFromId(id),
+                string.Join(" ", _parameters[id]));
+        }
     }
 }

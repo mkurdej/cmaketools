@@ -11,6 +11,7 @@
  * **************************************************************************/
 
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
@@ -49,6 +50,25 @@ namespace CMakeTools
 
         public override string GetDataTipText(int line, int col, out TextSpan span)
         {
+            TokenInfo tokenInfo;
+            bool inParens;
+            if (CMakeParsing.ParseForToken(_lines, line, col, out tokenInfo, out
+                inParens) && !inParens)
+            {
+                if (tokenInfo.Token == (int)CMakeToken.Keyword)
+                {
+                    // Get a Quick Info tip for the command at the cursor.
+                    span = new TextSpan();
+                    span.iStartLine = line;
+                    span.iStartIndex = tokenInfo.StartIndex;
+                    span.iEndLine = line;
+                    span.iEndIndex = tokenInfo.EndIndex;
+                    string lineText = _lines.ToList()[line];
+                    string tokenText = lineText.ExtractToken(tokenInfo);
+                    CMakeCommandId id = CMakeKeywords.GetCommandId(tokenText);
+                    return CMakeMethods.GetCommandQuickInfoTip(id);
+                }
+            }
             span = new TextSpan();
             return null;
         }

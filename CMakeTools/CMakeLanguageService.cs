@@ -140,6 +140,10 @@ namespace CMakeTools
                 scope.SetLines(source.GetLines());
                 scope.SetFileName(req.FileName);
             }
+            else if (req.Reason == ParseReason.QuickInfo)
+            {
+                scope.SetLines(source.GetLines());
+            }
             return scope;
         }
 

@@ -984,5 +984,46 @@ namespace CMakeTools
             isVariable = false;
             return null;
         }
+
+        /// <summary>
+        /// Parse to find the token at a given position.
+        /// </summary>
+        /// <param name="lines">A collection of lines to parse.</param>
+        /// <param name="lineNum">The line number at which to look for a token.</param>
+        /// <param name="col">The column at which to look for a token.</param>
+        /// <param name="tokenInfo">
+        /// A token information structure that will be set to contain information on the
+        /// token found.
+        /// </param>
+        /// <param name="inParens">
+        /// A Boolean value that will be set to true if a token is found or false
+        /// otherwise.
+        /// </param>
+        /// <returns>True if a token was found or false otherwise.</returns>
+        public static bool ParseForToken(IEnumerable<string> lines, int lineNum,
+            int col, out TokenInfo tokenInfo, out bool inParens)
+        {
+            CMakeScanner scanner = new CMakeScanner();
+            int state = 0;
+            int i = 0;
+            tokenInfo = new TokenInfo();
+            foreach (string line in lines)
+            {
+                scanner.SetSource(line, 0);
+                while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state))
+                {
+                    if (i == lineNum && tokenInfo.StartIndex <= col &&
+                        tokenInfo.EndIndex >= col)
+                    {
+                        // We found the token.
+                        inParens = CMakeScanner.InsideParens(state);
+                        return true;
+                    }
+                }
+                i++;
+            }
+            inParens = false;
+            return false;
+        }
     }
 }
