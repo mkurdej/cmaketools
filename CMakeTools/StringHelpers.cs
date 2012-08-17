@@ -11,6 +11,7 @@
  * **************************************************************************/
 
 using Microsoft.VisualStudio.Package;
+using Microsoft.VisualStudio.TextManager.Interop;
 
 namespace CMakeTools
 {
@@ -29,6 +30,23 @@ namespace CMakeTools
         {
             return text.Substring(tokenInfo.StartIndex,
                 tokenInfo.EndIndex - tokenInfo.StartIndex + 1);
+        }
+
+        /// <summary>
+        /// Generate a text span from token information.
+        /// </summary>
+        /// <param name="tokenInfo">Information on a token.</param>
+        /// <param name="line">The line number on which the token is found.</param>
+        /// <returns>A text span for the token.</returns>
+        public static TextSpan ToTextSpan(this TokenInfo tokenInfo, int line)
+        {
+            return new TextSpan()
+            {
+                iStartLine = line,
+                iStartIndex = tokenInfo.StartIndex,
+                iEndLine = line,
+                iEndIndex = tokenInfo.EndIndex
+            };
         }
     }
 }

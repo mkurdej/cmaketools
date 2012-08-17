@@ -58,11 +58,7 @@ namespace CMakeTools
                 if (tokenInfo.Token == (int)CMakeToken.Keyword)
                 {
                     // Get a Quick Info tip for the command at the cursor.
-                    span = new TextSpan();
-                    span.iStartLine = line;
-                    span.iStartIndex = tokenInfo.StartIndex;
-                    span.iEndLine = line;
-                    span.iEndIndex = tokenInfo.EndIndex;
+                    span = tokenInfo.ToTextSpan(line);
                     string lineText = _lines.ToList()[line];
                     string tokenText = lineText.ExtractToken(tokenInfo);
                     CMakeCommandId id = CMakeKeywords.GetCommandId(tokenText);
@@ -78,11 +74,7 @@ namespace CMakeTools
                         tokenText);
                     if (parameters != null)
                     {
-                        span = new TextSpan();
-                        span.iStartLine = line;
-                        span.iStartIndex = tokenInfo.StartIndex;
-                        span.iEndLine = line;
-                        span.iEndIndex = tokenInfo.EndIndex;
+                        span = tokenInfo.ToTextSpan(line);
                         return string.Format("{0}({1})", tokenText,
                             string.Join(" ", parameters));
                     }
