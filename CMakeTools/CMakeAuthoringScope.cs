@@ -68,6 +68,25 @@ namespace CMakeTools
                     CMakeCommandId id = CMakeKeywords.GetCommandId(tokenText);
                     return CMakeMethods.GetCommandQuickInfoTip(id);
                 }
+                else if (tokenInfo.Token == (int)CMakeToken.Identifier)
+                {
+                    // Get a Quick Info tip for the function called at the cursor, if
+                    // there is one.
+                    string lineText = _lines.ToList()[line];
+                    string tokenText = lineText.ExtractToken(tokenInfo);
+                    List<string> parameters = CMakeParsing.ParseForParameterNames(_lines,
+                        tokenText);
+                    if (parameters != null)
+                    {
+                        span = new TextSpan();
+                        span.iStartLine = line;
+                        span.iStartIndex = tokenInfo.StartIndex;
+                        span.iEndLine = line;
+                        span.iEndIndex = tokenInfo.EndIndex;
+                        return string.Format("{0}({1})", tokenText,
+                            string.Join(" ", parameters));
+                    }
+                }
             }
             span = new TextSpan();
             return null;
