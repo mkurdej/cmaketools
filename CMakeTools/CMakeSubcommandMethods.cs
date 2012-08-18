@@ -546,5 +546,32 @@ namespace CMakeTools
         {
             return _allSubcommands.Keys;
         }
+
+        /// <summary>
+        /// Get the Quick Info tip for a given CMake subcommand.
+        /// </summary>
+        /// <param name="id">The identifier of a CMake command.</param>
+        /// <param name="subcommand">The name of a subcommand.</param>
+        /// <returns>The Quick Info tip.</returns>
+        public static string GetSubcommandQuickInfoTip(CMakeCommandId id,
+            string subcommand)
+        {
+            if (!_allSubcommands.ContainsKey(id) ||
+                !_allSubcommands[id].ContainsKey(subcommand) ||
+                _allSubcommands[id][subcommand] == null)
+            {
+                return null;
+            }
+            if (_allSubcommands[id][subcommand].Length > 0)
+            {
+                return string.Format("{0}({1} {2})", CMakeKeywords.GetCommandFromId(id),
+                    subcommand, string.Join(" ", _allSubcommands[id][subcommand]));
+            }
+            else
+            {
+                return string.Format("{0}({1})", CMakeKeywords.GetCommandFromId(id),
+                    subcommand);
+            }
+        }
     }
 }

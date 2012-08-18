@@ -62,6 +62,14 @@ namespace CMakeTools
                     string lineText = _lines.ToList()[line];
                     string tokenText = lineText.ExtractToken(tokenInfo);
                     CMakeCommandId id = CMakeKeywords.GetCommandId(tokenText);
+                    if (CMakeSubcommandMethods.HasSubcommands(id))
+                    {
+                        // Parse to get the subcommand, if there is one.
+                        CMakeParsing.ParameterInfoResult result =
+                            CMakeParsing.ParseForParameterInfo(_lines, line, -1, true);
+                        return CMakeSubcommandMethods.GetSubcommandQuickInfoTip(id,
+                            result.SubcommandName);                        
+                    }
                     return CMakeMethods.GetCommandQuickInfoTip(id);
                 }
                 else if (tokenInfo.Token == (int)CMakeToken.Identifier)

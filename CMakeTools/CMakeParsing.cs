@@ -634,9 +634,14 @@ namespace CMakeTools
         /// <param name="endIndex">
         /// The end index of the token that triggered the parse request.
         /// </param>
+        /// <param name="namesOnly">
+        /// Flag indicating whether to find only the command and subcommand names,
+        /// skipping all other information.
+        /// </param>
         /// <returns>A structure containing the result of the parse operation.</returns>
         public static ParameterInfoResult ParseForParameterInfo(
-            IEnumerable<string> lines, int lineNum, int endIndex)
+            IEnumerable<string> lines, int lineNum, int endIndex,
+            bool namesOnly = false)
         {
             ParameterInfoResult result = new ParameterInfoResult();
             result.SeparatorSpans = new List<TextSpan>();
@@ -669,7 +674,7 @@ namespace CMakeTools
             int parenDepth = 0;
             while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state))
             {
-                if (tokenInfo.StartIndex > endIndex)
+                if (endIndex >= 0 && tokenInfo.StartIndex > endIndex)
                 {
                     // Stop parsing once we pass the token that triggered the parsing
                     // request.  Failure to do this will cause the arrow keys to not
@@ -713,6 +718,10 @@ namespace CMakeTools
                         else
                         {
                             result.CommandName = commandText;
+                            if (namesOnly)
+                            {
+                                break;
+                            }
                             result.CommandSpan = lastCommandSpan;
                             result.BeginSpan = new TextSpan()
                             {
@@ -750,6 +759,10 @@ namespace CMakeTools
                         {
                             result.CommandName = commandText;
                             result.SubcommandName = subcommandText;
+                            if (namesOnly)
+                            {
+                                break;
+                            }
                             result.CommandSpan = lastCommandSpan;
                             result.BeginSpan = new TextSpan()
                             {
