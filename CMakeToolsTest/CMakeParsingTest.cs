@@ -600,6 +600,37 @@ namespace CMakeTools
             Assert.AreEqual(0, result.EndSpan.Value.iEndLine);
             Assert.AreEqual(9, result.EndSpan.Value.iEndIndex);
 
+            // Test that passing a negative number for the column causes the entire line
+            // to be scanned.
+            result = CMakeParsing.ParseForParameterInfo(lines, 0, -1);
+            Assert.IsNotNull(result.CommandName);
+            Assert.AreEqual("foo", result.CommandName);
+            Assert.IsNull(result.SubcommandName);
+            Assert.IsTrue(result.CommandSpan.HasValue);
+            Assert.AreEqual(0, result.CommandSpan.Value.iStartLine);
+            Assert.AreEqual(0, result.CommandSpan.Value.iStartIndex);
+            Assert.AreEqual(0, result.CommandSpan.Value.iEndLine);
+            Assert.AreEqual(2, result.CommandSpan.Value.iEndIndex);
+            Assert.IsTrue(result.BeginSpan.HasValue);
+            Assert.AreEqual(0, result.BeginSpan.Value.iStartLine);
+            Assert.AreEqual(3, result.BeginSpan.Value.iStartIndex);
+            Assert.AreEqual(0, result.BeginSpan.Value.iEndLine);
+            Assert.AreEqual(3, result.BeginSpan.Value.iEndIndex);
+            Assert.AreEqual(2, result.SeparatorSpans.Count);
+            Assert.AreEqual(0, result.SeparatorSpans[0].iStartLine);
+            Assert.AreEqual(5, result.SeparatorSpans[0].iStartIndex);
+            Assert.AreEqual(0, result.SeparatorSpans[0].iEndLine);
+            Assert.AreEqual(5, result.SeparatorSpans[0].iEndIndex);
+            Assert.AreEqual(0, result.SeparatorSpans[1].iStartLine);
+            Assert.AreEqual(7, result.SeparatorSpans[1].iStartIndex);
+            Assert.AreEqual(0, result.SeparatorSpans[1].iEndLine);
+            Assert.AreEqual(7, result.SeparatorSpans[1].iEndIndex);
+            Assert.IsTrue(result.EndSpan.HasValue);
+            Assert.AreEqual(0, result.EndSpan.Value.iStartLine);
+            Assert.AreEqual(9, result.EndSpan.Value.iStartIndex);
+            Assert.AreEqual(0, result.EndSpan.Value.iEndLine);
+            Assert.AreEqual(9, result.EndSpan.Value.iEndIndex);
+
             // Test a subcommand.
             lines.Clear();
             lines.Add("FILE(COPY foo.txt bar.txt)");
@@ -628,6 +659,17 @@ namespace CMakeTools
             Assert.AreEqual(25, result.EndSpan.Value.iStartIndex);
             Assert.AreEqual(0, result.EndSpan.Value.iEndLine);
             Assert.AreEqual(25, result.EndSpan.Value.iEndIndex);
+
+            // Ensure that we can parse for names only.
+            result = CMakeParsing.ParseForParameterInfo(lines, 0, -1, true);
+            Assert.IsNotNull(result.CommandName);
+            Assert.AreEqual("FILE", result.CommandName);
+            Assert.IsNotNull(result.SubcommandName);
+            Assert.AreEqual("COPY", result.SubcommandName);
+            Assert.IsFalse(result.CommandSpan.HasValue);
+            Assert.IsFalse(result.BeginSpan.HasValue);
+            Assert.AreEqual(0, result.SeparatorSpans.Count);
+            Assert.IsFalse(result.EndSpan.HasValue);
         }
 
         /// <summary>

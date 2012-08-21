@@ -15,7 +15,7 @@ using Microsoft.VisualStudio.Package;
 
 namespace CMakeTools
 {
-    class CMakeSubcommandMethods : Methods
+    public class CMakeSubcommandMethods : Methods
     {
         // Parameters to the CMAKE_POLICY(GET) command.
         private static string[] _cmakePolicyGetParams = new string[]

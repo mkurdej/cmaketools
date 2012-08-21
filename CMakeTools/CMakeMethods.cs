@@ -18,7 +18,7 @@ namespace CMakeTools
     /// <summary>
     /// Methods object containing parameter information for a CMake command.
     /// </summary>
-    class CMakeMethods : Methods
+    public class CMakeMethods : Methods
     {
         // Parameters to the ADD_DEPENDENCIES command.
         private static string[] _addDependenciesParams = new string[]
