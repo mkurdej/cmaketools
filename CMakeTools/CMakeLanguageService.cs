@@ -13,6 +13,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
 
@@ -196,6 +197,13 @@ namespace CMakeTools
                 source.LastParseTime = 0;
             }
             base.OnIdle(periodic);
+        }
+
+        public override int ValidateBreakpointLocation(IVsTextBuffer buffer, int line,
+            int col, TextSpan[] pCodeSpan)
+        {
+            // Block all breakpoints in CMake, since debugging is not supported.
+            return VSConstants.S_FALSE;
         }
     }
 }
