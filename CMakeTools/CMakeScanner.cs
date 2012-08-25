@@ -44,6 +44,12 @@ namespace CMakeTools
         private int _offset;
         private bool _textFile;
 
+        // This flag indicates whether the scanner has yet scanned any non-whitespace
+        // tokens on the current line.  Since it does not need to persist between lines,
+        // it is safe (and indeed necessary) to store this value in a member variable
+        // rather than in the scanner state.
+        private bool _scannedNonWhitespace;
+
         public CMakeScanner(bool textFile = false)
         {
             _textFile = textFile;
@@ -53,6 +59,7 @@ namespace CMakeTools
         {
             _source = source;
             _offset = offset;
+            _scannedNonWhitespace = false;
         }
 
         public bool ScanTokenAndProvideInfoAboutIt(TokenInfo tokenInfo, ref int state)
@@ -69,8 +76,11 @@ namespace CMakeTools
                 // If the line begins inside a string token, begin by scanning the rest
                 // of the string.
                 ScanString(tokenInfo, ref state, false);
+                _scannedNonWhitespace = true;
                 return true;
             }
+
+            bool originalScannedNonWhitespace = _scannedNonWhitespace;
             bool expectVariable = GetVariableFlag(state);
             SetVariableFlag(ref state, false);
             bool noSeparator = GetNoSeparatorFlag(state);
@@ -141,7 +151,16 @@ namespace CMakeTools
                     SetNoSeparatorFlag(ref state, noSeparator);
                     return true;
                 }
-                else if (_source[_offset] == '"')
+
+                // If we haven't returned by this point, the token is something other
+                // than whitespace.  Therefore, set the flag indicating that a
+                // non-whitespace token has been scanned on the current line so that
+                // any additional identifier characters at the end won't trigger member
+                // selection.  If you add any additional token, ensure that you handle
+                // them after this point.
+                _scannedNonWhitespace = true;
+
+                if (_source[_offset] == '"')
                 {
                     // Scan a string token.
                     ScanString(tokenInfo, ref state, true);
@@ -255,6 +274,11 @@ namespace CMakeTools
                             TokenColor.Identifier;
                         tokenInfo.Token = isKeyword ? (int)CMakeToken.Keyword :
                             (int)CMakeToken.Identifier;
+                    }
+                    if (tokenInfo.StartIndex == tokenInfo.EndIndex &&
+                        !InsideParens(state) && !originalScannedNonWhitespace)
+                    {
+                        tokenInfo.Trigger |= TokenTriggers.MemberSelect;
                     }
                     return true;
                 }
@@ -531,6 +555,10 @@ namespace CMakeTools
         {
             // Get the identifier of the last command scanned from the state.
             int id = (state & LastCommandMask) >> LastCommandShift;
+            if (id == 0x00000FFF)
+            {
+                return CMakeCommandId.Unspecified;
+            }
             return (CMakeCommandId)id;
         }
 

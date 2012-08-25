@@ -19,8 +19,8 @@ namespace CMakeTools
     /// </summary>
     public enum CMakeCommandId
     {
-        Unspecified = 0,
-        AddCustomCommand,
+        Unspecified = -1,
+        AddCustomCommand = 0,
         AddCustomTarget,
         AddDefinitions,
         AddDependencies,
@@ -110,7 +110,6 @@ namespace CMakeTools
         // Array of CMake commands.  These should be in alphabetical order.
         private static string[] _commands = new string[]
         {
-            "<unspecified>",            // Dummy keyword for CMakeKeywordId.Unspecified.
             "add_custom_command",
             "add_custom_target",
             "add_definitions",
@@ -822,7 +821,6 @@ namespace CMakeTools
         // keyword identifier in the CMakeKeywordId enumeration.
         private static string[][] _keywordArrays = new string[][]
         {
-            null,
             _addCustomCommandKeywords,
             _addCustomTargetKeywords,
             _addDefinitionsKeywords,
@@ -932,7 +930,7 @@ namespace CMakeTools
         public static bool IsCommand(string token)
         {
             int index = Array.BinarySearch(_commands, token.ToLower());
-            return index > 0;
+            return index >= 0;
         }
 
         /// <summary>
@@ -944,6 +942,10 @@ namespace CMakeTools
         /// </returns>
         public static bool TriggersMemberSelection(CMakeCommandId id)
         {
+            if (id == CMakeCommandId.Unspecified)
+            {
+                return false;
+            }
             return _memberSelectionCommands[(int)id];
         }
 
@@ -1003,12 +1005,25 @@ namespace CMakeTools
         /// <returns>The corresponding array of command-specific keywords.</returns>
         public static string[] GetKeywordsForCommand(CMakeCommandId id)
         {
+            if (id == CMakeCommandId.Unspecified)
+            {
+                return null;
+            }
             string[] keywordArray = _keywordArrays[(int)id];
             if (keywordArray == null)
             {
                 return null;
             }
             return (string[])keywordArray.Clone();
+        }
+
+        /// <summary>
+        /// Get the names of all CMake commands.
+        /// </summary>
+        /// <returns>An array of all CMake commands.</returns>
+        public static string[] GetAllCommands()
+        {
+            return _commands;
         }
     }
 }
