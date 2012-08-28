@@ -69,7 +69,12 @@ namespace CMakeTools
                 }
                 else if (req.TokenInfo.Token == (int)CMakeToken.Identifier)
                 {
-                    scope.SetDeclarations(new CMakeFunctionDeclarations());
+                    List<string> functions = CMakeParsing.ParseForFunctionNames(
+                        source.GetLines(), false);
+                    List<string> macros = CMakeParsing.ParseForFunctionNames(
+                        source.GetLines(), true);
+                    scope.SetDeclarations(new CMakeFunctionDeclarations(functions,
+                        macros));
                 }
                 else if (req.TokenInfo.Token == (int)CMakeToken.OpenParen)
                 {

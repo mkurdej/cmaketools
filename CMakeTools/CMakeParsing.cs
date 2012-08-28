@@ -946,6 +946,80 @@ namespace CMakeTools
             return results;
         }
 
+        // Internal states of the function name parsing mechanism
+        private enum FunctionNameParseState
+        {
+            NeedKeyword,
+            NeedOpenParen,
+            NeedIdentifier
+        }
+
+        /// <summary>
+        /// Parse for the names of all functions or macros defined in the given code.
+        /// </summary>
+        /// <param name="lines">A collection of lines of code to parse.</param>
+        /// <param name="findMacros">
+        /// A Boolean value indicating whether to parse for the names of macros instead
+        /// of functions.
+        /// </param>
+        /// <returns>A list of function of macro names.</returns>
+        public static List<string> ParseForFunctionNames(IEnumerable<string> lines,
+            bool findMacros)
+        {
+            CMakeCommandId commandSought = findMacros ? CMakeCommandId.Macro :
+                CMakeCommandId.Function;
+            List<string> results = new List<string>();
+            CMakeScanner scanner = new CMakeScanner();
+            TokenInfo tokenInfo = new TokenInfo();
+            FunctionNameParseState state = FunctionNameParseState.NeedKeyword;
+            int scannerState = 0;
+            foreach (string line in lines)
+            {
+                scanner.SetSource(line, 0);
+                while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo,
+                    ref scannerState))
+                {
+                    string tokenText = line.ExtractToken(tokenInfo);
+                    switch (state)
+                    {
+                    case FunctionNameParseState.NeedKeyword:
+                        if (tokenInfo.Token == (int)CMakeToken.Keyword)
+                        {
+                            CMakeCommandId id = CMakeKeywords.GetCommandId(tokenText);
+                            if (id == commandSought)
+                            {
+                                state = FunctionNameParseState.NeedOpenParen;
+                            }
+                        }
+                        break;
+                    case FunctionNameParseState.NeedOpenParen:
+                        if (tokenInfo.Token == (int)CMakeToken.OpenParen)
+                        {
+                            state = FunctionNameParseState.NeedIdentifier;
+                        }
+                        else if (tokenInfo.Token != (int)CMakeToken.WhiteSpace &&
+                            tokenInfo.Token != (int)CMakeToken.Comment)
+                        {
+                            state = FunctionNameParseState.NeedKeyword;
+                        }
+                        break;
+                    case FunctionNameParseState.NeedIdentifier:
+                        if (tokenInfo.Token != (int)CMakeToken.WhiteSpace &&
+                            tokenInfo.Token != (int)CMakeToken.Comment)
+                        {
+                            if (tokenInfo.Token == (int)CMakeToken.Identifier)
+                            {
+                                results.Add(tokenText);
+                            }
+                            state = FunctionNameParseState.NeedKeyword;
+                        }
+                        break;
+                    }
+                }
+            }
+            return results;
+        }
+
         /// <summary>
         /// Parse to see if there is an identifier at a given position.
         /// </summary>
