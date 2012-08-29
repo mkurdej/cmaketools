@@ -709,5 +709,51 @@ namespace CMakeTools
             Assert.IsFalse(CMakeParsing.ParseForToken(lines, 10, 0, out tokenInfo,
                 out inParens));
         }
+
+        /// <summary>
+        /// Test parsing for function and macro names.
+        /// </summary>
+        [TestMethod]
+        public void TestParseForFunctionNames()
+        {
+            // Test parsing a function declaration.
+            List<string> lines = new List<string>();
+            lines.Add("function(foo)");
+            List<string> functions = CMakeParsing.ParseForFunctionNames(lines, false);
+            Assert.IsNotNull(functions);
+            Assert.AreEqual(1, functions.Count);
+            Assert.AreEqual("foo", functions[0]);
+            functions = CMakeParsing.ParseForFunctionNames(lines, true);
+            Assert.IsNotNull(functions);
+            Assert.AreEqual(0, functions.Count);
+
+            // Test parsing a macro declaration.
+            lines.Clear();
+            lines.Add("macro(bar)");
+            functions = CMakeParsing.ParseForFunctionNames(lines, false);
+            Assert.IsNotNull(functions);
+            Assert.AreEqual(0, functions.Count);
+            functions = CMakeParsing.ParseForFunctionNames(lines, true);
+            Assert.IsNotNull(functions);
+            Assert.AreEqual(1, functions.Count);
+            Assert.AreEqual("bar", functions[0]);
+
+            // Test parsing a declaration with extra whitespace.
+            lines.Clear();
+            lines.Add("function ( foo )");
+            functions = CMakeParsing.ParseForFunctionNames(lines, false);
+            Assert.IsNotNull(functions);
+            Assert.AreEqual(1, functions.Count);
+            Assert.AreEqual("foo", functions[0]);
+
+            // Test parsing a declaration with line breaks and comments.
+            lines.Clear();
+            lines.Add("function( # comment");
+            lines.Add("  foo)");
+            functions = CMakeParsing.ParseForFunctionNames(lines, false);
+            Assert.IsNotNull(functions);
+            Assert.AreEqual(1, functions.Count);
+            Assert.AreEqual("foo", functions[0]);
+        }
     }
 }
