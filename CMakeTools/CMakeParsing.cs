@@ -56,15 +56,27 @@ namespace CMakeTools
             NeedVariable
         }
 
+        private static void AddVariableToList(List<string> vars, string variable)
+        {
+            // This is a private helper function to handle adding a variable to a list
+            // if it is not already there and is not a standard CMake variable.
+            if (!CMakeVariableDeclarations.IsStandardVariable(variable))
+            {
+                if (vars.FindIndex(x => x.ToUpper().Equals(variable.ToUpper())) < 0)
+                {
+                    vars.Add(variable);
+                }
+            }
+        }
+
         /// <summary>
         /// Parse to find all variables defined in the code.
         /// </summary>
         /// <param name="code">The code to parse.</param>
         /// <returns>A list containing all variables defined in the code.</returns>
-        public static List<string> ParseForVariables(string code)
+        public static List<string> ParseForVariables(IEnumerable<string> lines)
         {
             CMakeScanner scanner = new CMakeScanner();
-            scanner.SetSource(code, 0);
             List<string> vars = new List<string>();
             TokenInfo tokenInfo = new TokenInfo();
             int scannerState = 0;
@@ -72,100 +84,113 @@ namespace CMakeTools
             bool advanceAtWhiteSpace = false;
             int paramsBeforeVariable = 0;
             string possibleVariable = null;
-            while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref scannerState))
+            foreach (string line in lines)
             {
-                string tokenText = code.ExtractToken(tokenInfo);
-                if (state == VariableParseState.NeedCommand &&
-                    tokenInfo.Token == (int)CMakeToken.Keyword)
+                scanner.SetSource(line, 0);
+                while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref scannerState))
                 {
-                    CMakeCommandId id = CMakeKeywords.GetCommandId(tokenText);
-                    if (_paramsBeforeVariable.ContainsKey(id))
+                    string tokenText = line.ExtractToken(tokenInfo);
+                    if (state == VariableParseState.NeedCommand &&
+                        tokenInfo.Token == (int)CMakeToken.Keyword)
                     {
-                        // We found the name of a command that defines a variable.  Now,
-                        // look for an opening parenthesis.
-                        state = VariableParseState.NeedParen;
-                        advanceAtWhiteSpace = false;
-                        paramsBeforeVariable = _paramsBeforeVariable[id];
-                    }
-                }
-                else if (state == VariableParseState.NeedParen &&
-                    tokenInfo.Token == (int)CMakeToken.OpenParen)
-                {
-                    // We found the opening parenthesis after the command name.  Now,
-                    // look for the variable name, possibly after some other parameters.
-                    state = VariableParseState.NeedVariable;
-                }
-                else if (state == VariableParseState.NeedVariable &&
-                    possibleVariable != null &&
-                    (tokenInfo.Token == (int)CMakeToken.WhiteSpace ||
-                    tokenInfo.Token == (int)CMakeToken.CloseParen))
-                {
-                    // We found the variable name.  Add it to the list if it's not
-                    // already there and isn't a standard variable.
-                    state = VariableParseState.NeedCommand;
-                    if (!CMakeVariableDeclarations.IsStandardVariable(possibleVariable))
-                    {
-                        if (vars.FindIndex(x => x.ToUpper().Equals(
-                            possibleVariable.ToUpper())) < 0)
+                        CMakeCommandId id = CMakeKeywords.GetCommandId(tokenText);
+                        if (_paramsBeforeVariable.ContainsKey(id))
                         {
-                            vars.Add(possibleVariable);
+                            // We found the name of a command that defines a variable.  Now,
+                            // look for an opening parenthesis.
+                            state = VariableParseState.NeedParen;
+                            advanceAtWhiteSpace = false;
+                            paramsBeforeVariable = _paramsBeforeVariable[id];
                         }
                     }
-                    possibleVariable = null;
-                }
-                else if (state == VariableParseState.NeedVariable &&
-                    (tokenInfo.Token == (int)CMakeToken.Identifier ||
-                    tokenInfo.Token == (int)CMakeToken.NumericIdentifier))
-                {
-                    if (paramsBeforeVariable == 0)
+                    else if (state == VariableParseState.NeedParen &&
+                        tokenInfo.Token == (int)CMakeToken.OpenParen)
                     {
-                        // We found an identifier token where the variable name is
-                        // expected.  If it isn't followed by a variable start token, we
-                        // will add it to the list.
-                        possibleVariable = tokenText;
+                        // We found the opening parenthesis after the command name.  Now,
+                        // look for the variable name, possibly after some other parameters.
+                        state = VariableParseState.NeedVariable;
                     }
-                    else
+                    else if (state == VariableParseState.NeedVariable &&
+                        possibleVariable != null &&
+                        (tokenInfo.Token == (int)CMakeToken.WhiteSpace ||
+                        tokenInfo.Token == (int)CMakeToken.CloseParen))
                     {
-                        // We found a parameter.
-                        advanceAtWhiteSpace = true;
+                        // We found the variable name.  Add it to the list if it's not
+                        // already there and isn't a standard variable.
+                        state = VariableParseState.NeedCommand;
+                        AddVariableToList(vars, possibleVariable);
+                        possibleVariable = null;
                     }
-                }
-                else if (tokenInfo.Token == (int)CMakeToken.WhiteSpace)
-                {
-                    if (advanceAtWhiteSpace)
+                    else if (state == VariableParseState.NeedVariable &&
+                        (tokenInfo.Token == (int)CMakeToken.Identifier ||
+                        tokenInfo.Token == (int)CMakeToken.NumericIdentifier))
                     {
-                        // We found whitespace after a parameter.  Advance to the next
-                        // parameter.
-                        advanceAtWhiteSpace = false;
+                        if (paramsBeforeVariable == 0)
+                        {
+                            // We found an identifier token where the variable name is
+                            // expected.  If it isn't followed by a variable start token, we
+                            // will add it to the list.
+                            possibleVariable = tokenText;
+                        }
+                        else
+                        {
+                            // We found a parameter.
+                            advanceAtWhiteSpace = true;
+                        }
+                    }
+                    else if (tokenInfo.Token == (int)CMakeToken.WhiteSpace)
+                    {
+                        if (advanceAtWhiteSpace)
+                        {
+                            // We found whitespace after a parameter.  Advance to the next
+                            // parameter.
+                            advanceAtWhiteSpace = false;
+                            if (paramsBeforeVariable > 0)
+                            {
+                                paramsBeforeVariable--;
+                            }
+                        }
+                    }
+                    else if (state == VariableParseState.NeedVariable &&
+                        (tokenInfo.Token == (int)CMakeToken.VariableStart ||
+                        tokenInfo.Token == (int)CMakeToken.Variable ||
+                        tokenInfo.Token == (int)CMakeToken.VariableEnd))
+                    {
                         if (paramsBeforeVariable > 0)
                         {
-                            paramsBeforeVariable--;
+                            // We found a variable as a parameter.  Advance to the next
+                            // parameter at the next whitespace token.
+                            advanceAtWhiteSpace = true;
                         }
-                    }
-                }
-                else if (state == VariableParseState.NeedVariable &&
-                    (tokenInfo.Token == (int)CMakeToken.VariableStart ||
-                    tokenInfo.Token == (int)CMakeToken.Variable ||
-                    tokenInfo.Token == (int)CMakeToken.VariableEnd))
-                {
-                    if (paramsBeforeVariable > 0)
-                    {
-                        // We found a variable as a parameter.  Advance to the next
-                        // parameter at the next whitespace token.
-                        advanceAtWhiteSpace = true;
+                        else
+                        {
+                            // We the variable name, and it is itself the value of another
+                            // variable.  Don't add anything to the list.
+                            state = VariableParseState.NeedCommand;
+                            possibleVariable = null;
+                        }
                     }
                     else
                     {
-                        // We the variable name, and it is itself the value of another
-                        // variable.  Don't add anything to the list.
                         state = VariableParseState.NeedCommand;
                         possibleVariable = null;
                     }
                 }
-                else
+                if (state == VariableParseState.NeedVariable && possibleVariable != null)
                 {
+                    // If we reached the end of the line and have a variable name, accept
+                    // it.  Any tokens on the next line won't be considered part of the
+                    // variable name.
                     state = VariableParseState.NeedCommand;
+                    AddVariableToList(vars, possibleVariable);
                     possibleVariable = null;
+                }
+                else if (state == VariableParseState.NeedParen)
+                {
+                    // If we reached the end of the line without finding the opening
+                    // parenthesis finding the command, then there is a syntax error and
+                    // the variable declaration shouldn't be recognized.
+                    state = VariableParseState.NeedCommand;
                 }
             }
             return vars;
@@ -619,6 +644,13 @@ namespace CMakeTools
                         state = ParameterParseState.NeedCommand;
                     }
                 }
+                if (state == ParameterParseState.NeedParen)
+                {
+                    // There may not be a line break between a command and the opening
+                    // parenthesis following.  If there is, don't recognize this as a
+                    // valid function definition.
+                    state = ParameterParseState.NeedCommand;
+                }
             }
             return null;
         }
@@ -941,6 +973,16 @@ namespace CMakeTools
                         break;
                     }
                 }
+                if (state == FunctionParseState.NeedFunctionArgs ||
+                    state == FunctionParseState.NeedMacroArgs ||
+                    state == FunctionParseState.NeedEndFunctionArgs ||
+                    state == FunctionParseState.NeedEndMacroArgs)
+                {
+                    // There must not be a line break between a command and the opening
+                    // parenthesis following it.  If there is, the command is invalid and
+                    // shouldn't be recognized by IntelliSense
+                    state = FunctionParseState.NotInFunction;
+                }
                 i++;
             }
             return results;
@@ -1015,6 +1057,13 @@ namespace CMakeTools
                         }
                         break;
                     }
+                }
+                if (state == FunctionNameParseState.NeedOpenParen)
+                {
+                    // A line break may not appear between the command and the opening
+                    // parenthesis that follows it.  If there is one, the function
+                    // definition is illegal and should be ignored.
+                    state = FunctionNameParseState.NeedKeyword;
                 }
             }
             return results;
