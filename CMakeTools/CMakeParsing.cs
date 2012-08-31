@@ -248,7 +248,8 @@ namespace CMakeTools
                         // We found the variable name.  Add it to the list if it's not
                         // already there and isn't a standard variable.
                         state = VariableParseState.NeedCommand;
-                        if (!CMakeVariableDeclarations.IsStandardVariable(possibleVariable))
+                        if (!CMakeVariableDeclarations.IsStandardVariable(
+                            possibleVariable, true))
                         {
                             if (vars.FindIndex(x => x.ToUpper().Equals(
                                 possibleVariable.ToUpper())) < 0)

@@ -194,6 +194,14 @@ namespace CMakeTools
             lines.Add("(ENV{foo} bar)");
             vars = CMakeParsing.ParseForEnvVariables(lines);
             Assert.AreEqual(0, vars.Count);
+
+            // Test an environment variable with the same name as a standard CMake
+            // variable.
+            lines.Clear();
+            lines.Add("set(ENV{CMAKE_CURRENT_BINARY_DIR} foo)");
+            vars = CMakeParsing.ParseForEnvVariables(lines);
+            Assert.AreEqual(1, vars.Count);
+            Assert.AreEqual("CMAKE_CURRENT_BINARY_DIR", vars[0]);
         }
 
         /// <summary>

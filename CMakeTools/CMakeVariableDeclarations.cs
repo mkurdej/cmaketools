@@ -230,15 +230,20 @@ namespace CMakeTools
         }
 
         /// <summary>
-        /// Check whether the given string names a standard variables.
+        /// Check whether the given string names a standard variable.
         /// </summary>
         /// <param name="varName">The string to check.</param>
+        /// <param name="useEnv">
+        /// Boolean value indicating whether to check for standard environment variables
+        /// instead of standard CMake variables.
+        /// </param>
         /// <returns>
         /// True if the string names a standard variable or false otherwise.
         /// </returns>
-        public static bool IsStandardVariable(string varName)
+        public static bool IsStandardVariable(string varName, bool useEnv = false)
         {
-            return Array.BinarySearch(_standardVariables, varName.ToUpper()) >= 0;
+            string[] variables = useEnv ? _standardEnvVariables : _standardVariables;
+            return Array.BinarySearch(variables, varName.ToUpper()) >= 0;
         }
     }
 }
