@@ -65,7 +65,8 @@ namespace CMakeTools
                 }
                 else if (req.TokenInfo.Token == (int)CMakeToken.VariableStartEnv)
                 {
-                    List<string> vars = CMakeParsing.ParseForEnvVariables(req.Text);
+                    List<string> vars = CMakeParsing.ParseForEnvVariables(
+                        source.GetLines());
                     scope.SetDeclarations(new CMakeVariableDeclarations(vars, true));
                 }
                 else if (req.TokenInfo.Token == (int)CMakeToken.Identifier)

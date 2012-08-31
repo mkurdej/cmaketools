@@ -203,75 +203,86 @@ namespace CMakeTools
         /// <returns>
         /// A list containing all environment variables defined in the code.
         /// </returns>
-        public static List<string> ParseForEnvVariables(string code)
+        public static List<string> ParseForEnvVariables(IEnumerable<string> lines)
         {
             CMakeScanner scanner = new CMakeScanner();
-            scanner.SetSource(code, 0);
             List<string> vars = new List<string>();
             TokenInfo tokenInfo = new TokenInfo();
             int scannerState = 0;
             VariableParseState state = VariableParseState.NeedCommand;
             string possibleVariable = null;
-            while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref scannerState))
+            foreach (string line in lines)
             {
-                string tokenText = code.ExtractToken(tokenInfo);
-                if (state == VariableParseState.NeedCommand &&
-                    tokenInfo.Token == (int)CMakeToken.Keyword)
+                scanner.SetSource(line, 0);
+                while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref scannerState))
                 {
-                    if (CMakeKeywords.GetCommandId(tokenText) == CMakeCommandId.Set)
+                    string tokenText = line.ExtractToken(tokenInfo);
+                    if (state == VariableParseState.NeedCommand &&
+                        tokenInfo.Token == (int)CMakeToken.Keyword)
                     {
-                        // We found the name of a command that may define an environment
-                        // variable.  Now, look for an opening parenthesis.
-                        state = VariableParseState.NeedParen;
-                    }
-                }
-                else if (state == VariableParseState.NeedParen &&
-                    tokenInfo.Token == (int)CMakeToken.OpenParen)
-                {
-                    // We found the opening parenthesis after the command name.  Now,
-                    // look for ENV{.
-                    state = VariableParseState.NeedSetEnv;
-                }
-                else if (state == VariableParseState.NeedSetEnv &&
-                    tokenInfo.Token == (int)CMakeToken.VariableStartSetEnv)
-                {
-                    // We found ENV{ after the opening parenthesis.  Now, look for the
-                    // environment variable name.
-                    state = VariableParseState.NeedVariable;
-                }
-                else if (state == VariableParseState.NeedVariable &&
-                    possibleVariable != null &&
-                    tokenInfo.Token == (int)CMakeToken.VariableEnd)
-                {
-                    // We found the variable name.  Add it to the list if it's not
-                    // already there and isn't a standard variable.
-                    state = VariableParseState.NeedCommand;
-                    if (!CMakeVariableDeclarations.IsStandardVariable(possibleVariable))
-                    {
-                        if (vars.FindIndex(x => x.ToUpper().Equals(
-                            possibleVariable.ToUpper())) < 0)
+                        if (CMakeKeywords.GetCommandId(tokenText) == CMakeCommandId.Set)
                         {
-                            vars.Add(possibleVariable);
+                            // We found the name of a command that may define an environment
+                            // variable.  Now, look for an opening parenthesis.
+                            state = VariableParseState.NeedParen;
                         }
                     }
-                    possibleVariable = null;
+                    else if (state == VariableParseState.NeedParen &&
+                        tokenInfo.Token == (int)CMakeToken.OpenParen)
+                    {
+                        // We found the opening parenthesis after the command name.  Now,
+                        // look for ENV{.
+                        state = VariableParseState.NeedSetEnv;
+                    }
+                    else if (state == VariableParseState.NeedSetEnv &&
+                        tokenInfo.Token == (int)CMakeToken.VariableStartSetEnv)
+                    {
+                        // We found ENV{ after the opening parenthesis.  Now, look for the
+                        // environment variable name.
+                        state = VariableParseState.NeedVariable;
+                    }
+                    else if (state == VariableParseState.NeedVariable &&
+                        possibleVariable != null &&
+                        tokenInfo.Token == (int)CMakeToken.VariableEnd)
+                    {
+                        // We found the variable name.  Add it to the list if it's not
+                        // already there and isn't a standard variable.
+                        state = VariableParseState.NeedCommand;
+                        if (!CMakeVariableDeclarations.IsStandardVariable(possibleVariable))
+                        {
+                            if (vars.FindIndex(x => x.ToUpper().Equals(
+                                possibleVariable.ToUpper())) < 0)
+                            {
+                                vars.Add(possibleVariable);
+                            }
+                        }
+                        possibleVariable = null;
+                    }
+                    else if (state == VariableParseState.NeedVariable &&
+                        tokenInfo.Token == (int)CMakeToken.Variable)
+                    {
+                        // We found an identifier token where the variable name is
+                        // expected.  If it's followed by a variable end token, we
+                        // will add it to the list.
+                        possibleVariable = tokenText;
+                    }
+                    else if (tokenInfo.Token == (int)CMakeToken.WhiteSpace)
+                    {
+                        possibleVariable = null;
+                    }
+                    else
+                    {
+                        possibleVariable = null;
+                        state = VariableParseState.NeedCommand;
+                    }
                 }
-                else if (state == VariableParseState.NeedVariable &&
-                    tokenInfo.Token == (int)CMakeToken.Variable)
+                if (state == VariableParseState.NeedParen)
                 {
-                    // We found an identifier token where the variable name is
-                    // expected.  If it's followed by a variable end token, we
-                    // will add it to the list.
-                    possibleVariable = tokenText;
-                }
-                else if (tokenInfo.Token == (int)CMakeToken.WhiteSpace)
-                {
-                    possibleVariable = null;
-                }
-                else
-                {
-                    possibleVariable = null;
+                    // If we reached the end of the line without finding the opening
+                    // parenthesis following the command, then there is a syntax error
+                    // and the variable declaration shouldn't be recognized.
                     state = VariableParseState.NeedCommand;
+                    possibleVariable = null;
                 }
             }
             return vars;
@@ -404,6 +415,14 @@ namespace CMakeTools
                         possibleVariable = null;
                     }
                 }
+                if (state == VariableParseState.NeedParen)
+                {
+                    // If we reached the end of the line without finding the opening
+                    // parenthesis following the command, then there is a syntax error
+                    // and the variable declaration shouldn't be recognized.
+                    state = VariableParseState.NeedCommand;
+                    possibleVariable = null;
+                }
                 i++;
             }
             return false;
@@ -472,6 +491,13 @@ namespace CMakeTools
                     {
                         state = VariableParseState.NeedCommand;
                     }
+                }
+                if (state == VariableParseState.NeedParen)
+                {
+                    // If we reached the end of the line without finding the opening
+                    // parenthesis following the command, then there is a syntax error
+                    // and the function declaration shouldn't be recognized.
+                    state = VariableParseState.NeedCommand;
                 }
                 i++;
             }

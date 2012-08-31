@@ -149,29 +149,50 @@ namespace CMakeTools
         [TestMethod]
         public void TestParseForEnvVariables()
         {
-            List<string> vars = CMakeParsing.ParseForEnvVariables(
-                "set(ENV{foo} abc)\nset(ENV{bar} def)");
+            List<string> lines = new List<string>();
+            lines.Clear();
+            lines.Add("set(ENV{foo} abc)");
+            lines.Add("set(ENV{bar} def)");
+            List<string> vars = CMakeParsing.ParseForEnvVariables(lines);
             Assert.AreEqual(2, vars.Count);
             Assert.AreEqual("foo", vars[0]);
             Assert.AreEqual("bar", vars[1]);
             
             // Ensure that ENV is case-sensitive.
-            vars = CMakeParsing.ParseForEnvVariables("set(env{foo} abc");
+            lines.Clear();
+            lines.Add("set(env{foo} abc");
+            vars = CMakeParsing.ParseForEnvVariables(lines);
             Assert.AreEqual(0, vars.Count);
             
             // Ensure that SET(ENV{}) is distinguished from SET($ENV{}).
-            vars = CMakeParsing.ParseForEnvVariables("set($ENV{foo} bar");
+            lines.Clear();
+            lines.Add("set($ENV{foo} bar");
+            vars = CMakeParsing.ParseForEnvVariables(lines);
             Assert.AreEqual(0, vars.Count);
 
             // Ensure that ENV{} elsewhere doesn't define a variable.
-            vars = CMakeParsing.ParseForEnvVariables("set(foo ENV{bar})");
+            lines.Clear();
+            lines.Add("set(foo ENV{bar})");
+            vars = CMakeParsing.ParseForEnvVariables(lines);
             Assert.AreEqual(0, vars.Count);
 
             // Test handling of environment variables defined in terms of other
             // variables or environment variables.
-            vars = CMakeParsing.ParseForEnvVariables("set(ENV{foo_${bar}} abc");
+            lines.Clear();
+            lines.Add("set(ENV{foo_${bar}} abc");
+            vars = CMakeParsing.ParseForEnvVariables(lines);
             Assert.AreEqual(0, vars.Count);
-            vars = CMakeParsing.ParseForEnvVariables("set(ENV{foo_$ENV{bar}} abc");
+            lines.Clear();
+            lines.Add("set(ENV{foo_$ENV{bar}} abc");
+            vars = CMakeParsing.ParseForEnvVariables(lines);
+            Assert.AreEqual(0, vars.Count);
+
+            // Test an environment variable declaration with an illegal line break.  This
+            // should fail.
+            lines.Clear();
+            lines.Add("set");
+            lines.Add("(ENV{foo} bar)");
+            vars = CMakeParsing.ParseForEnvVariables(lines);
             Assert.AreEqual(0, vars.Count);
         }
 
@@ -392,6 +413,13 @@ namespace CMakeTools
                 out span));
             Assert.IsFalse(CMakeParsing.ParseForVariableDefinition(lines, "set",
                 out span));
+            
+            // Test a declaration with an illegal line break.  This should fail.
+            lines.Clear();
+            lines.Add("set");
+            lines.Add("(foo bar)");
+            Assert.IsFalse(CMakeParsing.ParseForVariableDefinition(lines, "foo",
+                out span));
         }
 
         /// <summary>
@@ -458,6 +486,14 @@ namespace CMakeTools
             Assert.IsFalse(CMakeParsing.ParseForFunctionDefinition(lines, "bar",
                 out span));
             Assert.IsFalse(CMakeParsing.ParseForFunctionDefinition(lines, "function",
+                out span));
+
+            // Test a definition with illegal line breaks.  This should fail.
+            lines.Clear();
+            lines.Add("function");
+            lines.Add("(foo)");
+            lines.Add("endfunction(foo)");
+            Assert.IsFalse(CMakeParsing.ParseForFunctionDefinition(lines, "foo",
                 out span));
         }
 
