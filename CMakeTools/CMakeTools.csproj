@@ -40,6 +40,9 @@
     <Compile Include="CMakeKeywords.cs" />
     <Compile Include="CMakeLanguageService.cs" />
     <Compile Include="CMakeMethods.cs" />
+    <Compile Include="CMakeOptionPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="CMakePackage.cs" />
     <Compile Include="CMakePackageDeclarations.cs" />
     <Compile Include="CMakeParsing.cs" />

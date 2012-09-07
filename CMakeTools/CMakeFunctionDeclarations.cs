@@ -44,10 +44,14 @@ namespace CMakeTools
         private List<Item> _items;
 
         public CMakeFunctionDeclarations(IEnumerable<string> functions,
-            IEnumerable<string> macros)
+            IEnumerable<string> macros, bool commandsLower)
         {
-            _items = ConvertToItems(CMakeKeywords.GetAllCommands(),
-                ItemType.Command).ToList();
+            IEnumerable<string> commands = CMakeKeywords.GetAllCommands();
+            if (!commandsLower)
+            {
+                commands = commands.Select(x => x.ToUpper());
+            }
+            _items = ConvertToItems(commands, ItemType.Command).ToList();
             _items.AddRange(ConvertToItems(functions, ItemType.Function));
             _items.AddRange(ConvertToItems(macros, ItemType.Macro));
             _items.Sort();

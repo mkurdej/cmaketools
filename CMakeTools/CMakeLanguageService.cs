@@ -25,6 +25,12 @@ namespace CMakeTools
     public class CMakeLanguageService : LanguageService
     {
         private LanguagePreferences _preferences;
+        private CMakePackage _package;
+
+        public CMakeLanguageService(CMakePackage package)
+        {
+            _package = package;
+        }
 
         public override string GetFormatFilterList()
         {
@@ -75,8 +81,9 @@ namespace CMakeTools
                         source.GetLines(), false);
                     List<string> macros = CMakeParsing.ParseForFunctionNames(
                         source.GetLines(), true);
+                    bool commandsLower = _package.CMakeOptionPage.CommandsLower;
                     scope.SetDeclarations(new CMakeFunctionDeclarations(functions,
-                        macros));
+                        macros, commandsLower));
                 }
                 else if (req.TokenInfo.Token == (int)CMakeToken.OpenParen)
                 {

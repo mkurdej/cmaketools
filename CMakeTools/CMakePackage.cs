@@ -39,8 +39,12 @@ namespace CMakeTools
     [ProvideLanguageExtension(typeof(CMakeLanguageService), ".cmake")]
     [ProvideLanguageExtension(typeof(CMakeLanguageService), ".txt")]
     [ProvideMenuResource("Menus.ctmenu", 1)]
+    [ProvideOptionPage(typeof(CMakeOptionPage), "CMake Tools", "Advanced", 103, 104,
+        false)]
+    [ProvideProfile(typeof(CMakeOptionPage), "CMake Tools", "Advanced", 103, 104,
+        true)]
     [Guid(CMakeGuids.guidCMakeTools)]
-    class CMakePackage : Package, IOleComponent
+    public class CMakePackage : Package, IOleComponent
     {
         protected override void Initialize()
         {
@@ -48,7 +52,7 @@ namespace CMakeTools
 
             // Register the language service.
             IServiceContainer container = this as IServiceContainer;
-            CMakeLanguageService service = new CMakeLanguageService();
+            CMakeLanguageService service = new CMakeLanguageService(this);
             service.SetSite(this);
             container.AddService(typeof(CMakeLanguageService), service, true);
 
@@ -122,6 +126,14 @@ namespace CMakeTools
                 // Display an error message that CMake could not be found.
                 MessageBox.Show(CMakeStrings.CMakeNotFound, CMakeStrings.MessageBoxTitle,
                     MessageBoxButtons.OK, MessageBoxIcon.Stop);
+            }
+        }
+
+        public CMakeOptionPage CMakeOptionPage
+        {
+            get
+            {
+                return (CMakeOptionPage)GetDialogPage(typeof(CMakeOptionPage));
             }
         }
 
