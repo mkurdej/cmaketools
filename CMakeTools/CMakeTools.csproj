@@ -66,6 +66,14 @@
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
+    <Content Include="Templates\NewItems\CMakeFile.cmake">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\NewItems\NewCMakeItems.vsdir">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="Key.snk" />
@@ -92,6 +100,7 @@
   <ItemGroup>
     <EmbeddedResource Include="CMakeResources.resx">
       <MergeWithCTO>true</MergeWithCTO>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="CMakeStrings.resx">
       <Generator>ResXFileCodeGenerator</Generator>

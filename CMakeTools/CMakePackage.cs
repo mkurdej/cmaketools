@@ -17,6 +17,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Microsoft.Win32;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 
@@ -43,6 +44,8 @@ namespace CMakeTools
         false)]
     [ProvideProfile(typeof(CMakeOptionPage), "CMake Tools", "Advanced", 103, 104,
         true)]
+    [ProvideProjectItem(VSConstants.CLSID.MiscellaneousFilesProject_string, "CMake",
+        "Templates\\NewItems", 10)]
     [Guid(CMakeGuids.guidCMakeTools)]
     public class CMakePackage : Package, IOleComponent
     {
