@@ -46,6 +46,8 @@ namespace CMakeTools
         true)]
     [ProvideProjectItem(VSConstants.CLSID.MiscellaneousFilesProject_string, "CMake",
         "Templates\\NewItems", 10)]
+    [ProvideFileFilter(VSConstants.CLSID.MiscellaneousFilesProject_string, "CMake",
+        "CMake Files (*.cmake);*.cmake", 10)]
     [Guid(CMakeGuids.guidCMakeTools)]
     public class CMakePackage : Package, IOleComponent
     {
