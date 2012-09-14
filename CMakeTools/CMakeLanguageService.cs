@@ -91,13 +91,18 @@ namespace CMakeTools
                         source.GetLines(), req.Line, req.TokenInfo.StartIndex);
                     if (id == CMakeCommandId.Include)
                     {
-                        scope.SetDeclarations(
-                            new CMakeIncludeDeclarations(req.FileName));
+                        scope.SetDeclarations(new CMakeIncludeDeclarations(
+                            req.FileName));
                     }
                     else if (id == CMakeCommandId.FindPackage)
                     {
-                        scope.SetDeclarations(
-                            new CMakePackageDeclarations(req.FileName));
+                        scope.SetDeclarations(new CMakePackageDeclarations(
+                            req.FileName));
+                    }
+                    else if (id == CMakeCommandId.AddSubdirectory)
+                    {
+                        scope.SetDeclarations(new CMakeSubdirectoryDeclarations(
+                            req.FileName));
                     }
                     else
                     {

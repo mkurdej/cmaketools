@@ -24,7 +24,8 @@ namespace CMakeTools
         public CMakePackageDeclarations(string sourceFilePath)
             : base(sourceFilePath) {}
 
-        protected override IEnumerable<string> GetFilesFromDir(string dirPath, bool treatAsModules = false)
+        protected override IEnumerable<string> GetFilesFromDir(string dirPath,
+            bool treatAsModules = false)
         {
             // Find all the find scripts in a directory.
             IEnumerable<string> files = Directory.EnumerateFiles(dirPath, "Find*.cmake");

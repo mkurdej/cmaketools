@@ -916,10 +916,11 @@ namespace CMakeTools
                 _memberSelectionCommands[(int)id] = true;
             }
 
-            // The INCLUDE and FIND_PACKAGE commands don't have subcommands but should
-            // still trigger member selection.
+            // The INCLUDE, FIND_PACKAGE, and ADD_SUBDIRECTORY commands don't have
+            // subcommands but should still trigger member selection.
             _memberSelectionCommands[(int)CMakeCommandId.Include] = true;
             _memberSelectionCommands[(int)CMakeCommandId.FindPackage] = true;
+            _memberSelectionCommands[(int)CMakeCommandId.AddSubdirectory] = true;
         }
 
         /// <summary>

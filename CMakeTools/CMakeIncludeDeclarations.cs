@@ -406,7 +406,7 @@ namespace CMakeTools
 
         public override string GetDisplayText(int index)
         {
-            return GetName(index);
+            return GetFileName(index);
         }
 
         public override int GetGlyph(int index)
@@ -423,6 +423,14 @@ namespace CMakeTools
 
         public override string GetName(int index)
         {
+            return GetFileName(index);
+        }
+
+        private string GetFileName(int index)
+        {
+            // The purpose of this function is to ensure that either GetName() or
+            // GetDisplayText() can be overriden without affecting the behavior of the
+            // other.
             if (index < 0 || index >= _includeFiles.Count)
             {
                 return null;
