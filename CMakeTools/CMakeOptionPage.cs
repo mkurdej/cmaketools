@@ -119,7 +119,8 @@ namespace CMakeTools
         /// Flag indicating whether to display command names in lowercase.
         /// </summary>
         [DisplayName("Commands In Lowercase")]
-        [Description("Display CMake commands with lowercase letters in the IntelliSense list box.")]
+        [Description("Display CMake commands with lowercase letters in the " +
+            "IntelliSense list box.")]
         public bool CommandsLower { get; set; }
 
         /// <summary>
@@ -127,7 +128,8 @@ namespace CMakeTools
         /// CMakeLists.txt.
         /// </summary>
         [DisplayName("Show Subdirectories")]
-        [Description("Configure whether to show all subdirectories in the IntelliSense list box or only those containing a CMakeLists.txt file.")]
+        [Description("Configure whether to show all subdirectories in the " +
+            "IntelliSense list box or only those containing a CMakeLists.txt file.")]
         public SubdirectorySetting ShowSubdirectories { get; set; }
     }
 }
