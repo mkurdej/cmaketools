@@ -27,8 +27,13 @@ namespace CMakeTools
 
         private static char[] _quoteChars = new char[] { '#', '(', ')' };
 
-        public CMakeSubdirectoryDeclarations(string sourceFilePath)
-            : base(sourceFilePath) {}
+        private bool _requireCMakeLists;
+
+        public CMakeSubdirectoryDeclarations(string sourceFilePath,
+            bool requireCMakeLists) : base(sourceFilePath)
+        {
+            _requireCMakeLists = requireCMakeLists;
+        }
 
         protected override IEnumerable<string> GetFilesFromDir(string dirPath,
             bool treatAsModules = false)
@@ -42,6 +47,15 @@ namespace CMakeTools
             IEnumerable<string> subdirs = Directory.EnumerateDirectories(dirPath);
             subdirs = subdirs.Select(Path.GetFileName);
             subdirs = subdirs.Where(x => !_internalDirectories.Contains(x));
+
+            // If the setting is configured to require CMakeLists.txt for a subdirectory
+            // to be shown in the list, filter out all subdirectories that don't have it.
+            if (_requireCMakeLists)
+            {
+                subdirs = subdirs.Where(x => File.Exists(Path.Combine(dirPath, x,
+                    "CMakeLists.txt")));
+            }
+
             return subdirs;
         }
 

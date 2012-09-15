@@ -101,8 +101,11 @@ namespace CMakeTools
                     }
                     else if (id == CMakeCommandId.AddSubdirectory)
                     {
+                        bool requireCMakeLists =
+                            (_package.CMakeOptionPage.ShowSubdirectories ==
+                            CMakeOptionPage.SubdirectorySetting.CMakeListsOnly);
                         scope.SetDeclarations(new CMakeSubdirectoryDeclarations(
-                            req.FileName));
+                            req.FileName, requireCMakeLists));
                     }
                     else
                     {
