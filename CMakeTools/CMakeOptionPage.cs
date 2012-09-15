@@ -11,8 +11,8 @@
  * **************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using Microsoft.VisualStudio.Shell;
 
 namespace CMakeTools
@@ -39,80 +39,19 @@ namespace CMakeTools
             CMakeListsOnly
         }
 
-        private class SubdirectorySettingConverter : TypeConverter
+        // Custom type converter for SubdirectorySetting.
+        private class SubdirectorySettingConverter
+            : EnumToDisplayNameConverter<SubdirectorySetting>
         {
-            public override bool CanConvertTo(ITypeDescriptorContext context,
-                Type destinationType)
+            private static Dictionary<SubdirectorySetting, string> _map =
+                new Dictionary<SubdirectorySetting, string>()
             {
-                if (destinationType == typeof(string))
-                {
-                    return true;
-                }
-                return base.CanConvertTo(context, destinationType);
-            }
+                { SubdirectorySetting.AllSubdirectories, CMakeStrings.AllSubdirectories },
+                { SubdirectorySetting.CMakeListsOnly, CMakeStrings.CMakeListsOnly }
+            };
 
-            public override object ConvertTo(ITypeDescriptorContext context,
-                CultureInfo culture, object value, Type destinationType)
-            {
-                if (destinationType == typeof(string))
-                {
-                    switch ((SubdirectorySetting)value)
-                    {
-                    case SubdirectorySetting.AllSubdirectories:
-                        return CMakeStrings.AllSubdirectories;
-                    case SubdirectorySetting.CMakeListsOnly:
-                        return CMakeStrings.CMakeListsOnly;
-                    }
-                }
-                return base.ConvertTo(context, culture, value, destinationType);
-            }
-
-            public override bool CanConvertFrom(ITypeDescriptorContext context,
-                Type sourceType)
-            {
-                if (sourceType == typeof(string))
-                {
-                    return true;
-                }
-                return base.CanConvertFrom(context, sourceType);
-            }
-
-            public override object ConvertFrom(ITypeDescriptorContext context,
-                CultureInfo culture, object value)
-            {
-                string valueStr = (string)value;
-                if (valueStr.Equals(CMakeStrings.AllSubdirectories,
-                    StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return SubdirectorySetting.AllSubdirectories;
-                }
-                else if (valueStr.Equals(CMakeStrings.CMakeListsOnly,
-                    StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return SubdirectorySetting.CMakeListsOnly;
-                }
-                return base.ConvertFrom(context, culture, value);
-            }
-
-            public override TypeConverter.StandardValuesCollection GetStandardValues(
-                ITypeDescriptorContext context)
-            {
-                return new TypeConverter.StandardValuesCollection(new SubdirectorySetting[]
-                {
-                    SubdirectorySetting.AllSubdirectories,
-                    SubdirectorySetting.CMakeListsOnly
-                });
-            }
-
-            public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
-            {
-                return true;
-            }
-
-            public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
-            {
-                return true;
-            }
+            public SubdirectorySettingConverter()
+                : base(_map) {}
         }
 
         /// <summary>
