@@ -60,6 +60,8 @@ namespace CMakeTools
         [DisplayName("Commands In Lowercase")]
         [Description("Display CMake commands with lowercase letters in the " +
             "IntelliSense list box.")]
+        [DefaultValue(false)]
+        [TypeConverter(typeof(YesNoConverter))]
         public bool CommandsLower { get; set; }
 
         /// <summary>
@@ -69,6 +71,7 @@ namespace CMakeTools
         [DisplayName("Show Subdirectories")]
         [Description("Configure whether to show all subdirectories in the " +
             "IntelliSense list box or only those containing a CMakeLists.txt file.")]
+        [DefaultValue(SubdirectorySetting.AllSubdirectories)]
         public SubdirectorySetting ShowSubdirectories { get; set; }
     }
 }

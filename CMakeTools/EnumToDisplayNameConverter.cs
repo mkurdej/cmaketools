@@ -79,6 +79,8 @@ namespace CMakeTools
                 foreach (KeyValuePair<T, string> pair in _map)
                 {
                     if (valueStr.Equals(pair.Value,
+                        StringComparison.CurrentCultureIgnoreCase) ||
+                        valueStr.Equals(pair.Key.ToString(),
                         StringComparison.CurrentCultureIgnoreCase))
                     {
                         return pair.Key;
