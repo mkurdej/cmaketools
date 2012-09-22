@@ -17,6 +17,9 @@ using System.Linq;
 
 namespace CMakeTools
 {
+    /// <summary>
+    /// Declarations object for subdirectories.
+    /// </summary>
     class CMakeSubdirectoryDeclarations : CMakeIncludeDeclarations
     {
         // Directories created by CMake that should not be included in the build.

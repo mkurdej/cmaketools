@@ -960,6 +960,14 @@ namespace CMakeTools
             return _memberSelectionCommands[(int)id];
         }
 
+        /// <summary>
+        /// Check whether the specified command should trigger member selection in
+        /// response to whitespace.
+        /// </summary>
+        /// <param name="id">Identifier of the command to check.</param>
+        /// <returns>
+        /// True if member selection should be triggered of false otherwise.
+        /// </returns>
         public static bool TriggersMemberSelectionOnWhiteSpace(CMakeCommandId id)
         {
             if (id == CMakeCommandId.Unspecified)
