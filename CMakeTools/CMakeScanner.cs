@@ -123,6 +123,10 @@ namespace CMakeTools
                         {
                             tokenInfo.Trigger = TokenTriggers.ParameterNext;
                         }
+                        if (CMakeKeywords.TriggersMemberSelectionOnWhiteSpace(id))
+                        {
+                            tokenInfo.Trigger |= TokenTriggers.MemberSelect;
+                        }
                     }
                     SetNoSeparatorFlag(ref state, true);
                     return true;

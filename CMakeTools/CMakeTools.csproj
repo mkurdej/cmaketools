@@ -49,6 +49,7 @@
     <Compile Include="CMakePath.cs" />
     <Compile Include="CMakeScanner.cs" />
     <Compile Include="CMakeSource.cs" />
+    <Compile Include="CMakeSourceDeclarations.cs" />
     <Compile Include="CMakeStrings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

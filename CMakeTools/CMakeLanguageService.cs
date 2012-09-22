@@ -113,6 +113,10 @@ namespace CMakeTools
                             CMakeSubcommandDeclarations.GetSubcommandDeclarations(id));
                     }
                 }
+                else if (req.TokenInfo.Token == (int)CMakeToken.WhiteSpace)
+                {
+                    scope.SetDeclarations(new CMakeSourceDeclarations(req.FileName));
+                }
             }
             else if (req.Reason == ParseReason.MethodTip)
             {

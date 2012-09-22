@@ -902,13 +902,18 @@ namespace CMakeTools
             _whileKeywords
         };
 
-        // Array of Booleans indicating whether command should trigger member selection.
-        static bool[] _memberSelectionCommands;
+        // Array of Booleans indicating whether a command should trigger member
+        // selection after the opening parenthesis.
+        private static bool[] _memberSelectionCommands;
+
+        // Array of Booleans indicating whether a command should trigger member
+        // selection after whitespace.
+        private static bool[] _memberSelectionWSCommands;
 
         static CMakeKeywords()
         {
-            // Initialize the array of Booleans to indicate which commands should trigger
-            // member selection.
+            // Initialize the arrays of Booleans to indicate which commands should
+            // trigger member selection.
             _memberSelectionCommands = new bool[_commands.Length];
             foreach (CMakeCommandId id in
                 CMakeSubcommandMethods.GetMemberSelectionTriggers())
@@ -921,6 +926,11 @@ namespace CMakeTools
             _memberSelectionCommands[(int)CMakeCommandId.Include] = true;
             _memberSelectionCommands[(int)CMakeCommandId.FindPackage] = true;
             _memberSelectionCommands[(int)CMakeCommandId.AddSubdirectory] = true;
+
+            // These commands should trigger member selection on whitespace.
+            _memberSelectionWSCommands = new bool[_commands.Length];
+            _memberSelectionWSCommands[(int)CMakeCommandId.AddExecutable] = true;
+            _memberSelectionWSCommands[(int)CMakeCommandId.AddLibrary] = true;
         }
 
         /// <summary>
@@ -948,6 +958,15 @@ namespace CMakeTools
                 return false;
             }
             return _memberSelectionCommands[(int)id];
+        }
+
+        public static bool TriggersMemberSelectionOnWhiteSpace(CMakeCommandId id)
+        {
+            if (id == CMakeCommandId.Unspecified)
+            {
+                return false;
+            }
+            return _memberSelectionWSCommands[(int)id];
         }
 
         /// <summary>
