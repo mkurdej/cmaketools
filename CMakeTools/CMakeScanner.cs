@@ -50,6 +50,10 @@ namespace CMakeTools
         // rather than in the scanner state.
         private bool _scannedNonWhitespace;
 
+        // This flag indicates whether the last token scanned on the current line was a
+        // whitespace token.
+        private bool _lastWhitespace;
+
         public CMakeScanner(bool textFile = false)
         {
             _textFile = textFile;
@@ -60,6 +64,7 @@ namespace CMakeTools
             _source = source;
             _offset = offset;
             _scannedNonWhitespace = false;
+            _lastWhitespace = false;
         }
 
         public bool ScanTokenAndProvideInfoAboutIt(TokenInfo tokenInfo, ref int state)
@@ -77,15 +82,18 @@ namespace CMakeTools
                 // of the string.
                 ScanString(tokenInfo, ref state, false);
                 _scannedNonWhitespace = true;
+                _lastWhitespace = false;
                 return true;
             }
 
             bool originalScannedNonWhitespace = _scannedNonWhitespace;
+            bool originalLastWhitespace = _lastWhitespace;
             bool expectVariable = GetVariableFlag(state);
             SetVariableFlag(ref state, false);
             bool noSeparator = GetNoSeparatorFlag(state);
             SetNoSeparatorFlag(ref state, false);
             tokenInfo.Trigger = TokenTriggers.None;
+            _lastWhitespace = false;
             while (_offset < _source.Length)
             {
                 if (char.IsWhiteSpace(_source[_offset]))
@@ -129,6 +137,7 @@ namespace CMakeTools
                         }
                     }
                     SetNoSeparatorFlag(ref state, true);
+                    _lastWhitespace = true;
                     return true;
                 }
                 else if (_source[_offset] == '#')
@@ -281,16 +290,12 @@ namespace CMakeTools
                     }
                     if (tokenInfo.StartIndex == tokenInfo.EndIndex)
                     {
-                        if (!InsideParens(state))
+                        if (!InsideParens(state) && !originalScannedNonWhitespace)
                         {
-                            // Trigger member selection if we're not inside parentheses
-                            // and haven't scanned anything but whitespace on this line.
-                            if (!originalScannedNonWhitespace)
-                            {
-                                tokenInfo.Trigger |= TokenTriggers.MemberSelect;
-                            }
+                            // Trigger member selection if we're not inside parentheses.
+                            tokenInfo.Trigger |= TokenTriggers.MemberSelect;
                         }
-                        else
+                        else if (!originalScannedNonWhitespace || originalLastWhitespace)
                         {
                             // Always trigger member selection in response to certain
                             // commands.

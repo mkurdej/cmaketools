@@ -193,7 +193,8 @@ namespace CMakeTools
             Assert.AreEqual(7, tokenInfo.StartIndex);
             Assert.AreEqual(7, tokenInfo.EndIndex);
             Assert.AreEqual(CMakeToken.WhiteSpace, (CMakeToken)tokenInfo.Token);
-            Assert.AreEqual(TokenTriggers.ParameterNext, tokenInfo.Trigger);
+            Assert.AreEqual(TokenTriggers.ParameterNext | TokenTriggers.MemberSelect,
+                tokenInfo.Trigger);
             Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
             Assert.AreEqual(8, tokenInfo.StartIndex);
             Assert.AreEqual(12, tokenInfo.EndIndex);
@@ -378,7 +379,8 @@ namespace CMakeTools
             Assert.AreEqual(18, tokenInfo.StartIndex);
             Assert.AreEqual(18, tokenInfo.EndIndex);
             Assert.AreEqual(CMakeToken.WhiteSpace, (CMakeToken)tokenInfo.Token);
-            Assert.AreEqual(TokenTriggers.ParameterNext, tokenInfo.Trigger);
+            Assert.AreEqual(TokenTriggers.ParameterNext | TokenTriggers.MemberSelect,
+                tokenInfo.Trigger);
             Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
             Assert.AreEqual(19, tokenInfo.StartIndex);
             Assert.AreEqual(23, tokenInfo.EndIndex);
@@ -541,7 +543,7 @@ namespace CMakeTools
             Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
 
             // Check that a single character doesn't triggers member selection inside
-            // parenthesis.
+            // parentheses.
             scanner.SetSource("add_executable(a", 0);
             state = 0;
             Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
@@ -597,6 +599,47 @@ namespace CMakeTools
             Assert.AreEqual(0, tokenInfo.EndIndex);
             Assert.AreEqual(CMakeToken.Identifier, (CMakeToken)tokenInfo.Token);
             Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+            Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+        }
+
+        /// <summary>
+        /// Test that member selection is properly triggered for file names.
+        /// </summary>
+        [TestMethod]
+        public void TestFileMemberSelection()
+        {
+            CMakeScanner scanner = new CMakeScanner();
+            TokenInfo tokenInfo = new TokenInfo();
+            int state;
+
+            scanner.SetSource("add_executable(a b", 0);
+            state = 0;
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(0, tokenInfo.StartIndex);
+            Assert.AreEqual(13, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.Keyword, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(14, tokenInfo.StartIndex);
+            Assert.AreEqual(14, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.OpenParen, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.ParameterStart, tokenInfo.Trigger);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(15, tokenInfo.StartIndex);
+            Assert.AreEqual(15, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.Identifier, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(16, tokenInfo.StartIndex);
+            Assert.AreEqual(16, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.WhiteSpace, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.ParameterNext | TokenTriggers.MemberSelect,
+                tokenInfo.Trigger);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(17, tokenInfo.StartIndex);
+            Assert.AreEqual(17, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.Identifier, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.MemberSelect, tokenInfo.Trigger);
             Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
         }
     }
