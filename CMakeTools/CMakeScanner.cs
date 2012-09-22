@@ -279,10 +279,27 @@ namespace CMakeTools
                         tokenInfo.Token = isKeyword ? (int)CMakeToken.Keyword :
                             (int)CMakeToken.Identifier;
                     }
-                    if (tokenInfo.StartIndex == tokenInfo.EndIndex &&
-                        !InsideParens(state) && !originalScannedNonWhitespace)
+                    if (tokenInfo.StartIndex == tokenInfo.EndIndex)
                     {
-                        tokenInfo.Trigger |= TokenTriggers.MemberSelect;
+                        if (!InsideParens(state))
+                        {
+                            // Trigger member selection if we're not inside parentheses
+                            // and haven't scanned anything but whitespace on this line.
+                            if (!originalScannedNonWhitespace)
+                            {
+                                tokenInfo.Trigger |= TokenTriggers.MemberSelect;
+                            }
+                        }
+                        else
+                        {
+                            // Always trigger member selection in response to certain
+                            // commands.
+                            if (CMakeKeywords.TriggersMemberSelectionOnWhiteSpace(
+                                GetLastCommand(state)))
+                            {
+                                tokenInfo.Trigger |= TokenTriggers.MemberSelect;
+                            }
+                        }
                     }
                     return true;
                 }
