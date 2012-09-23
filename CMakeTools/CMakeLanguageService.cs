@@ -90,7 +90,7 @@ namespace CMakeTools
                         scope.SetDeclarations(new CMakeFunctionDeclarations(functions,
                             macros, commandsLower));
                     }
-                    else
+                    else if (tokenData.ParameterIndex > 0)
                     {
                         scope.SetDeclarations(new CMakeSourceDeclarations(req.FileName));
                     }
@@ -125,7 +125,13 @@ namespace CMakeTools
                 }
                 else if (req.TokenInfo.Token == (int)CMakeToken.WhiteSpace)
                 {
-                    scope.SetDeclarations(new CMakeSourceDeclarations(req.FileName));
+                    CMakeParsing.TokenData tokenData;
+                    CMakeParsing.ParseForToken(source.GetLines(), req.Line,
+                        req.TokenInfo.StartIndex, out tokenData);
+                    if (tokenData.ParameterIndex > 0)
+                    {
+                        scope.SetDeclarations(new CMakeSourceDeclarations(req.FileName));
+                    }
                 }
             }
             else if (req.Reason == ParseReason.MethodTip)

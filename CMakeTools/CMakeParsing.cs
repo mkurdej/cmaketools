@@ -1162,6 +1162,11 @@ namespace CMakeTools
             /// Boolean value indicating whether the token is in parentheses.
             /// </summary>
             public bool InParens;
+
+            /// <summary>
+            /// The parameter index of the token, if it is a parameter.
+            /// </summary>
+            public int ParameterIndex;
         }
 
         /// <summary>
@@ -1185,6 +1190,7 @@ namespace CMakeTools
             CMakeScanner scanner = new CMakeScanner();
             int state = 0;
             int i = 0;
+            bool foundParameter = false;
             tokenData = new TokenData();
             tokenData.TokenInfo = new TokenInfo();
             foreach (string line in lines)
@@ -1193,13 +1199,41 @@ namespace CMakeTools
                 while (scanner.ScanTokenAndProvideInfoAboutIt(tokenData.TokenInfo,
                     ref state))
                 {
+                    tokenData.InParens = CMakeScanner.InsideParens(state);
+                    if (tokenData.InParens)
+                    {
+                        CMakeToken token = (CMakeToken)tokenData.TokenInfo.Token;
+                        if (token != CMakeToken.WhiteSpace &&
+                            token != CMakeToken.Comment &&
+                            token != CMakeToken.OpenParen)
+                        {
+                            foundParameter = true;
+                        }
+                        else if (foundParameter && token == CMakeToken.WhiteSpace)
+                        {
+                            ++tokenData.ParameterIndex;
+                            foundParameter = false;
+                        }
+                    }
+                    else
+                    {
+                        foundParameter = false;
+                        tokenData.ParameterIndex = 0;
+                    }
                     if (i == lineNum && tokenData.TokenInfo.StartIndex <= col &&
                         tokenData.TokenInfo.EndIndex >= col)
                     {
                         // We found the token.
-                        tokenData.InParens = CMakeScanner.InsideParens(state);
                         return true;
                     }
+                }
+                if (foundParameter)
+                {
+                    // Handle the case where the parameters are separated by newlines
+                    // without any whitespace.  (It's ugly code, but it's syntactically
+                    // correct, so it needs to be handled properly.)
+                    ++tokenData.ParameterIndex;
+                    foundParameter = false;
                 }
                 i++;
             }
