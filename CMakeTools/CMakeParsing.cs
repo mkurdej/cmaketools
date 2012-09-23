@@ -1149,6 +1149,22 @@ namespace CMakeTools
         }
 
         /// <summary>
+        /// Structure to hold the results of a token parsing operation.
+        /// </summary>
+        public struct TokenData
+        {
+            /// <summary>
+            /// Information on the token found.
+            /// </summary>
+            public TokenInfo TokenInfo;
+
+            /// <summary>
+            /// Boolean value indicating whether the token is in parentheses.
+            /// </summary>
+            public bool InParens;
+        }
+
+        /// <summary>
         /// Parse to find the token at a given position.
         /// </summary>
         /// <param name="lines">A collection of lines to parse.</param>
@@ -1164,28 +1180,30 @@ namespace CMakeTools
         /// </param>
         /// <returns>True if a token was found or false otherwise.</returns>
         public static bool ParseForToken(IEnumerable<string> lines, int lineNum,
-            int col, out TokenInfo tokenInfo, out bool inParens)
+            int col, out TokenData tokenData)
         {
             CMakeScanner scanner = new CMakeScanner();
             int state = 0;
             int i = 0;
-            tokenInfo = new TokenInfo();
+            tokenData = new TokenData();
+            tokenData.TokenInfo = new TokenInfo();
             foreach (string line in lines)
             {
                 scanner.SetSource(line, 0);
-                while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state))
+                while (scanner.ScanTokenAndProvideInfoAboutIt(tokenData.TokenInfo,
+                    ref state))
                 {
-                    if (i == lineNum && tokenInfo.StartIndex <= col &&
-                        tokenInfo.EndIndex >= col)
+                    if (i == lineNum && tokenData.TokenInfo.StartIndex <= col &&
+                        tokenData.TokenInfo.EndIndex >= col)
                     {
                         // We found the token.
-                        inParens = CMakeScanner.InsideParens(state);
+                        tokenData.InParens = CMakeScanner.InsideParens(state);
                         return true;
                     }
                 }
                 i++;
             }
-            inParens = false;
+            tokenData.InParens = false;
             return false;
         }
     }

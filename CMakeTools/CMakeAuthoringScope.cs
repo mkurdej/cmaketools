@@ -50,17 +50,16 @@ namespace CMakeTools
 
         public override string GetDataTipText(int line, int col, out TextSpan span)
         {
-            TokenInfo tokenInfo;
-            bool inParens;
-            if (CMakeParsing.ParseForToken(_lines, line, col, out tokenInfo, out
-                inParens) && !inParens)
+            CMakeParsing.TokenData tokenData;
+            if (CMakeParsing.ParseForToken(_lines, line, col, out tokenData) &&
+                !tokenData.InParens)
             {
-                if (tokenInfo.Token == (int)CMakeToken.Keyword)
+                if (tokenData.TokenInfo.Token == (int)CMakeToken.Keyword)
                 {
                     // Get a Quick Info tip for the command at the cursor.
-                    span = tokenInfo.ToTextSpan(line);
+                    span = tokenData.TokenInfo.ToTextSpan(line);
                     string lineText = _lines.ToList()[line];
-                    string tokenText = lineText.ExtractToken(tokenInfo);
+                    string tokenText = lineText.ExtractToken(tokenData.TokenInfo);
                     CMakeCommandId id = CMakeKeywords.GetCommandId(tokenText);
                     if (CMakeSubcommandMethods.HasSubcommands(id))
                     {
@@ -72,17 +71,17 @@ namespace CMakeTools
                     }
                     return CMakeMethods.GetCommandQuickInfoTip(id);
                 }
-                else if (tokenInfo.Token == (int)CMakeToken.Identifier)
+                else if (tokenData.TokenInfo.Token == (int)CMakeToken.Identifier)
                 {
                     // Get a Quick Info tip for the function called at the cursor, if
                     // there is one.
                     string lineText = _lines.ToList()[line];
-                    string tokenText = lineText.ExtractToken(tokenInfo);
+                    string tokenText = lineText.ExtractToken(tokenData.TokenInfo);
                     List<string> parameters = CMakeParsing.ParseForParameterNames(_lines,
                         tokenText);
                     if (parameters != null)
                     {
-                        span = tokenInfo.ToTextSpan(line);
+                        span = tokenData.TokenInfo.ToTextSpan(line);
                         return string.Format("{0}({1})", tokenText,
                             string.Join(" ", parameters));
                     }

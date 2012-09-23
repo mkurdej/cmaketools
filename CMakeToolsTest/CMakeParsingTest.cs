@@ -782,30 +782,24 @@ namespace CMakeTools
             lines.Add("  Y");
             lines.Add("  Z)");
 
-            bool inParens;
-            TokenInfo tokenInfo;
-            Assert.IsTrue(CMakeParsing.ParseForToken(lines, 0, 1, out tokenInfo,
-                out inParens));
-            Assert.IsFalse(inParens);
-            Assert.AreEqual(CMakeToken.Keyword, (CMakeToken)tokenInfo.Token);
-            Assert.AreEqual(0, tokenInfo.StartIndex);
-            Assert.AreEqual(2, tokenInfo.EndIndex);
-            Assert.IsTrue(CMakeParsing.ParseForToken(lines, 0, 4, out tokenInfo,
-                out inParens));
-            Assert.IsTrue(inParens);
-            Assert.AreEqual(CMakeToken.Identifier, (CMakeToken)tokenInfo.Token);
-            Assert.AreEqual(4, tokenInfo.StartIndex);
-            Assert.AreEqual(6, tokenInfo.EndIndex);
-            Assert.IsFalse(CMakeParsing.ParseForToken(lines, 0, 10, out tokenInfo,
-                out inParens));
-            Assert.IsTrue(CMakeParsing.ParseForToken(lines, 1, 2, out tokenInfo,
-                out inParens));
-            Assert.IsTrue(inParens);
-            Assert.AreEqual(CMakeToken.Identifier, (CMakeToken)tokenInfo.Token);
-            Assert.AreEqual(2, tokenInfo.StartIndex);
-            Assert.AreEqual(2, tokenInfo.EndIndex);
-            Assert.IsFalse(CMakeParsing.ParseForToken(lines, 10, 0, out tokenInfo,
-                out inParens));
+            CMakeParsing.TokenData tokenData;
+            Assert.IsTrue(CMakeParsing.ParseForToken(lines, 0, 1, out tokenData));
+            Assert.IsFalse(tokenData.InParens);
+            Assert.AreEqual(CMakeToken.Keyword, (CMakeToken)tokenData.TokenInfo.Token);
+            Assert.AreEqual(0, tokenData.TokenInfo.StartIndex);
+            Assert.AreEqual(2, tokenData.TokenInfo.EndIndex);
+            Assert.IsTrue(CMakeParsing.ParseForToken(lines, 0, 4, out tokenData));
+            Assert.IsTrue(tokenData.InParens);
+            Assert.AreEqual(CMakeToken.Identifier, (CMakeToken)tokenData.TokenInfo.Token);
+            Assert.AreEqual(4, tokenData.TokenInfo.StartIndex);
+            Assert.AreEqual(6, tokenData.TokenInfo.EndIndex);
+            Assert.IsFalse(CMakeParsing.ParseForToken(lines, 0, 10, out tokenData));
+            Assert.IsTrue(CMakeParsing.ParseForToken(lines, 1, 2, out tokenData));
+            Assert.IsTrue(tokenData.InParens);
+            Assert.AreEqual(CMakeToken.Identifier, (CMakeToken)tokenData.TokenInfo.Token);
+            Assert.AreEqual(2, tokenData.TokenInfo.StartIndex);
+            Assert.AreEqual(2, tokenData.TokenInfo.EndIndex);
+            Assert.IsFalse(CMakeParsing.ParseForToken(lines, 10, 0, out tokenData));
         }
 
         /// <summary>

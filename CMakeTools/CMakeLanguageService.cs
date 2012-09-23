@@ -77,11 +77,10 @@ namespace CMakeTools
                 }
                 else if (req.TokenInfo.Token == (int)CMakeToken.Identifier)
                 {
-                    TokenInfo dummy;
-                    bool inParens;
+                    CMakeParsing.TokenData tokenData;
                     CMakeParsing.ParseForToken(source.GetLines(), req.Line,
-                        req.TokenInfo.StartIndex, out dummy, out inParens);
-                    if (!inParens)
+                        req.TokenInfo.StartIndex, out tokenData);
+                    if (!tokenData.InParens)
                     {
                         List<string> functions = CMakeParsing.ParseForFunctionNames(
                             source.GetLines(), false);
