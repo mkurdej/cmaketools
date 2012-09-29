@@ -29,8 +29,22 @@ namespace CMakeTools
             "*.cxx"
         };
 
-        public CMakeSourceDeclarations(string sourceFilePath)
-            : base(sourceFilePath) {}
+        private List<string> _filesToExclude;
+
+        public CMakeSourceDeclarations(string sourceFilePath,
+            IEnumerable<string> priorParameters) : base(sourceFilePath)
+        {
+            // Exclude all files that already appear in the parameter list, except for
+            // the first token, which is the name of the executable to be generated.
+            // Sort the files so that we can quick check if a file is in the list using
+            // a binary search.
+            _filesToExclude = new List<string>(priorParameters);
+            if (_filesToExclude.Count > 0)
+            {
+                _filesToExclude.RemoveAt(0);
+            }
+            _filesToExclude.Sort();
+        }
 
         protected override IEnumerable<string> GetFilesFromDir(string dirPath,
             bool treatAsModules = false)
@@ -46,6 +60,7 @@ namespace CMakeTools
             {
                 IEnumerable<string> files = Directory.EnumerateFiles(dirPath, filter);
                 files = files.Select(Path.GetFileName);
+                files = files.Where(x => _filesToExclude.BinarySearch(x) < 0);
                 allFiles.AddRange(files);
             }
             allFiles.Sort();
