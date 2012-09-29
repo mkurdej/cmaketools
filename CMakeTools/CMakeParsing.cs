@@ -1167,6 +1167,12 @@ namespace CMakeTools
             /// The parameter index of the token, if it is a parameter.
             /// </summary>
             public int ParameterIndex;
+
+            /// <summary>
+            /// List of all parameters to the same command appearing prior to the token,
+            /// if it is a parameter.
+            /// </summary>
+            public List<string> PriorParameters;
         }
 
         /// <summary>
@@ -1191,8 +1197,10 @@ namespace CMakeTools
             int state = 0;
             int i = 0;
             bool foundParameter = false;
+            string parameterText = "";
             tokenData = new TokenData();
             tokenData.TokenInfo = new TokenInfo();
+            tokenData.PriorParameters = new List<string>();
             foreach (string line in lines)
             {
                 scanner.SetSource(line, 0);
@@ -1208,15 +1216,20 @@ namespace CMakeTools
                             token != CMakeToken.OpenParen)
                         {
                             foundParameter = true;
+                            parameterText += line.ExtractToken(tokenData.TokenInfo);
                         }
                         else if (foundParameter && token == CMakeToken.WhiteSpace)
                         {
+                            tokenData.PriorParameters.Add(parameterText);
+                            parameterText = "";
                             ++tokenData.ParameterIndex;
                             foundParameter = false;
                         }
                     }
                     else
                     {
+                        tokenData.PriorParameters.Clear();
+                        parameterText = "";
                         foundParameter = false;
                         tokenData.ParameterIndex = 0;
                     }
@@ -1232,6 +1245,8 @@ namespace CMakeTools
                     // Handle the case where the parameters are separated by newlines
                     // without any whitespace.  (It's ugly code, but it's syntactically
                     // correct, so it needs to be handled properly.)
+                    tokenData.PriorParameters.Add(parameterText);
+                    parameterText = "";
                     ++tokenData.ParameterIndex;
                     foundParameter = false;
                 }
