@@ -789,6 +789,7 @@ namespace CMakeTools
             Assert.AreEqual(0, tokenData.TokenInfo.StartIndex);
             Assert.AreEqual(2, tokenData.TokenInfo.EndIndex);
             Assert.AreEqual(0, tokenData.PriorParameters.Count);
+            Assert.AreEqual(CMakeCommandId.Unspecified, tokenData.Command);
             Assert.IsTrue(CMakeParsing.ParseForToken(lines, 0, 4, out tokenData));
             Assert.IsTrue(tokenData.InParens);
             Assert.AreEqual(0, tokenData.ParameterIndex);
@@ -796,6 +797,7 @@ namespace CMakeTools
             Assert.AreEqual(4, tokenData.TokenInfo.StartIndex);
             Assert.AreEqual(6, tokenData.TokenInfo.EndIndex);
             Assert.AreEqual(0, tokenData.PriorParameters.Count);
+            Assert.AreEqual(CMakeCommandId.Set, tokenData.Command);
             Assert.IsFalse(CMakeParsing.ParseForToken(lines, 0, 10, out tokenData));
             Assert.IsTrue(CMakeParsing.ParseForToken(lines, 1, 2, out tokenData));
             Assert.IsTrue(tokenData.InParens);
@@ -805,6 +807,7 @@ namespace CMakeTools
             Assert.AreEqual(2, tokenData.TokenInfo.EndIndex);
             Assert.AreEqual(1, tokenData.PriorParameters.Count);
             Assert.AreEqual("ABC", tokenData.PriorParameters[0]);
+            Assert.AreEqual(CMakeCommandId.Set, tokenData.Command);
             Assert.IsFalse(CMakeParsing.ParseForToken(lines, 10, 0, out tokenData));
 
             // Test on a single line.
@@ -814,11 +817,13 @@ namespace CMakeTools
             Assert.IsTrue(tokenData.InParens);
             Assert.AreEqual(0, tokenData.ParameterIndex);
             Assert.AreEqual(0, tokenData.PriorParameters.Count);
+            Assert.AreEqual(CMakeCommandId.Set, tokenData.Command);
             Assert.IsTrue(CMakeParsing.ParseForToken(lines, 0, 8, out tokenData));
             Assert.IsTrue(tokenData.InParens);
             Assert.AreEqual(1, tokenData.ParameterIndex);
             Assert.AreEqual(1, tokenData.PriorParameters.Count);
             Assert.AreEqual("ABC", tokenData.PriorParameters[0]);
+            Assert.AreEqual(CMakeCommandId.Set, tokenData.Command);
 
             // Test with extra whitespace.
             lines.Clear();
@@ -827,11 +832,13 @@ namespace CMakeTools
             Assert.IsTrue(tokenData.InParens);
             Assert.AreEqual(0, tokenData.ParameterIndex);
             Assert.AreEqual(0, tokenData.PriorParameters.Count);
+            Assert.AreEqual(CMakeCommandId.Set, tokenData.Command);
             Assert.IsTrue(CMakeParsing.ParseForToken(lines, 0, 9, out tokenData));
             Assert.IsTrue(tokenData.InParens);
             Assert.AreEqual(1, tokenData.ParameterIndex);
             Assert.AreEqual(1, tokenData.PriorParameters.Count);
             Assert.AreEqual("ABC", tokenData.PriorParameters[0]);
+            Assert.AreEqual(CMakeCommandId.Set, tokenData.Command);
 
             // Test on multiple lines with no whitespace.
             lines.Clear();
@@ -842,11 +849,13 @@ namespace CMakeTools
             Assert.IsTrue(tokenData.InParens);
             Assert.AreEqual(0, tokenData.ParameterIndex);
             Assert.AreEqual(0, tokenData.PriorParameters.Count);
+            Assert.AreEqual(CMakeCommandId.Set, tokenData.Command);
             Assert.IsTrue(CMakeParsing.ParseForToken(lines, 2, 0, out tokenData));
             Assert.IsTrue(tokenData.InParens);
             Assert.AreEqual(1, tokenData.ParameterIndex);
             Assert.AreEqual(1, tokenData.PriorParameters.Count);
             Assert.AreEqual("ABC", tokenData.PriorParameters[0]);
+            Assert.AreEqual(CMakeCommandId.Set, tokenData.Command);
 
             // Test a parameter involving multiple tokens.
             lines.Clear();
@@ -856,6 +865,24 @@ namespace CMakeTools
             Assert.AreEqual(1, tokenData.ParameterIndex);
             Assert.AreEqual(1, tokenData.PriorParameters.Count);
             Assert.AreEqual("ABC${FOO}", tokenData.PriorParameters[0]);
+            Assert.AreEqual(CMakeCommandId.Set, tokenData.Command);
+
+            // Test a different command.
+            lines.Clear();
+            lines.Add("UNSET(FOO)");
+            Assert.IsTrue(CMakeParsing.ParseForToken(lines, 0, 6, out tokenData));
+            Assert.IsTrue(tokenData.InParens);
+            Assert.AreEqual(0, tokenData.ParameterIndex);
+            Assert.AreEqual(0, tokenData.PriorParameters.Count);
+            Assert.AreEqual(CMakeCommandId.Unset, tokenData.Command);
+
+            // Test a user-defined function or macro.
+            lines.Clear();
+            lines.Add("BAR(FOO)");
+            Assert.IsTrue(CMakeParsing.ParseForToken(lines, 0, 4, out tokenData));
+            Assert.IsTrue(tokenData.InParens);
+            Assert.AreEqual(0, tokenData.ParameterIndex);
+            Assert.AreEqual(CMakeCommandId.Unspecified, tokenData.Command);
         }
 
         /// <summary>

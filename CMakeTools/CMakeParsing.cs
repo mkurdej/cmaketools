@@ -1173,6 +1173,12 @@ namespace CMakeTools
             /// if it is a parameter.
             /// </summary>
             public List<string> PriorParameters;
+
+            /// <summary>
+            /// Identifier of the command to which this token is a parameter, if it is a
+            /// parameter.
+            /// </summary>
+            public CMakeCommandId Command;
         }
 
         /// <summary>
@@ -1211,6 +1217,7 @@ namespace CMakeTools
                     if (tokenData.InParens)
                     {
                         CMakeToken token = (CMakeToken)tokenData.TokenInfo.Token;
+                        tokenData.Command = CMakeScanner.GetLastCommand(state);
                         if (token != CMakeToken.WhiteSpace &&
                             token != CMakeToken.Comment &&
                             token != CMakeToken.OpenParen)
@@ -1232,6 +1239,7 @@ namespace CMakeTools
                         parameterText = "";
                         foundParameter = false;
                         tokenData.ParameterIndex = 0;
+                        tokenData.Command = CMakeCommandId.Unspecified;
                     }
                     if (i == lineNum && tokenData.TokenInfo.StartIndex <= col &&
                         tokenData.TokenInfo.EndIndex >= col)
