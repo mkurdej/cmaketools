@@ -93,7 +93,7 @@ namespace CMakeTools
                     else if (tokenData.ParameterIndex > 0)
                     {
                         scope.SetDeclarations(new CMakeSourceDeclarations(req.FileName,
-                            tokenData.PriorParameters));
+                            tokenData.PriorParameters, tokenData.Command));
                     }
                 }
                 else if (req.TokenInfo.Token == (int)CMakeToken.OpenParen)
@@ -132,7 +132,7 @@ namespace CMakeTools
                     if (tokenData.ParameterIndex > 0)
                     {
                         scope.SetDeclarations(new CMakeSourceDeclarations(req.FileName,
-                            tokenData.PriorParameters));
+                            tokenData.PriorParameters, tokenData.Command));
                     }
                 }
             }
