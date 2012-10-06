@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.Package;
+using Microsoft.VisualStudio.TextManager.Interop;
 
 namespace CMakeTools
 {
@@ -439,6 +440,19 @@ namespace CMakeTools
         public override string GetName(int index)
         {
             return GetFileName(index);
+        }
+
+        public override string OnCommit(IVsTextView textView, string textSoFar,
+            char commitCharacter, int index, ref TextSpan initialExtent)
+        {
+            // Allow the user to type file names involving CMake variables without
+            // member selection getting in the way.
+            if (commitCharacter == '$')
+            {
+                return string.IsNullOrEmpty(textSoFar) ? "$" : textSoFar;
+            }
+            return base.OnCommit(textView, textSoFar, commitCharacter, index,
+                ref initialExtent);
         }
 
         private string GetFileName(int index)
