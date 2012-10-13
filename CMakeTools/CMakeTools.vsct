@@ -3,16 +3,16 @@
     <Extern href="vsshlids.h" />
     <Commands package="guidCMakeTools">
         <Groups>
-            <Group guid="guidCMakeCmdSet" id="CMakeGroup" priority="0xFF40">
+            <Group guid="guidCMakeCmdSet" id="IDG_CMAKETOOLS_CMAKE" priority="0xFF40">
                 <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS" />
             </Group>
-            <Group guid="guidCMakeCmdSet" id="CMakeHelpGroup" priority="0x0100">
-                <Parent guid="guidCMakeCmdSet" id="CMakeHelpMenu" />
+            <Group guid="guidCMakeCmdSet" id="IDG_CMAKETOOLS_CMAKE_HELP" priority="0x0100">
+                <Parent guid="guidCMakeCmdSet" id="IDM_CMAKETOOLS_CMAKE_HELP" />
             </Group>
         </Groups>
         <Menus>
-            <Menu guid="guidCMakeCmdSet" id="CMakeHelpMenu" priority="0x0100" type="Menu">
-                <Parent guid="guidCMakeCmdSet" id="CMakeGroup" />
+            <Menu guid="guidCMakeCmdSet" id="IDM_CMAKETOOLS_CMAKE_HELP" priority="0x0100" type="Menu">
+                <Parent guid="guidCMakeCmdSet" id="IDG_CMAKETOOLS_CMAKE" />
                 <Strings>
                     <ButtonText>CMake Help</ButtonText>
                     <CommandName>CMake Help</CommandName>
@@ -21,7 +21,7 @@
         </Menus>
         <Buttons>
             <Button guid="guidCMakeCmdSet" id="cmdidCMake" priority="0x0100" type="Button">
-                <Parent guid="guidCMakeCmdSet" id="CMakeGroup" />
+                <Parent guid="guidCMakeCmdSet" id="IDG_CMAKETOOLS_CMAKE" />
                 <Icon guid="guidImages" id="bmpCMakeLogo" />
                 <Strings>
                     <CommandName>CMake GUI</CommandName>
@@ -29,7 +29,7 @@
                 </Strings>
             </Button>
             <Button guid="guidCMakeCmdSet" id="cmdidCMakeHelp" priority="0x0100" type="Button">
-                <Parent guid="guidCMakeCmdSet" id="CMakeHelpGroup" />
+                <Parent guid="guidCMakeCmdSet" id="IDG_CMAKETOOLS_CMAKE_HELP" />
                 <Strings>
                     <CommandName>CMake Help</CommandName>
                     <ButtonText>CMake Help</ButtonText>
@@ -45,9 +45,9 @@
         <GuidSymbol name="guidCMakeCmdSet" value="{08dcf0dd-678f-4971-b890-05e25674e2fb}">
             <IDSymbol name="cmdidCMake" value="0x0100" />
             <IDSymbol name="cmdidCMakeHelp" value="0x0101" />
-            <IDSymbol name="CMakeHelpMenu" value="0x2000" />
-            <IDSymbol name="CMakeGroup" value="0x4000" />
-            <IDSymbol name="CMakeHelpGroup" value="0x4001" />
+            <IDSymbol name="IDM_CMAKETOOLS_CMAKE_HELP" value="0x2000" />
+            <IDSymbol name="IDG_CMAKETOOLS_CMAKE" value="0x4000" />
+            <IDSymbol name="IDG_CMAKETOOLS_CMAKE_HELP" value="0x4001" />
         </GuidSymbol>
         <GuidSymbol name="guidImages" value="{04fe46f4-4747-486e-81ae-bb9fee1c2ad3}">
             <IDSymbol name="bmpCMakeLogo" value="1" />
