@@ -18,5 +18,6 @@ namespace CMakeTools
     static class CMakeCmdIds
     {
         public const uint cmdidCMake = 0x0100;
+        public const uint cmdidCMakeHelp = 0x0101;
     }
 }

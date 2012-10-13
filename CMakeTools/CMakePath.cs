@@ -10,6 +10,8 @@
  * 
  * **************************************************************************/
 
+using System.Collections.Generic;
+using System.IO;
 using Microsoft.Win32;
 
 namespace CMakeTools
@@ -51,6 +53,30 @@ namespace CMakeTools
                 }
             }
             return location;
+        }
+
+        public static string FindCMakeHelp()
+        {
+            string pathToCMake = FindCMake();
+            if (pathToCMake != null)
+            {
+                try
+                {
+                    string pathToDoc = Path.Combine(pathToCMake, "doc");
+                    IEnumerable<string> dirs = Directory.EnumerateDirectories(pathToDoc,
+                        "cmake-*.*");
+                    foreach (string dir in dirs)
+                    {
+                        return Path.Combine(pathToDoc, dir);
+                    }
+                }
+                catch (DirectoryNotFoundException)
+                {
+                    // This exception will occur if the CMake installation is missing
+                    // expected subdirectories.  Proceed as if CMake had not been found.
+                }
+            }
+            return null;
         }
     }
 }

@@ -20,6 +20,7 @@ using Microsoft.Win32;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace CMakeTools
 {
@@ -61,15 +62,14 @@ namespace CMakeTools
             service.SetSite(this);
             container.AddService(typeof(CMakeLanguageService), service, true);
 
-            // Register callback to respond to menu command.
+            // Register callbacks to respond to menu commands.
             OleMenuCommandService mcs = GetService(typeof(IMenuCommandService))
                 as OleMenuCommandService;
             if (mcs != null)
             {
-                CommandID cmdid = new CommandID(new Guid(CMakeGuids.guidCMakeCmdSet),
-                    (int)CMakeCmdIds.cmdidCMake);
-                MenuCommand menuItem = new MenuCommand(CMakeMenuCallback, cmdid);
-                mcs.AddCommand(menuItem);
+                RegisterMenuCallback(mcs, CMakeCmdIds.cmdidCMake, CMakeMenuCallback);
+                RegisterMenuCallback(mcs, CMakeCmdIds.cmdidCMakeHelp,
+                    CMakeHelpMenuCallback);
             }
 
             // Register this object as an OLE component.  This is boilerplate code that
@@ -90,6 +90,16 @@ namespace CMakeTools
                 uint componentID = 0;
                 manager.FRegisterComponent(this, crinfo, out componentID);
             }
+        }
+
+        private void RegisterMenuCallback(OleMenuCommandService mcs, uint cmdid,
+            EventHandler handler)
+        {
+            // Helper function to register a callback for a menu command.
+            CommandID cmdidObj = new CommandID(new Guid(CMakeGuids.guidCMakeCmdSet),
+                (int)cmdid);
+            MenuCommand menuItem = new MenuCommand(handler, cmdidObj);
+            mcs.AddCommand(menuItem);
         }
 
         private void CMakeMenuCallback(object sender, EventArgs e)
@@ -124,6 +134,38 @@ namespace CMakeTools
                     MessageBox.Show(CMakeStrings.FailedToLaunchCMake,
                         CMakeStrings.MessageBoxTitle, MessageBoxButtons.OK,
                         MessageBoxIcon.Stop);
+                }
+            }
+            else
+            {
+                // Display an error message that CMake could not be found.
+                MessageBox.Show(CMakeStrings.CMakeNotFound, CMakeStrings.MessageBoxTitle,
+                    MessageBoxButtons.OK, MessageBoxIcon.Stop);
+            }
+        }
+
+        private void CMakeHelpMenuCallback(object sender, EventArgs e)
+        {
+            OpenCMakeHelpPage("cmake.html");
+        }
+
+        private void OpenCMakeHelpPage(string fileName)
+        {
+            // Attempt to find CMake in the registry.
+            string location = CMakePath.FindCMakeHelp();
+
+            // If we found CMake, attempt to open the request help page in
+            // Visual Studio's built-in web browser.
+            if (location != null)
+            {
+                IVsWebBrowsingService service = (IVsWebBrowsingService)GetService(
+                    typeof(SVsWebBrowsingService));
+                if (service != null)
+                {
+                    string absolutePath = Path.Combine(location, fileName);
+                    IVsWindowFrame frame;
+                    service.Navigate(absolutePath,
+                        (uint)__VSWBNAVIGATEFLAGS.VSNWB_ForceNew, out frame);
                 }
             }
             else
