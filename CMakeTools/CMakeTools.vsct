@@ -3,13 +3,16 @@
     <Extern href="vsshlids.h" />
     <Commands package="guidCMakeTools">
         <Groups>
+            <Group guid="guidCMakeCmdSet" id="CMakeGroup" priority="0xFF40">
+                <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS" />
+            </Group>
             <Group guid="guidCMakeCmdSet" id="CMakeHelpGroup" priority="0x0100">
                 <Parent guid="guidCMakeCmdSet" id="CMakeHelpMenu" />
             </Group>
         </Groups>
         <Menus>
             <Menu guid="guidCMakeCmdSet" id="CMakeHelpMenu" priority="0x0100" type="Menu">
-                <Parent guid="guidSHLMainMenu" id="IDG_VS_TOOLS_EXT_TOOLS" />
+                <Parent guid="guidCMakeCmdSet" id="CMakeGroup" />
                 <Strings>
                     <ButtonText>CMake Help</ButtonText>
                     <CommandName>CMake Help</CommandName>
@@ -18,14 +21,14 @@
         </Menus>
         <Buttons>
             <Button guid="guidCMakeCmdSet" id="cmdidCMake" priority="0x0100" type="Button">
-                <Parent guid="guidSHLMainMenu" id="IDG_VS_TOOLS_EXT_TOOLS" />
+                <Parent guid="guidCMakeCmdSet" id="CMakeGroup" />
                 <Icon guid="guidImages" id="bmpCMakeLogo" />
                 <Strings>
                     <CommandName>CMake GUI</CommandName>
                     <ButtonText>CMake GUI</ButtonText>
                 </Strings>
             </Button>
-            <Button guid="guidCMakeCmdSet" id="cmdidCMakeHelp" priority="0x0101" type="Button">
+            <Button guid="guidCMakeCmdSet" id="cmdidCMakeHelp" priority="0x0100" type="Button">
                 <Parent guid="guidCMakeCmdSet" id="CMakeHelpGroup" />
                 <Strings>
                     <CommandName>CMake Help</CommandName>
@@ -43,7 +46,8 @@
             <IDSymbol name="cmdidCMake" value="0x0100" />
             <IDSymbol name="cmdidCMakeHelp" value="0x0101" />
             <IDSymbol name="CMakeHelpMenu" value="0x2000" />
-            <IDSymbol name="CMakeHelpGroup" value="0x4000" />
+            <IDSymbol name="CMakeGroup" value="0x4000" />
+            <IDSymbol name="CMakeHelpGroup" value="0x4001" />
         </GuidSymbol>
         <GuidSymbol name="guidImages" value="{04fe46f4-4747-486e-81ae-bb9fee1c2ad3}">
             <IDSymbol name="bmpCMakeLogo" value="1" />
