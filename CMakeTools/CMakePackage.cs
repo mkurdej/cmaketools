@@ -68,8 +68,21 @@ namespace CMakeTools
             if (mcs != null)
             {
                 RegisterMenuCallback(mcs, CMakeCmdIds.cmdidCMake, CMakeMenuCallback);
-                RegisterMenuCallback(mcs, CMakeCmdIds.cmdidCMakeHelp,
-                    CMakeHelpMenuCallback);
+                RegisterHelpMenuCallback(mcs, CMakeCmdIds.cmdidCMakeHelp, "cmake.html");
+                RegisterHelpMenuCallback(mcs, CMakeCmdIds.cmdidCMakeHelpCommands,
+                    "cmake-commands.html");
+                RegisterHelpMenuCallback(mcs, CMakeCmdIds.cmdidCMakeHelpModules,
+                    "cmake-modules.html");
+                RegisterHelpMenuCallback(mcs, CMakeCmdIds.cmdidCMakeHelpProperties,
+                    "cmake-properties.html");
+                RegisterHelpMenuCallback(mcs, CMakeCmdIds.cmdidCMakeHelpVariables,
+                    "cmake-variables.html");
+                RegisterHelpMenuCallback(mcs, CMakeCmdIds.cmdidCMakeHelpCPack,
+                    "cpack.html");
+                RegisterHelpMenuCallback(mcs, CMakeCmdIds.cmdidCMakeHelpCTest,
+                    "ctest.html");
+                RegisterMenuCallback(mcs, CMakeCmdIds.cmdidCMakeHelpWebSite,
+                    CMakeHelpWebSiteMenuCallback);
             }
 
             // Register this object as an OLE component.  This is boilerplate code that
@@ -100,6 +113,14 @@ namespace CMakeTools
                 (int)cmdid);
             MenuCommand menuItem = new MenuCommand(handler, cmdidObj);
             mcs.AddCommand(menuItem);
+        }
+        
+        private void RegisterHelpMenuCallback(OleMenuCommandService mcs, uint cmdid,
+            string htmlFile)
+        {
+            // Register a callback to open the specified HTML file in the CMake
+            // documentation directory when the specified menu command is selected.
+            RegisterMenuCallback(mcs, cmdid, (sender, e) => OpenCMakeHelpPage(htmlFile));
         }
 
         private void CMakeMenuCallback(object sender, EventArgs e)
@@ -144,9 +165,23 @@ namespace CMakeTools
             }
         }
 
-        private void CMakeHelpMenuCallback(object sender, EventArgs e)
+        private void CMakeHelpWebSiteMenuCallback(object sender, EventArgs e)
         {
-            OpenCMakeHelpPage("cmake.html");
+            // Open the CMake web site.
+            OpenWebPage("http://www.cmake.org");
+        }
+
+        private void OpenWebPage(string url)
+        {
+            // Open the specified URL in Visual Studio's built-in web browser.
+            IVsWebBrowsingService service = (IVsWebBrowsingService)GetService(
+                typeof(SVsWebBrowsingService));
+            if (service != null)
+            {
+                IVsWindowFrame frame;
+                service.Navigate(url, (uint)__VSWBNAVIGATEFLAGS.VSNWB_ForceNew,
+                    out frame);
+            }
         }
 
         private void OpenCMakeHelpPage(string fileName)
@@ -158,15 +193,8 @@ namespace CMakeTools
             // Visual Studio's built-in web browser.
             if (location != null)
             {
-                IVsWebBrowsingService service = (IVsWebBrowsingService)GetService(
-                    typeof(SVsWebBrowsingService));
-                if (service != null)
-                {
-                    string absolutePath = Path.Combine(location, fileName);
-                    IVsWindowFrame frame;
-                    service.Navigate(absolutePath,
-                        (uint)__VSWBNAVIGATEFLAGS.VSNWB_ForceNew, out frame);
-                }
+                string absolutePath = Path.Combine(location, fileName);
+                OpenWebPage(absolutePath);
             }
             else
             {

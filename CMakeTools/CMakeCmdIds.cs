@@ -19,5 +19,12 @@ namespace CMakeTools
     {
         public const uint cmdidCMake = 0x0100;
         public const uint cmdidCMakeHelp = 0x0101;
+        public const uint cmdidCMakeHelpCommands = 0x0102;
+        public const uint cmdidCMakeHelpModules = 0x0103;
+        public const uint cmdidCMakeHelpProperties = 0x0104;
+        public const uint cmdidCMakeHelpVariables = 0x0105;
+        public const uint cmdidCMakeHelpCPack = 0x0106;
+        public const uint cmdidCMakeHelpCTest = 0x0107;
+        public const uint cmdidCMakeHelpWebSite = 0x0108;
     }
 }
