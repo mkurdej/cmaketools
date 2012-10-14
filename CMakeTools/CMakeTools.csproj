@@ -68,6 +68,10 @@
     <Compile Include="YesNoConverter.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="License.rtf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -119,10 +123,6 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="CMakeLogoBig.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="License.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
