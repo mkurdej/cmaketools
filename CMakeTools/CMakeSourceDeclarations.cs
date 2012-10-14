@@ -99,6 +99,12 @@ namespace CMakeTools
             return allFiles;
         }
 
+        protected override IEnumerable<string> GetDefaultModules()
+        {
+            // Don't show list of CMake modules when there is no CMake installation.
+            return new string[] {};
+        }
+
         public override int GetGlyph(int index)
         {
             // If the index specifies a keyword, return the index for a keyword.
