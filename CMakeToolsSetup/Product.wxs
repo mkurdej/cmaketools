@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Product Id="1da9cbfe-c311-43ae-8310-d201ec1da835" Name="CMake Tools for Visual Studio" Language="1033" Version="1.0.0.0" Manufacturer="David Golub" UpgradeCode="38709d2b-9fe1-448d-8e5d-c55c1555c620">
+        <Package InstallerVersion="200" Compressed="yes" />
+
+        <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="ProgramFilesFolder">
+                <Directory Id="INSTALLLOCATION" Name="CMake Tools for Visual Studio">
+                    <Component Id="CMakeTools" Guid="A2321DDB-A524-49F6-92FA-D339AC822CA7">
+                        <File Id="CMakeLogo" Name="CMakeLogo.ico" DiskId="1" Source="CMakeLogo.ico" />
+                        <File Id="CMakeLogoBig" Name="CMakeLogoBig.png" DiskId="1" Source="CMakeLogoBig.png" />
+                        <File Id="CMakeToolsDLL" Name="CMakeTools.dll" DiskId="1" Source="CMakeTools.dll" KeyPath="yes" />
+                        <File Id="CMakeToolsPkgDef" Name="CMakeTools.pkgdef" DiskId="1" Source="CMakeTools.pkgdef" />
+                        <File Id="License" Name="License.rtf" DiskId="1" Source="License.rtf" />
+                        <File Id="VSIXManifest" Name="extension.vsixmanifest" DiskId="1" Source="extension.vsixmanifest" />
+                    </Component>
+                </Directory>
+            </Directory>
+        </Directory>
+
+        <Feature Id="ProductFeature" Title="CMakeToolsSetup" Level="1">
+            <ComponentRef Id="CMakeTools" />
+            
+            <ComponentGroupRef Id="Product.Generated" />
+        </Feature>
+    </Product>
+</Wix>

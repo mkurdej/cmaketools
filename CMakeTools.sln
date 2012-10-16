@@ -13,23 +13,54 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
 	EndProjectSection
 EndProject
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "CMakeToolsSetup", "CMakeToolsSetup\CMakeToolsSetup.wixproj", "{7B9F756F-F5E2-4E70-8FB7-1E8BB0774978}"
+	ProjectSection(ProjectDependencies) = postProject
+		{678324F2-4B99-4601-A72A-58B24546A19F} = {678324F2-4B99-4601-A72A-58B24546A19F}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = CMakeTools.vsmdi
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{678324F2-4B99-4601-A72A-58B24546A19F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{678324F2-4B99-4601-A72A-58B24546A19F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{678324F2-4B99-4601-A72A-58B24546A19F}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{678324F2-4B99-4601-A72A-58B24546A19F}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{678324F2-4B99-4601-A72A-58B24546A19F}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{678324F2-4B99-4601-A72A-58B24546A19F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{678324F2-4B99-4601-A72A-58B24546A19F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{678324F2-4B99-4601-A72A-58B24546A19F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{678324F2-4B99-4601-A72A-58B24546A19F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{678324F2-4B99-4601-A72A-58B24546A19F}.Release|x86.ActiveCfg = Release|Any CPU
 		{C2F9B23F-4944-4945-BEB2-2428C14B15FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C2F9B23F-4944-4945-BEB2-2428C14B15FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2F9B23F-4944-4945-BEB2-2428C14B15FE}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{C2F9B23F-4944-4945-BEB2-2428C14B15FE}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{C2F9B23F-4944-4945-BEB2-2428C14B15FE}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{C2F9B23F-4944-4945-BEB2-2428C14B15FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2F9B23F-4944-4945-BEB2-2428C14B15FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2F9B23F-4944-4945-BEB2-2428C14B15FE}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{C2F9B23F-4944-4945-BEB2-2428C14B15FE}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{C2F9B23F-4944-4945-BEB2-2428C14B15FE}.Release|x86.ActiveCfg = Release|Any CPU
+		{7B9F756F-F5E2-4E70-8FB7-1E8BB0774978}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{7B9F756F-F5E2-4E70-8FB7-1E8BB0774978}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{7B9F756F-F5E2-4E70-8FB7-1E8BB0774978}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{7B9F756F-F5E2-4E70-8FB7-1E8BB0774978}.Debug|x86.ActiveCfg = Debug|x86
+		{7B9F756F-F5E2-4E70-8FB7-1E8BB0774978}.Debug|x86.Build.0 = Debug|x86
+		{7B9F756F-F5E2-4E70-8FB7-1E8BB0774978}.Release|Any CPU.ActiveCfg = Release|x86
+		{7B9F756F-F5E2-4E70-8FB7-1E8BB0774978}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{7B9F756F-F5E2-4E70-8FB7-1E8BB0774978}.Release|Mixed Platforms.Build.0 = Release|x86
+		{7B9F756F-F5E2-4E70-8FB7-1E8BB0774978}.Release|x86.ActiveCfg = Release|x86
+		{7B9F756F-F5E2-4E70-8FB7-1E8BB0774978}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
