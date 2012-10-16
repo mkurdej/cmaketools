@@ -20,10 +20,15 @@
             </Directory>
         </Directory>
 
-        <Feature Id="ProductFeature" Title="CMakeToolsSetup" Level="1">
+        <Feature Id="CMakeTools" Title="CMake Tools for Visual Studio" Description="Syntax highlighting and IntelliSense for CMake in Visual Studio." Level="1">
             <ComponentRef Id="CMakeTools" />
             
             <ComponentGroupRef Id="Product.Generated" />
         </Feature>
+
+        <UIRef Id="WixUI_Mondo" />
+        <UIRef Id="WixUI_ErrorProgressText" />
+
+        <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
     </Product>
 </Wix>
