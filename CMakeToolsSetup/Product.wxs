@@ -3,29 +3,64 @@
     <Product Id="1da9cbfe-c311-43ae-8310-d201ec1da835" Name="CMake Tools for Visual Studio" Language="1033" Version="1.0.0.0" Manufacturer="David Golub" UpgradeCode="38709d2b-9fe1-448d-8e5d-c55c1555c620">
         <Package InstallerVersion="200" Compressed="yes" />
 
-        <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+        <Media Id="1" Cabinet="CMakeTools.cab" EmbedCab="yes" />
 
+        <Icon Id="CMakeLogo" SourceFile="CMakeLogo.ico" />
+        
+        <Property Id="ARPPRODUCTICON" Value="CMakeLogo" />
+        <Property Id="VS2012DIR">
+            <RegistrySearch Id="VS2012InstallDir" Type="raw" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\11.0" Name="InstallDir" />
+        </Property>
+        <Property Id="VS2012DEVENV">
+            <RegistrySearch Id="VS2012EnvironmentPath" Type="raw" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\11.0\Setup\VS" Name="EnvironmentPath" />
+        </Property>
+
+        <CustomAction Id="VS2012Setup" Property="VS2012DEVENV" ExeCommand="/setup" Execute="deferred" Return="ignore" Impersonate="no" />
+        
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="ProgramFilesFolder">
                 <Directory Id="INSTALLLOCATION" Name="CMake Tools for Visual Studio">
-                    <Component Id="CMakeTools" Guid="A2321DDB-A524-49F6-92FA-D339AC822CA7">
-                        <File Id="CMakeLogo" Name="CMakeLogo.ico" DiskId="1" Source="CMakeLogo.ico" />
-                        <File Id="CMakeLogoBig" Name="CMakeLogoBig.png" DiskId="1" Source="CMakeLogoBig.png" />
-                        <File Id="CMakeToolsDLL" Name="CMakeTools.dll" DiskId="1" Source="CMakeTools.dll" KeyPath="yes" />
-                        <File Id="CMakeToolsPkgDef" Name="CMakeTools.pkgdef" DiskId="1" Source="CMakeTools.pkgdef" />
-                        <File Id="License" Name="License.rtf" DiskId="1" Source="License.rtf" />
-                        <File Id="VSIXManifest" Name="extension.vsixmanifest" DiskId="1" Source="extension.vsixmanifest" />
-                    </Component>
+                </Directory>
+            </Directory>
+            <Directory Id="VS2012DIR">
+                <Directory Id="Extensions" Name="Extensions">
+                    <Directory Id="CMakeExtension" Name="CMake Tools for Visual Studio">
+                        <Component Id="CMakeTools" Guid="a2321ddb-a524-49f6-92fa-d339ac822ca7">
+                            <File Id="CMakeLogo" Name="CMakeLogo.ico" DiskId="1" Source="CMakeLogo.ico" />
+                            <File Id="CMakeLogoBig" Name="CMakeLogoBig.png" DiskId="1" Source="CMakeLogoBig.png" />
+                            <File Id="CMakeToolsDLL" Name="CMakeTools.dll" DiskId="1" Source="CMakeTools.dll" KeyPath="yes" />
+                            <File Id="CMakeToolsPkgDef" Name="CMakeTools.pkgdef" DiskId="1" Source="CMakeTools.pkgdef" />
+                            <File Id="License" Name="License.rtf" DiskId="1" Source="License.rtf" />
+                            <File Id="VSIXManifest" Name="extension.vsixmanifest" DiskId="1" Source="extension.vsixmanifest" />
+                        </Component>
+                        <Directory Id="Templates" Name="Templates">
+                            <Directory Id="NewItems" Name="NewItems">
+                                <Component Id="CMakeTemplates" Guid="e94d6685-484f-43e1-ae7f-cd14fe66ed22">
+                                    <File Id="CMakeFile" Name="CMakeFile.cmake" DiskId="1" Source="Templates\NewItems\CMakeFile.cmake" />
+                                    <File Id="NewCMakeItems" Name="NewCMakeItems.vsdir" DiskId="1" Source="Templates\NewItems\NewCMakeItems.vsdir" />
+                                </Component>
+                            </Directory>
+                        </Directory>
+                    </Directory>
                 </Directory>
             </Directory>
         </Directory>
 
         <Feature Id="CMakeTools" Title="CMake Tools for Visual Studio" Description="Syntax highlighting and IntelliSense for CMake in Visual Studio." Level="1">
             <ComponentRef Id="CMakeTools" />
+            <ComponentRef Id="CMakeTemplates" />
             
             <ComponentGroupRef Id="Product.Generated" />
         </Feature>
 
+        <InstallExecuteSequence>
+            <Custom Action="VS2012Setup" Before="InstallFinalize">VS2012DEVENV</Custom>
+        </InstallExecuteSequence>
+
+        <UI>
+            <ProgressText Action="VS2012Setup" Template="[1]">Updating Visual Studio 2012 registration</ProgressText>
+        </UI>
+        
         <UIRef Id="WixUI_Mondo" />
         <UIRef Id="WixUI_ErrorProgressText" />
 
