@@ -21,6 +21,8 @@
         <CustomAction Id="VS2012Setup" Property="VS2012DEVENV" ExeCommand="/setup" Execute="deferred" Return="ignore" Impersonate="no" />
         
         <Directory Id="TARGETDIR" Name="SourceDir">
+            <Component Id="CMakeTools" Guid="a286eaec-129e-4e7b-b3dd-a2f0c46448d9">
+            </Component>
             <Directory Id="ProgramFilesFolder">
                 <Directory Id="INSTALLLOCATION" Name="CMake Tools for Visual Studio">
                 </Directory>
@@ -63,16 +65,17 @@
             </Directory>
         </Directory>
 
-        <Feature Id="CMakeTools" Title="CMake Tools for Visual Studio" Description="Syntax highlighting and IntelliSense for CMake in Visual Studio." Level="1">
-            <Feature Id="CMakeTools2010" Title="Visual Studio 2010 Extension" Description="Extension for Visual Studio 2010." Level="1">
+        <Feature Id="CMakeTools" Title="CMake Tools for Visual Studio" Description="Syntax highlighting and IntelliSense for CMake in Visual Studio." Level="1" AllowAdvertise="no">
+            <Feature Id="CMakeTools2010" Title="Visual Studio 2010 Extension" Description="Extension for Visual Studio 2010." Level="1" AllowAdvertise="no">
                 <ComponentRef Id="CMakeTools2010" />
                 <ComponentRef Id="CMakeTemplates2010" />
             </Feature>
-            <Feature Id="CMakeTools2012" Title="Visual Studio 2012 Extension" Description="Extension for Visual Studio 2012." Level="1">
+            <Feature Id="CMakeTools2012" Title="Visual Studio 2012 Extension" Description="Extension for Visual Studio 2012." Level="1" AllowAdvertise="no">
                 <ComponentRef Id="CMakeTools2012" />
                 <ComponentRef Id="CMakeTemplates2012" />
             </Feature>
-            
+
+            <ComponentRef Id="CMakeTools" />
             <ComponentGroupRef Id="Product.Generated" />
         </Feature>
 
