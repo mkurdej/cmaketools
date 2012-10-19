@@ -64,10 +64,14 @@
         </Directory>
 
         <Feature Id="CMakeTools" Title="CMake Tools for Visual Studio" Description="Syntax highlighting and IntelliSense for CMake in Visual Studio." Level="1">
-            <ComponentRef Id="CMakeTools2010" />
-            <ComponentRef Id="CMakeTemplates2010" />
-            <ComponentRef Id="CMakeTools2012" />
-            <ComponentRef Id="CMakeTemplates2012" />
+            <Feature Id="CMakeTools2010" Title="Visual Studio 2010 Extension" Description="Extension for Visual Studio 2010." Level="1">
+                <ComponentRef Id="CMakeTools2010" />
+                <ComponentRef Id="CMakeTemplates2010" />
+            </Feature>
+            <Feature Id="CMakeTools2012" Title="Visual Studio 2012 Extension" Description="Extension for Visual Studio 2012." Level="1">
+                <ComponentRef Id="CMakeTools2012" />
+                <ComponentRef Id="CMakeTemplates2012" />
+            </Feature>
             
             <ComponentGroupRef Id="Product.Generated" />
         </Feature>
