@@ -5,7 +5,7 @@
 
         <Media Id="1" Cabinet="CMakeTools.cab" EmbedCab="yes" />
 
-        <Icon Id="CMakeLogo" SourceFile="CMakeLogo.ico" />
+        <Icon Id="CMakeLogo" SourceFile="dist\CMakeLogo.ico" />
         
         <Property Id="ARPPRODUCTICON" Value="CMakeLogo" />
         <Property Id="VS2010DIR">
@@ -90,6 +90,6 @@
         <UIRef Id="WixUI_Mondo" />
         <UIRef Id="WixUI_ErrorProgressText" />
 
-        <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+        <WixVariable Id="WixUILicenseRtf" Value="dist\License.rtf" />
     </Product>
 </Wix>
