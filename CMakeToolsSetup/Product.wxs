@@ -11,6 +11,9 @@
         <Property Id="VS2010DIR">
             <RegistrySearch Id="VS2010InstallDir" Type="raw" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\10.0" Name="InstallDir" />
         </Property>
+        <Property Id="VS2010DEVENV">
+            <RegistrySearch Id="VS2010EnvironmentPath" Type="raw" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\10.0\Setup\VS" Name="EnvironmentPath" />
+        </Property>
         <Property Id="VS2012DIR">
             <RegistrySearch Id="VS2012InstallDir" Type="raw" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\11.0" Name="InstallDir" />
         </Property>
@@ -33,6 +36,11 @@
                     <Directory Id="CMakeExtensions2010" Name="CMake Tools for Visual Studio">
                         <Component Id="CMakeTools2010" Guid="fcf7da9d-a549-47f7-b77d-de710efdab75">
                             <?include CMakeTools.wxi ?>
+                            <ProgId Id="CMakeTools.cmake.10.0" Description="CMake File" Icon="CMakeLogo2010">
+                                <Extension Id="cmake" ContentType="text/plain">
+                                    <Verb Id="open" Command="Open" TargetProperty="VS2010DEVENV" Argument='"%1"' />
+                                </Extension>
+                            </ProgId>
                         </Component>
                     </Directory>
                 </Directory>
@@ -51,6 +59,11 @@
                     <Directory Id="CMakeExtension2012" Name="CMake Tools for Visual Studio">
                         <Component Id="CMakeTools2012" Guid="a2321ddb-a524-49f6-92fa-d339ac822ca7">
                             <?include CMakeTools.wxi ?>
+                            <ProgId Id="CMakeTools.cmake.11.0" Description="CMake File" Icon="CMakeLogo2012">
+                                <Extension Id="cmake" ContentType="text/plain">
+                                    <Verb Id="open" Command="Open" TargetProperty="VS2012DEVENV" Argument='"%1"' />
+                                </Extension>
+                            </ProgId>
                         </Component>
                         <Directory Id="Templates2012" Name="Templates">
                             <Directory Id="NewItems2012" Name="NewItems">
