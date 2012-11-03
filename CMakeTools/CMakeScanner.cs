@@ -201,6 +201,7 @@ namespace CMakeTools
                     tokenInfo.EndIndex = _offset;
                     tokenInfo.Color = TokenColor.Text;
                     tokenInfo.Token = (int)CMakeToken.OpenParen;
+                    tokenInfo.Trigger |= TokenTriggers.MatchBraces;
                     _offset++;
                     return true;
                 }
@@ -216,6 +217,7 @@ namespace CMakeTools
                     tokenInfo.EndIndex = _offset;
                     tokenInfo.Color = TokenColor.Text;
                     tokenInfo.Token = (int)CMakeToken.CloseParen;
+                    tokenInfo.Trigger |= TokenTriggers.MatchBraces;
                     _offset++;
                     return true;
                 }

@@ -59,7 +59,17 @@ namespace CMakeTools
                     req.Sink.AddHiddenRegion(textSpan);
                 }
             }
-            if (req.Reason == ParseReason.MemberSelect)
+            if (req.Sink.BraceMatching)
+            {
+                List<CMakeParsing.SpanPair> pairs = CMakeParsing.ParseForParens(
+                    source.GetLines());
+                foreach (CMakeParsing.SpanPair pair in pairs)
+                {
+                    req.Sink.MatchPair(pair.First, pair.Second, 0);
+                }
+            }
+            if (req.Reason == ParseReason.MemberSelect ||
+                req.Reason == ParseReason.MemberSelectAndHighlightBraces)
             {
                 // Set an appropriate declarations object depending on the token that
                 // triggered member selection.

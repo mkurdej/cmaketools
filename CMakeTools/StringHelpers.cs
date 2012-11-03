@@ -48,5 +48,24 @@ namespace CMakeTools
                 iEndIndex = tokenInfo.EndIndex
             };
         }
+
+        /// <summary>
+        /// Generate a text span for use in brace matching from token information.
+        /// </summary>
+        /// <param name="tokenInfo">Information on a token.</param>
+        /// <param name="line">The line number on which the token is found</param>
+        /// <returns>A text span for the token for use in brace matching.</returns>
+        public static TextSpan ToBraceMatchingSpan(this TokenInfo tokenInfo, int line)
+        {
+            // For brace matching to work properly, it is necessary to add one to the
+            // end index.
+            return new TextSpan()
+            {
+                iStartLine = line,
+                iStartIndex = tokenInfo.StartIndex,
+                iEndLine = line,
+                iEndIndex = tokenInfo.EndIndex + 1
+            };
+        }
     }
 }

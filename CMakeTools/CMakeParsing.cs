@@ -1263,5 +1263,58 @@ namespace CMakeTools
             tokenData.InParens = false;
             return false;
         }
+
+        /// <summary>
+        /// A pair of matched text spans.
+        /// </summary>
+        public struct SpanPair
+        {
+            /// <summary>
+            /// The first text span.
+            /// </summary>
+            public TextSpan First;
+
+            /// <summary>
+            /// The second text span.
+            /// </summary>
+            public TextSpan Second;
+        }
+
+        /// <summary>
+        /// Parse for pairs of matching parentheses.
+        /// </summary>
+        /// <param name="lines">A collection of lines to parse.</param>
+        /// <returns>A list of pairs of matching parentheses.</returns>
+        public static List<SpanPair> ParseForParens(IEnumerable<string> lines)
+        {
+            List<SpanPair> pairs = new List<SpanPair>();
+            Stack<TextSpan> stack = new Stack<TextSpan>();
+            CMakeScanner scanner = new CMakeScanner();
+            TokenInfo tokenInfo = new TokenInfo();
+            int state = 0;
+            int i = 0;
+            foreach (string line in lines)
+            {
+                scanner.SetSource(line, 0);
+                while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state))
+                {
+                    if (tokenInfo.Token == (int)CMakeToken.OpenParen)
+                    {
+                        stack.Push(tokenInfo.ToBraceMatchingSpan(i));
+                    }
+                    else if (tokenInfo.Token == (int)CMakeToken.CloseParen &&
+                        stack.Count > 0)
+                    {
+                        pairs.Add(new SpanPair()
+                        {
+                            First = stack.Pop(),
+                            Second = tokenInfo.ToBraceMatchingSpan(i)
+                        });
+                    }
+                }
+                i++;
+            }
+            return pairs;
+        }
     }
 }
