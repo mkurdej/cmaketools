@@ -938,5 +938,81 @@ namespace CMakeTools
             Assert.IsNotNull(functions);
             Assert.AreEqual(0, functions.Count);
         }
+
+        /// <summary>
+        /// Test parsing for matching pairs of parentheses.
+        /// </summary>
+        [TestMethod]
+        public void TestParseForParens()
+        {
+            // Test a single pair.
+            List<string> lines = new List<string>();
+            lines.Add("set(foo)");
+            List<CMakeParsing.SpanPair> pairs = CMakeParsing.ParseForParens(lines);
+            Assert.IsNotNull(pairs);
+            Assert.AreEqual(1, pairs.Count);
+            Assert.AreEqual(0, pairs[0].First.iStartLine);
+            Assert.AreEqual(3, pairs[0].First.iStartIndex);
+            Assert.AreEqual(0, pairs[0].First.iEndLine);
+            Assert.AreEqual(4, pairs[0].First.iEndIndex);
+            Assert.AreEqual(0, pairs[0].Second.iStartLine);
+            Assert.AreEqual(7, pairs[0].Second.iStartIndex);
+            Assert.AreEqual(0, pairs[0].Second.iEndLine);
+            Assert.AreEqual(8, pairs[0].Second.iEndIndex);
+
+            // Test nested parentheses.
+            lines.Clear();
+            lines.Add("set(foo (abc))");
+            pairs = CMakeParsing.ParseForParens(lines);
+            Assert.IsNotNull(pairs);
+            Assert.AreEqual(2, pairs.Count);
+            Assert.AreEqual(0, pairs[0].First.iStartLine);
+            Assert.AreEqual(8, pairs[0].First.iStartIndex);
+            Assert.AreEqual(0, pairs[0].First.iEndLine);
+            Assert.AreEqual(9, pairs[0].First.iEndIndex);
+            Assert.AreEqual(0, pairs[0].Second.iStartLine);
+            Assert.AreEqual(12, pairs[0].Second.iStartIndex);
+            Assert.AreEqual(0, pairs[0].Second.iEndLine);
+            Assert.AreEqual(13, pairs[0].Second.iEndIndex);
+            Assert.AreEqual(0, pairs[1].First.iStartLine);
+            Assert.AreEqual(3, pairs[1].First.iStartIndex);
+            Assert.AreEqual(0, pairs[1].First.iEndLine);
+            Assert.AreEqual(4, pairs[1].First.iEndIndex);
+            Assert.AreEqual(0, pairs[1].Second.iStartLine);
+            Assert.AreEqual(13, pairs[1].Second.iStartIndex);
+            Assert.AreEqual(0, pairs[1].Second.iEndLine);
+            Assert.AreEqual(14, pairs[1].Second.iEndIndex);
+
+            // Test a pair of parentheses split across multiple lines.
+            lines.Clear();
+            lines.Add("set(foo");
+            lines.Add("  abc");
+            lines.Add(")");
+            pairs = CMakeParsing.ParseForParens(lines);
+            Assert.IsNotNull(pairs);
+            Assert.AreEqual(1, pairs.Count);
+            Assert.AreEqual(0, pairs[0].First.iStartLine);
+            Assert.AreEqual(3, pairs[0].First.iStartIndex);
+            Assert.AreEqual(0, pairs[0].First.iEndLine);
+            Assert.AreEqual(4, pairs[0].First.iEndIndex);
+            Assert.AreEqual(2, pairs[0].Second.iStartLine);
+            Assert.AreEqual(0, pairs[0].Second.iStartIndex);
+            Assert.AreEqual(2, pairs[0].Second.iEndLine);
+            Assert.AreEqual(1, pairs[0].Second.iEndIndex);
+
+            // Test an unmatched opening parenthesis.
+            lines.Clear();
+            lines.Add("set(");
+            pairs = CMakeParsing.ParseForParens(lines);
+            Assert.IsNotNull(pairs);
+            Assert.AreEqual(0, pairs.Count);
+
+            // Test an unmatched closing parenthesis.
+            lines.Clear();
+            lines.Add(")");
+            pairs = CMakeParsing.ParseForParens(lines);
+            Assert.IsNotNull(pairs);
+            Assert.AreEqual(0, pairs.Count);
+        }
     }
 }
