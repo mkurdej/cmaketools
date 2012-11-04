@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Include>
+    <File Id="SnippetsIndex$(var.VSVersion)" Name="SnippetsIndex.xml" DiskId="1" Source="dist/Snippets/1033/SnippetsIndex.xml" />
+</Include>

@@ -30,6 +30,8 @@
     </WixExtension>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="CMakeSnippets.wxi" />
+    <Content Include="CMakeSnippetsIndex.wxi" />
     <Content Include="CMakeTemplates.wxi" />
     <Content Include="CMakeTools.wxi" />
   </ItemGroup>

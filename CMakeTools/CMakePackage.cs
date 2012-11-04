@@ -42,6 +42,9 @@ namespace CMakeTools
         MatchBracesAtCaret = true)]
     [ProvideLanguageExtension(typeof(CMakeLanguageService), ".cmake")]
     [ProvideLanguageExtension(typeof(CMakeLanguageService), ".txt")]
+    [ProvideLanguageCodeExpansion(typeof(CMakeLanguageService), "CMake", 102, "CMake",
+        @"%InstallRoot%\CMake\Snippets\%LCID%\SnippetsIndex.xml",
+        SearchPaths = @"%InstallRoot%\CMake\Snippets\%LCID%\Snippets\")]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideOptionPage(typeof(CMakeOptionPage), "CMake Tools", "Advanced", 103, 104,
         false)]

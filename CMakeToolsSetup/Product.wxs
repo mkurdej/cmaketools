@@ -14,11 +14,17 @@
         <Property Id="VS2010DEVENV">
             <RegistrySearch Id="VS2010EnvironmentPath" Type="raw" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\10.0\Setup\VS" Name="EnvironmentPath" />
         </Property>
+        <Property Id="VS2010SHELL">
+            <RegistrySearch Id="VS2010ShellFolder" Type="raw" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\10.0" Name="ShellFolder" />
+        </Property>
         <Property Id="VS2012DIR">
             <RegistrySearch Id="VS2012InstallDir" Type="raw" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\11.0" Name="InstallDir" />
         </Property>
         <Property Id="VS2012DEVENV">
             <RegistrySearch Id="VS2012EnvironmentPath" Type="raw" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\11.0\Setup\VS" Name="EnvironmentPath" />
+        </Property>
+        <Property Id="VS2012SHELL">
+            <RegistrySearch Id="VS2012ShellFolder" Type="raw" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\11.0" Name="ShellFolder" />
         </Property>
 
         <CustomAction Id="VS2012Setup" Property="VS2012DEVENV" ExeCommand="/setup" Execute="deferred" Return="ignore" Impersonate="no" />
@@ -30,8 +36,24 @@
                 <Directory Id="INSTALLLOCATION" Name="CMake Tools for Visual Studio">
                 </Directory>
             </Directory>
+            <?define VSVersion = 2010 ?>
+            <Directory Id="VS2010SHELL" Name="VS2010ROOT">
+                <Directory Id="CMake2010" Name="CMake">
+                    <Directory Id="CMakeSnippets2010" Name="Snippets">
+                        <Directory Id="CMakeSnippetsLocale2010" Name="1033">
+                            <Component Id="CMakeSnippetsIndex2010" Guid="78cfc6a9-87ad-4bbe-abf3-dc9efb10f8f4">
+                                <?include CMakeSnippetsIndex.wxi ?>
+                            </Component>
+                            <Directory Id="CMakeSnippetsSubdir2010" Name="Snippets">
+                                <Component Id="CMakeSnippets2010" Guid="596d6079-3f57-41d8-9065-5b6487610b27">
+                                    <?include CMakeSnippets.wxi ?>
+                                </Component>
+                            </Directory>
+                        </Directory>
+                    </Directory>
+                </Directory>
+            </Directory>
             <Directory Id="VS2010DIR" Name="VS2010">
-                <?define VSVersion = 2010 ?>
                 <Directory Id="Extensions2010" Name="Extensions">
                     <Directory Id="CMakeExtensions2010" Name="CMake Tools for Visual Studio">
                         <Component Id="CMakeTools2010" Guid="fcf7da9d-a549-47f7-b77d-de710efdab75">
@@ -51,10 +73,26 @@
                         </Component>
                     </Directory>
                 </Directory>
-                <?undef VSVersion ?>
+            </Directory>
+            <?undef VSVersion ?>
+            <?define VSVersion = 2012 ?>
+            <Directory Id="VS2012SHELL" Name="VS2012ROOT">
+                <Directory Id="CMake2012" Name="CMake">
+                    <Directory Id="CMakeSnippets2012" Name="Snippets">
+                        <Directory Id="CMakeSnippetsLocale2012" Name="1033">
+                            <Component Id="CMakeSnippetsIndex2012" Guid="f88c7690-b6e0-424f-995d-e85e710dfbB5">
+                                <?include CMakeSnippetsIndex.wxi ?>
+                            </Component>
+                            <Directory Id="CMakeSnippetsSubdir2012" Name="Snippets">
+                                <Component Id="CMakeSnippets2012" Guid="3fbf7d1d-e62f-4194-8af3-fd2b86f46f65">
+                                    <?include CMakeSnippets.wxi ?>
+                                </Component>
+                            </Directory>
+                        </Directory>
+                    </Directory>
+                </Directory>
             </Directory>
             <Directory Id="VS2012DIR" Name="VS2012">
-                <?define VSVersion = 2012 ?>
                 <Directory Id="Extensions2012" Name="Extensions">
                     <Directory Id="CMakeExtension2012" Name="CMake Tools for Visual Studio">
                         <Component Id="CMakeTools2012" Guid="a2321ddb-a524-49f6-92fa-d339ac822ca7">
@@ -74,18 +112,22 @@
                         </Directory>
                     </Directory>
                 </Directory>
-                <?undef VSVersion ?>
             </Directory>
+            <?undef VSVersion ?>
         </Directory>
 
         <Feature Id="CMakeTools" Title="CMake Tools for Visual Studio" Description="Syntax highlighting and IntelliSense for CMake in Visual Studio." Level="1" AllowAdvertise="no">
             <Feature Id="CMakeTools2010" Title="Visual Studio 2010 Extension" Description="Extension for Visual Studio 2010." Level="1" AllowAdvertise="no">
                 <ComponentRef Id="CMakeTools2010" />
                 <ComponentRef Id="CMakeTemplates2010" />
+                <ComponentRef Id="CMakeSnippets2010" />
+                <ComponentRef Id="CMakeSnippetsIndex2010" />
             </Feature>
             <Feature Id="CMakeTools2012" Title="Visual Studio 2012 Extension" Description="Extension for Visual Studio 2012." Level="1" AllowAdvertise="no">
                 <ComponentRef Id="CMakeTools2012" />
                 <ComponentRef Id="CMakeTemplates2012" />
+                <ComponentRef Id="CMakeSnippets2012" />
+                <ComponentRef Id="CMakeSnippetsIndex2012" />
             </Feature>
 
             <ComponentRef Id="CMakeTools" />

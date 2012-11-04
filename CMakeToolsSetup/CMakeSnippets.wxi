@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Include>
+    <File Id="AddCustomCommandSnippet$(var.VSVersion)" Name="AddCustomCommand.snippet" DiskId="1" Source="dist/Snippets/1033/Snippets/AddCustomCommand.snippet" />
+</Include>
