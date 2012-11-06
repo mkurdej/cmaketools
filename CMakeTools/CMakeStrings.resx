@@ -126,6 +126,9 @@
   <data name="CMakeNotFound" xml:space="preserve">
     <value>CMake could not be found on your computer.  Please ensure that it is properly installed.</value>
   </data>
+  <data name="CMakeSnippet" xml:space="preserve">
+    <value>CMake Snippet</value>
+  </data>
   <data name="FailedToLaunchCMake" xml:space="preserve">
     <value>An error occurred while launching CMake.</value>
   </data>

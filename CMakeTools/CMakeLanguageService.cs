@@ -245,6 +245,12 @@ namespace CMakeTools
             return new CMakeSource(this, buffer, GetColorizer(buffer));
         }
 
+        public override ViewFilter CreateViewFilter(CodeWindowManager mgr,
+            IVsTextView newView)
+        {
+            return new CMakeViewFilter(mgr, newView);
+        }
+
         public override void OnIdle(bool periodic)
         {
             // This code must be present in any language service that uses any of the
