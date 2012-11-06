@@ -240,6 +240,17 @@ namespace CMakeTools
             return _preferences;
         }
 
+        public override ExpansionFunction CreateExpansionFunction(
+            ExpansionProvider provider, string functionName)
+        {
+            if (functionName == "ToCommandCase")
+            {
+                return new ToCommandCaseExpansionFunction(
+                    _package.CMakeOptionPage.CommandsLower, provider);
+            }
+            return base.CreateExpansionFunction(provider, functionName);
+        }
+
         public override Source CreateSource(IVsTextLines buffer)
         {
             return new CMakeSource(this, buffer, GetColorizer(buffer));

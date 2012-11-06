@@ -12,6 +12,11 @@
         </Header>
         <Snippet>
             <Declarations>
+                <Literal Editable="false">
+                    <ID>AddCustomCommand</ID>
+                    <Function>ToCommandCase(ADD_CUSTOM_COMMAND)</Function>
+                    <Default>ADD_CUSTOM_COMMAND</Default>
+                </Literal>
                 <Literal>
                     <ID>Output</ID>
                     <ToolTip>The name of output file to be built by the custom command</ToolTip>
@@ -24,7 +29,7 @@
                 </Literal>
             </Declarations>
             <Code Language="CMake">
-                <![CDATA[ADD_CUSTOM_COMMAND(
+                <![CDATA[$AddCustomCommand$(
     OUTPUT $Output$
     COMMAND $Command$
 )]]>
