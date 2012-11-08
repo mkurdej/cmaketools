@@ -37,17 +37,54 @@ namespace CMakeTools
         public override bool HandlePreExec(ref Guid guidCmdGroup, uint nCmdId,
             uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
-            // Handle the Insert Snippet command by showing the UI to insert a snippet.
-            if (guidCmdGroup == VSConstants.VSStd2K &&
-                nCmdId == (uint)VSConstants.VSStd2KCmdID.INSERTSNIPPET)
+            if (guidCmdGroup == VSConstants.VSStd2K)
             {
-                ExpansionProvider ep = GetExpansionProvider();
-                if (ep != null && TextView != null)
+                if (nCmdId == (uint)VSConstants.VSStd2KCmdID.INSERTSNIPPET)
                 {
-                    ep.DisplayExpansionBrowser(TextView, CMakeStrings.CMakeSnippet, null,
-                        false, null, false);
+                    // Handle the Insert Snippet command by showing the UI to insert a snippet.
+                    ExpansionProvider ep = GetExpansionProvider();
+                    if (ep != null && TextView != null)
+                    {
+                        ep.DisplayExpansionBrowser(TextView, CMakeStrings.CMakeSnippet, null,
+                            false, null, false);
+                    }
+                    return true;
                 }
-                return true;
+                else if (nCmdId == (uint)VSConstants.VSStd2KCmdID.TAB)
+                {
+                    // Handle the tab key when the caret is positioned immediately after
+                    // the name of a snippet by inserting that snippet.
+                    ExpansionProvider ep = GetExpansionProvider();
+                    if (ep == null || TextView == null || ep.InTemplateEditingMode)
+                    {
+                        return false;
+                    }
+                    int line;
+                    int col;
+                    if (TextView.GetCaretPos(out line, out col) != VSConstants.S_OK)
+                    {
+                        return false;
+                    }
+                    TokenInfo tokenInfo = Source.GetTokenInfo(line, col);
+                    if (tokenInfo.StartIndex == tokenInfo.EndIndex)
+                    {
+                        return false;
+                    }
+                    TextSpan span = tokenInfo.ToBraceMatchingSpan(line);
+                    string shortcut = Source.GetText(span);
+                    if (string.IsNullOrEmpty(shortcut))
+                    {
+                        return false;
+                    }
+                    string title;
+                    string path;
+                    if (ep.FindExpansionByShortcut(TextView, shortcut, span, true,
+                        out title, out path) != VSConstants.S_OK)
+                    {
+                        return false;
+                    }
+                    return ep.InsertNamedExpansion(TextView, title, path, span, false);
+                }
             }
             return base.HandlePreExec(ref guidCmdGroup, nCmdId, nCmdexecopt, pvaIn,
                 pvaOut);
