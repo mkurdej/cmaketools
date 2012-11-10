@@ -83,7 +83,9 @@
         </Feature>
 
         <InstallExecuteSequence>
-            <Custom Action="VS2012Setup" Before="InstallFinalize">VS2012DEVENV</Custom>
+            <Custom Action="VS2012Setup" Before="InstallFinalize">
+                <![CDATA[VS2012DEVENV AND (&CMakeTools2012 > 0)]]>
+            </Custom>
         </InstallExecuteSequence>
 
         <UI>
