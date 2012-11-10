@@ -30,10 +30,7 @@
     </WixExtension>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="CMakeSnippets.wxi" />
-    <Content Include="CMakeSnippetsIndex.wxi" />
-    <Content Include="CMakeTemplates.wxi" />
-    <Content Include="CMakeTools.wxi" />
+    <Content Include="Components.wxi" />
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" />
   <!--

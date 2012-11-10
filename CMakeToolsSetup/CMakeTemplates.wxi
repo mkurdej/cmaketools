@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Include>
-    <File Id="CMakeFile$(var.VSVersion)" Name="CMakeFile.cmake" DiskId="1" Source="dist\Templates\NewItems\CMakeFile.cmake" />
-    <File Id="NewCMakeItems$(var.VSVersion)" Name="NewCMakeItems.vsdir" DiskId="1" Source="dist\Templates\NewItems\NewCMakeItems.vsdir" />
-</Include>
