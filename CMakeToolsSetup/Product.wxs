@@ -8,26 +8,13 @@
         <Icon Id="CMakeLogo" SourceFile="dist\CMakeLogo.ico" />
         
         <Property Id="ARPPRODUCTICON" Value="CMakeLogo" />
-        <Property Id="VS2010DIR">
-            <RegistrySearch Id="VS2010InstallDir" Type="raw" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\10.0" Name="InstallDir" />
-        </Property>
-        <Property Id="VS2010DEVENV">
-            <RegistrySearch Id="VS2010EnvironmentPath" Type="raw" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\10.0\Setup\VS" Name="EnvironmentPath" />
-        </Property>
-        <Property Id="VS2010SHELL">
-            <RegistrySearch Id="VS2010ShellFolder" Type="raw" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\10.0" Name="ShellFolder" />
-        </Property>
-        <Property Id="VS2012DIR">
-            <RegistrySearch Id="VS2012InstallDir" Type="raw" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\11.0" Name="InstallDir" />
-        </Property>
-        <Property Id="VS2012DEVENV">
-            <RegistrySearch Id="VS2012EnvironmentPath" Type="raw" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\11.0\Setup\VS" Name="EnvironmentPath" />
-        </Property>
-        <Property Id="VS2012SHELL">
-            <RegistrySearch Id="VS2012ShellFolder" Type="raw" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\11.0" Name="ShellFolder" />
-        </Property>
+        <PropertyRef Id="VS2010_ROOT_FOLDER" />
+        <PropertyRef Id="VS2010_EXTENSIONS_DIR" />
+        <PropertyRef Id="VS2012_ROOT_FOLDER" />
+        <PropertyRef Id="VS2012_EXTENSIONS_DIR" />
+        <PropertyRef Id="VS2012DEVENV" />
 
-        <CustomAction Id="VS2012Setup" Property="VS2012DEVENV" ExeCommand="/setup" Execute="deferred" Return="ignore" Impersonate="no" />
+        <CustomActionRef Id="VS2012Setup" />
         
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Component Id="CMakeTools" Guid="a286eaec-129e-4e7b-b3dd-a2f0c46448d9">
@@ -79,7 +66,6 @@
             </Feature>
 
             <ComponentRef Id="CMakeTools" />
-            <ComponentGroupRef Id="Product.Generated" />
         </Feature>
 
         <InstallExecuteSequence>
