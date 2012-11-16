@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+    <CodeSnippet Format="1.0.0">
+        <Header>
+            <Title>FUNCTION</Title>
+            <Shortcut>FUNCTION</Shortcut>
+            <Description>A CMake function</Description>
+            <Author>David Golub</Author>
+            <SnippetTypes>
+                <SnippetType>Expansion</SnippetType>
+            </SnippetTypes>
+        </Header>
+        <Snippet>
+            <Declarations>
+                <Literal Editable="false">
+                    <ID>Function</ID>
+                    <Function>ToCommandCase(FUNCTION)</Function>
+                    <Default>FUNCTION</Default>
+                </Literal>
+                <Literal Editable="false">
+                    <ID>EndFunction</ID>
+                    <Function>ToCommandCase(ENDFUNCTION)</Function>
+                    <Default>ENDFUNCTION</Default>
+                </Literal>
+                <Literal>
+                    <ID>Name</ID>
+                    <ToolTip>The name of the function</ToolTip>
+                    <Default>Name</Default>
+                </Literal>
+                <Literal>
+                    <ID>Parameters</ID>
+                    <ToolTip>The function's parameters</ToolTip>
+                    <Default>Parameters</Default>
+                </Literal>
+            </Declarations>
+            <Code Language="CMake">
+                <![CDATA[$Function$($Name$ $Parameters$)
+
+$EndFunction$($Name$)]]>
+            </Code>
+        </Snippet>
+    </CodeSnippet>
+</CodeSnippets>

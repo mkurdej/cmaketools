@@ -42,7 +42,7 @@ namespace CMakeTools
         MatchBracesAtCaret = true)]
     [ProvideLanguageExtension(typeof(CMakeLanguageService), ".cmake")]
     [ProvideLanguageExtension(typeof(CMakeLanguageService), ".txt")]
-    [ProvideLanguageCodeExpansion(typeof(CMakeLanguageService), "CMake", 102, "cmake",
+    [ProvideLanguageCodeExpansion(typeof(CMakeLanguageService), "CMake", 102, "CMake",
         @"%%InstallRoot%%\CMake\Snippets\%%LCID%%\SnippetsIndex.xml",
         SearchPaths = @"%InstallRoot%\CMake\Snippets\%LCID%\Snippets\;" +
             @"%MyDocs%\Code Snippets\CMake\My Code Snippets\",

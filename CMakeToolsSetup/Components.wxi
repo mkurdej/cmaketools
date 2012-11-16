@@ -9,7 +9,12 @@
                     </Component>
                     <Directory Id="CMakeSnippetsSubdir$(var.VSVersion)" Name="Snippets">
                         <Component Id="CMakeSnippets$(var.VSVersion)" Guid="$(var.SnippetsGuid)">
-                            <File Id="AddCustomCommandSnippet$(var.VSVersion)" Name="AddCustomCommand.snippet" DiskId="1" Source="dist/Snippets/1033/Snippets/AddCustomCommand.snippet" />
+                            <File Id="ForEachSnippet$(var.VSVersion)" Name="ForEach.snippet" DiskId="1" Source="dist/Snippets/1033/Snippets/ForEach.snippet" />
+                            <File Id="FunctionSnippet$(var.VSVersion)" Name="Function.snippet" DiskId="1" Source="dist/Snippets/1033/Snippets/Function.snippet" />
+                            <File Id="IfSnippet$(var.VSVersion)" Name="If.snippet" DiskId="1" Source="dist/Snippets/1033/Snippets/If.snippet" />
+                            <File Id="IfElseSnippet$(var.VSVersion)" Name="IfElse.snippet" DiskId="1" Source="dist/Snippets/1033/Snippets/IfElse.snippet" />
+                            <File Id="MacroSnippet$(var.VSVersion)" Name="Macro.snippet" DiskId="1" Source="dist/Snippets/1033/Snippets/Macro.snippet" />
+                            <File Id="WhileSnippet$(var.VSVersion)" Name="While.snippet" DiskId="1" Source="dist/Snippets/1033/Snippets/While.snippet" />
                         </Component>
                     </Directory>
                 </Directory>

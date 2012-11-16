@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+    <CodeSnippet Format="1.0.0">
+        <Header>
+            <Title>IF</Title>
+            <Shortcut>IF</Shortcut>
+            <Description>An IF block</Description>
+            <Author>David Golub</Author>
+            <SnippetTypes>
+                <SnippetType>Expansion</SnippetType>
+            </SnippetTypes>
+        </Header>
+        <Snippet>
+            <Declarations>
+                <Literal Editable="false">
+                    <ID>If</ID>
+                    <Function>ToCommandCase(IF)</Function>
+                    <Default>IF</Default>
+                </Literal>
+                <Literal Editable="false">
+                    <ID>EndIf</ID>
+                    <Function>ToCommandCase(ENDIF)</Function>
+                    <Default>ENDIF</Default>
+                </Literal>
+                <Literal>
+                    <ID>Condition</ID>
+                    <ToolTip>The condition for the IF block</ToolTip>
+                    <Default>Condition</Default>
+                </Literal>
+            </Declarations>
+            <Code Language="CMake">
+                <![CDATA[$If$($Condition$)
+
+$EndIf$($Condition$)]]>
+            </Code>
+        </Snippet>
+    </CodeSnippet>
+</CodeSnippets>
