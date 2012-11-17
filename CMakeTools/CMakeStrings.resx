@@ -132,6 +132,9 @@
   <data name="FailedToLaunchCMake" xml:space="preserve">
     <value>An error occurred while launching CMake.</value>
   </data>
+  <data name="FileNotFound" xml:space="preserve">
+    <value>The file '{0}' could not be found.</value>
+  </data>
   <data name="MessageBoxTitle" xml:space="preserve">
     <value>CMake Tools for Visual Studio</value>
   </data>
