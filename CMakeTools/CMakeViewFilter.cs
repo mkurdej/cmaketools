@@ -39,7 +39,8 @@ namespace CMakeTools
                 {
                     // Show and enable the Open File command if the current token is a
                     // file name.
-                    if (GetCurrentTokenFileName() != null)
+                    string extraSearchPath;
+                    if (GetCurrentTokenFileName(out extraSearchPath) != null)
                     {
                         return (int)(OLECMDF.OLECMDF_SUPPORTED |
                             OLECMDF.OLECMDF_ENABLED);
@@ -69,7 +70,8 @@ namespace CMakeTools
                 {
                     // Handle the Open File by opening the file specified by the current
                     // token.
-                    string fileName = GetCurrentTokenFileName();
+                    string extraSearchPath;
+                    string fileName = GetCurrentTokenFileName(out extraSearchPath);
                     if (fileName == null)
                     {
                         return false;
@@ -79,10 +81,9 @@ namespace CMakeTools
                     if (!File.Exists(filePath))
                     {
                         filePath = null;
-                        string pathToModules = CMakePath.FindCMakeModules();
-                        if (pathToModules != null)
+                        if (extraSearchPath != null)
                         {
-                            filePath = Path.Combine(pathToModules, fileName);
+                            filePath = Path.Combine(extraSearchPath, fileName);
                             if (!File.Exists(filePath))
                             {
                                 filePath = null;
@@ -142,12 +143,13 @@ namespace CMakeTools
                 pvaOut);
         }
 
-        private string GetCurrentTokenFileName()
+        private string GetCurrentTokenFileName(out string extraSearchPath)
         {
             // Obtain the name of the file referenced by the current token if there is
             // one or null otherwise.
             int line;
             int col;
+            extraSearchPath = null;
             if (TextView == null ||
                 TextView.GetCaretPos(out line, out col) != VSConstants.S_OK)
             {
@@ -190,6 +192,7 @@ namespace CMakeTools
             case CMakeCommandId.Include:
                 if (tokenData.ParameterIndex == 0)
                 {
+                    extraSearchPath = CMakePath.FindCMakeModules();
                     return string.Format("{0}.cmake",
                         Source.GetText(tokenInfo.ToTextSpan(line)));
                 }
@@ -197,6 +200,7 @@ namespace CMakeTools
             case CMakeCommandId.FindPackage:
                 if (tokenData.ParameterIndex == 0)
                 {
+                    extraSearchPath = CMakePath.FindCMakeModules();
                     return string.Format("Find{0}.cmake",
                         Source.GetText(tokenInfo.ToTextSpan(line)));
                 }
