@@ -39,18 +39,10 @@ namespace CMakeTools
                 {
                     // Show and enable the Open File command if the current token is a
                     // file name.
-                    int line;
-                    int col;
-                    if (TextView != null &&
-                        TextView.GetCaretPos(out line, out col) == VSConstants.S_OK)
+                    if (GetCurrentTokenFileName() != null)
                     {
-                        TokenInfo tokenInfo = Source.GetTokenInfo(line, col);
-                        if (tokenInfo != null &&
-                            tokenInfo.Token == (int)CMakeToken.FileName)
-                        {
-                            return (int)(OLECMDF.OLECMDF_SUPPORTED |
-                                OLECMDF.OLECMDF_ENABLED);
-                        }
+                        return (int)(OLECMDF.OLECMDF_SUPPORTED |
+                            OLECMDF.OLECMDF_ENABLED);
                     }
                 }
             }
@@ -77,21 +69,8 @@ namespace CMakeTools
                 {
                     // Handle the Open File by opening the file specified by the current
                     // token.
-                    int line;
-                    int col;
-                    if (TextView == null ||
-                        TextView.GetCaretPos(out line, out col) != VSConstants.S_OK)
-                    {
-                        return false;
-                    }
-                    TokenInfo tokenInfo = Source.GetTokenInfo(line, col);
-                    if (tokenInfo == null ||
-                        tokenInfo.Token != (int)CMakeToken.FileName)
-                    {
-                        return false;
-                    }
-                    string fileName = Source.GetText(tokenInfo.ToTextSpan(line));
-                    if (string.IsNullOrEmpty(fileName))
+                    string fileName = GetCurrentTokenFileName();
+                    if (fileName == null)
                     {
                         return false;
                     }
@@ -148,6 +127,76 @@ namespace CMakeTools
             }
             return base.HandlePreExec(ref guidCmdGroup, nCmdId, nCmdexecopt, pvaIn,
                 pvaOut);
+        }
+
+        private string GetCurrentTokenFileName()
+        {
+            // Obtain the name of the file referenced by the current token if there is
+            // one or null otherwise.
+            int line;
+            int col;
+            if (TextView == null ||
+                TextView.GetCaretPos(out line, out col) != VSConstants.S_OK)
+            {
+                return null;
+            }
+            TokenInfo tokenInfo = Source.GetTokenInfo(line, col);
+            if (tokenInfo == null ||
+                (tokenInfo.Token != (int)CMakeToken.FileName &&
+                tokenInfo.Token != (int)CMakeToken.Identifier))
+            {
+                return null;
+            }
+            string text = Source.GetText(tokenInfo.ToTextSpan(line));
+            if (string.IsNullOrEmpty(text))
+            {
+                return null;
+            }
+
+            // If the string specifies a file name with an extension, just return it
+            // regardless or where it is found.
+            if (tokenInfo.Token == (int)CMakeToken.FileName &&
+                text.IndexOf('.') >= 0)
+            {
+                return text;
+            }
+
+            // An identifier or path may reference a file if appears as a parameter to
+            // one of certain commands, such as INCLUDE or FIND_PACKAGE.  Parse to find
+            // the command to which the token is a parameter, if any, and handle it
+            // accordingly.
+            CMakeSource cmSource = (CMakeSource)Source;
+            CMakeParsing.TokenData tokenData;
+            if (!CMakeParsing.ParseForToken(cmSource.GetLines(), line, col,
+                out tokenData) || !tokenData.InParens)
+            {
+                return null;
+            }
+            switch (tokenData.Command)
+            {
+            case CMakeCommandId.Include:
+                if (tokenData.ParameterIndex == 0)
+                {
+                    return string.Format("{0}.cmake",
+                        Source.GetText(tokenInfo.ToTextSpan(line)));
+                }
+                break;
+            case CMakeCommandId.FindPackage:
+                if (tokenData.ParameterIndex == 0)
+                {
+                    return string.Format("Find{0}.cmake",
+                        Source.GetText(tokenInfo.ToTextSpan(line)));
+                }
+                break;
+            case CMakeCommandId.AddSubdirectory:
+                if (tokenData.ParameterIndex == 0)
+                {
+                    return Path.Combine(Source.GetText(tokenInfo.ToTextSpan(line)),
+                        "CMakeLists.txt");
+                }
+                break;
+            }
+            return null;
         }
     }
 }
