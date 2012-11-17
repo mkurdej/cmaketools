@@ -326,31 +326,13 @@ namespace CMakeTools
 
             // Find all *.cmake files in the Modules directory inside the CMake
             // installation, if there is one.
-            string pathToCMake = CMakePath.FindCMake();
+            string pathToModules = CMakePath.FindCMakeModules();
             bool foundModules = false;
-            if (pathToCMake != null)
+            if (pathToModules != null)
             {
-                try
-                {
-                    string pathToShare = Path.Combine(pathToCMake, "share");
-                    IEnumerable<string> dirs = Directory.EnumerateDirectories(
-                        pathToShare, "cmake-*.*");
-                    foreach (string dir in dirs)
-                    {
-                        string pathToModules = Path.Combine(pathToShare, dir, "Modules");
-                        if (Directory.Exists(pathToModules))
-                        {
-                            foundModules = true;
-                            files = GetFilesFromDir(pathToModules, true);
-                            _includeFiles.AddRange(files);
-                        }
-                    }
-                }
-                catch (DirectoryNotFoundException)
-                {
-                    // This exception will occur if the CMake installation is missing
-                    // expected subdirectories.  Proceed as if CMake had not been found.
-                }
+                foundModules = true;
+                files = GetFilesFromDir(pathToModules, true);
+                _includeFiles.AddRange(files);
             }
             if (!foundModules)
             {

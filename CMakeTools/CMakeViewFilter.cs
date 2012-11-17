@@ -76,7 +76,20 @@ namespace CMakeTools
                     }
                     string curFileDir = Path.GetDirectoryName(Source.GetFilePath());
                     string filePath = Path.Combine(curFileDir, fileName);
-                    if (File.Exists(filePath))
+                    if (!File.Exists(filePath))
+                    {
+                        filePath = null;
+                        string pathToModules = CMakePath.FindCMakeModules();
+                        if (pathToModules != null)
+                        {
+                            filePath = Path.Combine(pathToModules, fileName);
+                            if (!File.Exists(filePath))
+                            {
+                                filePath = null;
+                            }
+                        }
+                    }
+                    if (filePath != null)
                     {
                         VsShellUtilities.OpenDocument(ServiceProvider.GlobalProvider,
                             filePath);

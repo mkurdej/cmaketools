@@ -55,6 +55,12 @@ namespace CMakeTools
             return location;
         }
 
+        /// <summary>
+        /// Attempt to find the path to the CMake documentation.
+        /// </summary>
+        /// <returns>
+        /// The path to the CMake documentation, or null if CMake is not installed.
+        /// </returns>
         public static string FindCMakeHelp()
         {
             string pathToCMake = FindCMake();
@@ -68,6 +74,40 @@ namespace CMakeTools
                     foreach (string dir in dirs)
                     {
                         return Path.Combine(pathToDoc, dir);
+                    }
+                }
+                catch (DirectoryNotFoundException)
+                {
+                    // This exception will occur if the CMake installation is missing
+                    // expected subdirectories.  Proceed as if CMake had not been found.
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Attempt to find the path to the CMake modules.
+        /// </summary>
+        /// <returns>
+        /// The path to the CMake modules, or null if CMake is not installed.
+        /// </returns>
+        public static string FindCMakeModules()
+        {
+            string pathToCMake = FindCMake();
+            if (pathToCMake != null)
+            {
+                try
+                {
+                    string pathToShare = Path.Combine(pathToCMake, "share");
+                    IEnumerable<string> dirs = Directory.EnumerateDirectories(
+                        pathToShare, "cmake-*.*");
+                    foreach (string dir in dirs)
+                    {
+                        string pathToModules = Path.Combine(pathToShare, dir, "Modules");
+                        if (Directory.Exists(pathToModules))
+                        {
+                            return pathToModules;
+                        }
                     }
                 }
                 catch (DirectoryNotFoundException)
