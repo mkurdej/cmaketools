@@ -94,6 +94,7 @@
     <Content Include="Snippets\1033\Snippets\IfElse.snippet">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Snippets\1033\Snippets\Macro.snippet">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

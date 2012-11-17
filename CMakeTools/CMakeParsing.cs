@@ -1300,7 +1300,7 @@ namespace CMakeTools
                 {
                     if (tokenInfo.Token == (int)CMakeToken.OpenParen)
                     {
-                        stack.Push(tokenInfo.ToBraceMatchingSpan(i));
+                        stack.Push(tokenInfo.ToTextSpan(i));
                     }
                     else if (tokenInfo.Token == (int)CMakeToken.CloseParen &&
                         stack.Count > 0)
@@ -1308,7 +1308,7 @@ namespace CMakeTools
                         pairs.Add(new SpanPair()
                         {
                             First = stack.Pop(),
-                            Second = tokenInfo.ToBraceMatchingSpan(i)
+                            Second = tokenInfo.ToTextSpan(i)
                         });
                     }
                 }
