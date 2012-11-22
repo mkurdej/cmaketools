@@ -11,7 +11,9 @@
  * **************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
@@ -138,6 +140,15 @@ namespace CMakeTools
                     }
                     return ep.InsertNamedExpansion(TextView, title, path, span, false);
                 }
+                else if (nCmdId == (uint)VSConstants.VSStd2KCmdID.RETURN)
+                {
+                    // Dismiss method tips when the user presses enter.  They interfere
+                    // with the proper functioning of smart indentation.
+                    if (Source.IsCompletorActive && !Source.CompletionSet.IsDisplayed)
+                    {
+                        Source.DismissCompletor();
+                    }
+                }
             }
             return base.HandlePreExec(ref guidCmdGroup, nCmdId, nCmdexecopt, pvaIn,
                 pvaOut);
@@ -214,6 +225,36 @@ namespace CMakeTools
                 break;
             }
             return null;
+        }
+
+        public override bool HandleSmartIndent()
+        {
+            // If the line contains an outer opening parenthesis, intent by one level.
+            // If the line contains an outer closing parenthesis, unindent to match the
+            // level of the corresponding opening parenthesis.  In all other cases,
+            // match the indentation level of the previous line.
+            LanguagePreferences prefs = Source.LanguageService.Preferences;
+            char indentChar = prefs.InsertTabs ? '\t' : ' ';
+            int line;
+            int col;
+            TextView.GetCaretPos(out line, out col);
+            CMakeSource cmSource = (CMakeSource)Source;
+            IEnumerable<string> lines = cmSource.GetLines();
+            int level = CMakeParsing.GetIndentationLevel(lines.ToList()[line - 1],
+                indentChar);
+            int lineToMatch;
+            if (CMakeParsing.ShouldIndent(lines, line - 1))
+            {
+                level += prefs.InsertTabs ? 1 : prefs.IndentSize;
+            }
+            else if (CMakeParsing.ShouldUnindent(lines, line - 1, out lineToMatch))
+            {
+                level = CMakeParsing.GetIndentationLevel(lines.ToList()[lineToMatch],
+                    indentChar);
+            }
+            Source.SetText(line, 0, line, col, new string(indentChar, level));
+            TextView.PositionCaretForEditing(line, level);
+            return true;
         }
     }
 }

@@ -39,7 +39,8 @@ namespace CMakeTools
         AutoOutlining = true,
         QuickInfo = true,
         MatchBraces = true,
-        MatchBracesAtCaret = true)]
+        MatchBracesAtCaret = true,
+        ShowSmartIndent = true)]
     [ProvideLanguageExtension(typeof(CMakeLanguageService), ".cmake")]
     [ProvideLanguageExtension(typeof(CMakeLanguageService), ".txt")]
     [ProvideLanguageCodeExpansion(typeof(CMakeLanguageService), "CMake", 102, "CMake",

@@ -1316,5 +1316,114 @@ namespace CMakeTools
             }
             return pairs;
         }
+
+        /// <summary>
+        /// Check whether the line following the specified line should be indented.
+        /// </summary>
+        /// <param name="lines">A collection of lines to parse.</param>
+        /// <param name="lineNum">The number of the line to check.</param>
+        /// <returns>
+        /// True if the following line should be indented, or false otherwise.
+        /// </returns>
+        public static bool ShouldIndent(IEnumerable<string> lines, int lineNum)
+        {
+            CMakeScanner scanner = new CMakeScanner();
+            TokenInfo tokenInfo = new TokenInfo();
+            int state = 0;
+            int i = 0;
+            foreach (string line in lines)
+            {
+                scanner.SetSource(line, 0);
+                if (i < lineNum)
+                {
+                    while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+                }
+                else
+                {
+                    if (CMakeScanner.InsideParens(state))
+                    {
+                        return false;
+                    }
+                    while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+                    return CMakeScanner.InsideParens(state);
+                }
+                i++;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Check whether the line following the specified line should be unindented.
+        /// </summary>
+        /// <param name="lines">A collection of lines to parse.</param>
+        /// <param name="lineNum">The number of the line to check.</param>
+        /// <param name="lineToMatch">
+        /// Variable to receive the number of the line that the following line should be
+        /// unindented to match.
+        /// </param>
+        /// <returns>
+        /// True if the following line should be unindented, or false otherwise.
+        /// </returns>
+        public static bool ShouldUnindent(IEnumerable<string> lines, int lineNum,
+            out int lineToMatch)
+        {
+            CMakeScanner scanner = new CMakeScanner();
+            TokenInfo tokenInfo = new TokenInfo();
+            int state = 0;
+            int i = 0;
+            int openParenLine = -1;
+            lineToMatch = -1;
+            foreach (string line in lines)
+            {
+                scanner.SetSource(line, 0);
+                if (i < lineNum)
+                {
+                    bool wasInParens = CMakeScanner.InsideParens(state);
+                    while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state)) ;
+                    if (!wasInParens && CMakeScanner.InsideParens(state))
+                    {
+                        openParenLine = i;
+                    }
+                }
+                else
+                {
+                    if (!CMakeScanner.InsideParens(state))
+                    {
+                        return false;
+                    }
+                    while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state)) ;
+                    if (!CMakeScanner.InsideParens(state))
+                    {
+                        lineToMatch = openParenLine;
+                        return true;
+                    }
+                    return false;
+                }
+                i++;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Determine the indentation level of the given line.
+        /// </summary>
+        /// <param name="line">The line to check.</param>
+        /// <param name="indentChar">
+        /// The character used for indentation, either a space or a tab.
+        /// </param>
+        /// <returns>The indentation level of the specified line.</returns>
+        public static int GetIndentationLevel(string line, char indentChar)
+        {
+            int i = 0;
+            while (i < line.Length)
+            {
+                if (line[i] != indentChar)
+                {
+                    break;
+                }
+                i++;
+            }
+            return i;
+        }
     }
 }
