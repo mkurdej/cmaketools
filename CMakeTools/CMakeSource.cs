@@ -55,18 +55,5 @@ namespace CMakeTools
             base.Completion(textView, info, reason);
             LanguageService.Preferences.EnableAsyncCompletion = oldValue;
         }
-
-        /// <summary>
-        /// Get a collection containing all the lines in the source file.
-        /// </summary>
-        /// <returns>An IEnumerable providing access to all the lines.</returns>
-        public IEnumerable<string> GetLines()
-        {
-            int lineCount = GetLineCount();
-            for (int i = 0; i < lineCount; i++)
-            {
-                yield return GetLine(i);
-            }
-        }
     }
 }

@@ -10,6 +10,7 @@
  * 
  * **************************************************************************/
 
+using System.Collections.Generic;
 using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
 
@@ -50,6 +51,20 @@ namespace CMakeTools
                 iEndLine = line,
                 iEndIndex = tokenInfo.EndIndex + 1
             };
+        }
+
+        /// <summary>
+        /// Get a collection containing all the lines in the source file.
+        /// </summary>
+        /// <param name="source">The source file.</param>
+        /// <returns>An IEnumerable providing access to all the lines.</returns>
+        public static IEnumerable<string> GetLines(this Source source)
+        {
+            int lineCount = source.GetLineCount();
+            for (int i = 0; i < lineCount; i++)
+            {
+                yield return source.GetLine(i);
+            }
         }
     }
 }

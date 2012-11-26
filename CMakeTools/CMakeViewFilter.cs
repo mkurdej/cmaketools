@@ -191,9 +191,8 @@ namespace CMakeTools
             // one of certain commands, such as INCLUDE or FIND_PACKAGE.  Parse to find
             // the command to which the token is a parameter, if any, and handle it
             // accordingly.
-            CMakeSource cmSource = (CMakeSource)Source;
             CMakeParsing.TokenData tokenData;
-            if (!CMakeParsing.ParseForToken(cmSource.GetLines(), line, col,
+            if (!CMakeParsing.ParseForToken(Source.GetLines(), line, col,
                 out tokenData) || !tokenData.InParens)
             {
                 return null;
@@ -238,8 +237,7 @@ namespace CMakeTools
             int line;
             int col;
             TextView.GetCaretPos(out line, out col);
-            CMakeSource cmSource = (CMakeSource)Source;
-            List<string> lines = cmSource.GetLines().ToList();
+            List<string> lines = Source.GetLines().ToList();
             int prevLine = CMakeParsing.GetLastNonEmptyLine(lines, line);
             int level = CMakeParsing.GetIndentationLevel(lines[prevLine], indentChar);
             int lineToMatch;

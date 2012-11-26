@@ -48,7 +48,7 @@ namespace CMakeTools
         public override AuthoringScope ParseSource(ParseRequest req)
         {
             CMakeAuthoringScope scope = new CMakeAuthoringScope();
-            CMakeSource source = (CMakeSource)GetSource(req.FileName);
+            Source source = GetSource(req.FileName);
             if (req.Sink.HiddenRegions)
             {
                 req.Sink.ProcessHiddenRegions = true;
