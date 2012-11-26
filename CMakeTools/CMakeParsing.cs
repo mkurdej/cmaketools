@@ -1425,5 +1425,23 @@ namespace CMakeTools
             }
             return i;
         }
+
+        /// <summary>
+        /// Find the last line up to and including the specified line that is not empty.
+        /// </summary>
+        /// <param name="lines">A list of lines.</param>
+        /// <param name="lineNum">The line number of the last line to consider.</param>
+        /// <returns>The line number of the last line that is not empty.</returns>
+        public static int GetLastNonEmptyLine(List<string> lines, int lineNum)
+        {
+            for (int i = lineNum; i > 0; i--)
+            {
+                if (!string.IsNullOrWhiteSpace(lines[i]))
+                {
+                    return i;
+                }
+            }
+            return 0;
+        }
     }
 }

@@ -239,18 +239,17 @@ namespace CMakeTools
             int col;
             TextView.GetCaretPos(out line, out col);
             CMakeSource cmSource = (CMakeSource)Source;
-            IEnumerable<string> lines = cmSource.GetLines();
-            int level = CMakeParsing.GetIndentationLevel(lines.ToList()[line - 1],
-                indentChar);
+            List<string> lines = cmSource.GetLines().ToList();
+            int prevLine = CMakeParsing.GetLastNonEmptyLine(lines, line);
+            int level = CMakeParsing.GetIndentationLevel(lines[prevLine], indentChar);
             int lineToMatch;
-            if (CMakeParsing.ShouldIndent(lines, line - 1))
+            if (CMakeParsing.ShouldIndent(lines, prevLine))
             {
                 level += prefs.InsertTabs ? 1 : prefs.IndentSize;
             }
-            else if (CMakeParsing.ShouldUnindent(lines, line - 1, out lineToMatch))
+            else if (CMakeParsing.ShouldUnindent(lines, prevLine, out lineToMatch))
             {
-                level = CMakeParsing.GetIndentationLevel(lines.ToList()[lineToMatch],
-                    indentChar);
+                level = CMakeParsing.GetIndentationLevel(lines[lineToMatch], indentChar);
             }
             Source.SetText(line, 0, line, col, new string(indentChar, level));
             TextView.PositionCaretForEditing(line, level);
