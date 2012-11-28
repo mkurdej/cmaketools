@@ -1014,5 +1014,59 @@ namespace CMakeTools
             Assert.IsNotNull(pairs);
             Assert.AreEqual(0, pairs.Count);
         }
+
+        /// <summary>
+        /// Test parsing to determine whether a line should be indented.
+        /// </summary>
+        [TestMethod]
+        public void TestIndentation()
+        {
+            List<string> lines = new List<string>();
+            int lineToMatch;
+            lines.Add("# foo");
+            Assert.IsFalse(CMakeParsing.ShouldIndent(lines, 0));
+            Assert.IsFalse(CMakeParsing.ShouldUnindent(lines, 0, out lineToMatch));
+            lines.Clear();
+            lines.Add("if(foo)");
+            Assert.IsFalse(CMakeParsing.ShouldIndent(lines, 0));
+            Assert.IsFalse(CMakeParsing.ShouldUnindent(lines, 0, out lineToMatch));
+            lines.Clear();
+            lines.Add("set(foo");
+            lines.Add("  bar)");
+            Assert.IsTrue(CMakeParsing.ShouldIndent(lines, 0));
+            Assert.IsFalse(CMakeParsing.ShouldUnindent(lines, 0, out lineToMatch));
+            Assert.IsFalse(CMakeParsing.ShouldIndent(lines, 1));
+            Assert.IsTrue(CMakeParsing.ShouldUnindent(lines, 1, out lineToMatch));
+            Assert.AreEqual(0, lineToMatch);
+        }
+
+        /// <summary>
+        /// Test finding the indentation level of a line.
+        /// </summary>
+        [TestMethod]
+        public void TestIndentationLevel()
+        {
+            Assert.AreEqual(0, CMakeParsing.GetIndentationLevel("set(foo)", '\t'));
+            Assert.AreEqual(0, CMakeParsing.GetIndentationLevel("set(foo)", ' '));
+            Assert.AreEqual(1, CMakeParsing.GetIndentationLevel("\tset(foo)", '\t'));
+            Assert.AreEqual(2, CMakeParsing.GetIndentationLevel("  set(foo)", ' '));
+        }
+
+        /// <summary>
+        /// Test finding the last non-empty line up to a given line.
+        /// </summary>
+        [TestMethod]
+        public void TestLastNonEmptyLines()
+        {
+            List<string> lines = new List<string>();
+            lines.Add("set(foo)");
+            lines.Add("    ");
+            lines.Add("\t");
+            lines.Add("set(bar)");
+            Assert.AreEqual(0, CMakeParsing.GetLastNonEmptyLine(lines, 0));
+            Assert.AreEqual(0, CMakeParsing.GetLastNonEmptyLine(lines, 1));
+            Assert.AreEqual(0, CMakeParsing.GetLastNonEmptyLine(lines, 2));
+            Assert.AreEqual(3, CMakeParsing.GetLastNonEmptyLine(lines, 3));
+        }
     }
 }
