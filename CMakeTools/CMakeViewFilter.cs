@@ -247,7 +247,14 @@ namespace CMakeTools
             }
             else if (CMakeParsing.ShouldUnindent(lines, prevLine, out lineToMatch))
             {
-                level = CMakeParsing.GetIndentationLevel(lines[lineToMatch], indentChar);
+                if (lineToMatch < 0)
+                {
+                    level = 0;
+                }
+                else
+                {
+                    level = CMakeParsing.GetIndentationLevel(lines[lineToMatch], indentChar);
+                }
             }
             Source.SetText(line, 0, line, col, new string(indentChar, level));
             TextView.PositionCaretForEditing(line, level);

@@ -1340,12 +1340,14 @@ namespace CMakeTools
                 }
                 else
                 {
-                    if (CMakeScanner.InsideParens(state))
+                    if (CMakeScanner.InsideParens(state) ||
+                        CMakeScanner.GetStringFlag(state))
                     {
                         return false;
                     }
                     while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
-                    return CMakeScanner.InsideParens(state);
+                    return CMakeScanner.InsideParens(state) &&
+                        !CMakeScanner.GetStringFlag(state);
                 }
                 i++;
             }
@@ -1372,6 +1374,7 @@ namespace CMakeTools
             int state = 0;
             int i = 0;
             int openParenLine = -1;
+            int openStringLine = -1;
             lineToMatch = -1;
             foreach (string line in lines)
             {
@@ -1379,10 +1382,15 @@ namespace CMakeTools
                 if (i < lineNum)
                 {
                     bool wasInParens = CMakeScanner.InsideParens(state);
-                    while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state)) ;
+                    bool wasInString = CMakeScanner.GetStringFlag(state);
+                    while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
                     if (!wasInParens && CMakeScanner.InsideParens(state))
                     {
                         openParenLine = i;
+                    }
+                    if (!wasInString && CMakeScanner.GetStringFlag(state))
+                    {
+                        openStringLine = i;
                     }
                 }
                 else
@@ -1391,10 +1399,22 @@ namespace CMakeTools
                     {
                         return false;
                     }
-                    while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state)) ;
+                    bool wasInString = CMakeScanner.GetStringFlag(state);
+                    while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+                    if (CMakeScanner.GetStringFlag(state))
+                    {
+                        // Inside multiline strings, always unindent all the way.
+                        lineToMatch = -1;
+                        return true;
+                    }
                     if (!CMakeScanner.InsideParens(state))
                     {
                         lineToMatch = openParenLine;
+                        return true;
+                    }
+                    if (wasInString)
+                    {
+                        lineToMatch = openStringLine;
                         return true;
                     }
                     return false;

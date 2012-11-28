@@ -456,7 +456,7 @@ namespace CMakeTools
         private const int LastCommandMask       = 0x0FFF0000;
         private const int LastCommandShift      = 16;
 
-        private bool GetStringFlag(int state)
+        public static bool GetStringFlag(int state)
         {
             // Get the flag indicating whether we're inside a string.
             return ((uint)state & StringFlag) != 0;
