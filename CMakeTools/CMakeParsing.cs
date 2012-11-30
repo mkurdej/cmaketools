@@ -1395,10 +1395,7 @@ namespace CMakeTools
                 }
                 else
                 {
-                    if (!CMakeScanner.InsideParens(state))
-                    {
-                        return false;
-                    }
+                    bool wasInParens = CMakeScanner.InsideParens(state);
                     bool wasInString = CMakeScanner.GetStringFlag(state);
                     while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
                     if (CMakeScanner.GetStringFlag(state))
@@ -1407,7 +1404,7 @@ namespace CMakeTools
                         lineToMatch = -1;
                         return true;
                     }
-                    if (!CMakeScanner.InsideParens(state))
+                    if (wasInParens && !CMakeScanner.InsideParens(state))
                     {
                         lineToMatch = openParenLine;
                         return true;

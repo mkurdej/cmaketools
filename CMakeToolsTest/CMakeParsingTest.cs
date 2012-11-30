@@ -1038,6 +1038,37 @@ namespace CMakeTools
             Assert.IsFalse(CMakeParsing.ShouldIndent(lines, 1));
             Assert.IsTrue(CMakeParsing.ShouldUnindent(lines, 1, out lineToMatch));
             Assert.AreEqual(0, lineToMatch);
+            lines.Clear();
+            lines.Add("set(");
+            lines.Add("  foo");
+            lines.Add("  \"abc");
+            lines.Add("def");
+            lines.Add("ghi\"");
+            lines.Add(")");
+            Assert.IsTrue(CMakeParsing.ShouldIndent(lines, 0));
+            Assert.IsFalse(CMakeParsing.ShouldUnindent(lines, 0, out lineToMatch));
+            Assert.IsFalse(CMakeParsing.ShouldIndent(lines, 1));
+            Assert.IsFalse(CMakeParsing.ShouldUnindent(lines, 1, out lineToMatch));
+            Assert.IsFalse(CMakeParsing.ShouldIndent(lines, 2));
+            Assert.IsTrue(CMakeParsing.ShouldUnindent(lines, 2, out lineToMatch));
+            Assert.AreEqual(-1, lineToMatch);
+            Assert.IsFalse(CMakeParsing.ShouldIndent(lines, 3));
+            Assert.IsTrue(CMakeParsing.ShouldUnindent(lines, 3, out lineToMatch));
+            Assert.AreEqual(-1, lineToMatch);
+            Assert.IsFalse(CMakeParsing.ShouldIndent(lines, 4));
+            Assert.IsTrue(CMakeParsing.ShouldUnindent(lines, 4, out lineToMatch));
+            Assert.AreEqual(2, lineToMatch);
+            Assert.IsFalse(CMakeParsing.ShouldIndent(lines, 5));
+            Assert.IsTrue(CMakeParsing.ShouldUnindent(lines, 5, out lineToMatch));
+            lines.Clear();
+            lines.Add("set(foo \"abc");
+            lines.Add("def\")");
+            Assert.IsFalse(CMakeParsing.ShouldIndent(lines, 0));
+            Assert.IsTrue(CMakeParsing.ShouldUnindent(lines, 0, out lineToMatch));
+            Assert.AreEqual(-1, lineToMatch);
+            Assert.IsFalse(CMakeParsing.ShouldIndent(lines, 1));
+            Assert.IsTrue(CMakeParsing.ShouldUnindent(lines, 1, out lineToMatch));
+            Assert.AreEqual(0, lineToMatch);
         }
 
         /// <summary>
