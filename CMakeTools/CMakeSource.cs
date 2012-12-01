@@ -11,6 +11,7 @@
  * **************************************************************************/
 
 using System.Collections.Generic;
+using System.IO;
 using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
 
@@ -54,6 +55,28 @@ namespace CMakeTools
             }
             base.Completion(textView, info, reason);
             LanguageService.Preferences.EnableAsyncCompletion = oldValue;
+        }
+
+        /// <summary>
+        /// Test whether the given path specifies the name of a CMake file.
+        /// </summary>
+        /// <param name="path">The path to a file.</param>
+        /// <returns>True if the file is a CMake file or false otherwise.</returns>
+        public static bool IsCMakeFile(string path)
+        {
+            bool textFile = true;
+            if (Path.GetExtension(path).ToLower() == ".cmake")
+            {
+                textFile = false;
+            }
+            else if (Path.GetExtension(path).ToLower() == ".txt")
+            {
+                if (Path.GetFileName(path).ToLower() == "cmakelists.txt")
+                {
+                    textFile = false;
+                }
+            }
+            return !textFile;
         }
     }
 }

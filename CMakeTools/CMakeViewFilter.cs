@@ -30,7 +30,8 @@ namespace CMakeTools
 
         protected override int QueryCommandStatus(ref Guid guidCmdGroup, uint nCmdId)
         {
-            if (guidCmdGroup == VSConstants.VSStd2K)
+            if (guidCmdGroup == VSConstants.VSStd2K &&
+                CMakeSource.IsCMakeFile(Source.GetFilePath()))
             {
                 if (nCmdId == (uint)VSConstants.VSStd2KCmdID.INSERTSNIPPET)
                 {
@@ -47,6 +48,21 @@ namespace CMakeTools
                         return (int)(OLECMDF.OLECMDF_SUPPORTED |
                             OLECMDF.OLECMDF_ENABLED);
                     }
+                }
+            }
+            else if (guidCmdGroup == VSConstants.GUID_VSStandardCommandSet97 &&
+                !CMakeSource.IsCMakeFile(Source.GetFilePath()))
+            {
+                // Visual Studio does not show these commands for ordinary text files.
+                // All text files get associated with the CMake language service in order
+                // to facilitate handling CMakeLists.txt.  When the current file is an
+                // ordinary text file, hide these commands to match what Visual Studio
+                // would otherwise do.
+                if (nCmdId == (uint)VSConstants.VSStd97CmdID.GotoDecl ||
+                    nCmdId == (uint)VSConstants.VSStd97CmdID.GotoDefn ||
+                    nCmdId == (uint)VSConstants.VSStd97CmdID.GotoRef)
+                {
+                    return (int)(OLECMDF.OLECMDF_SUPPORTED | OLECMDF.OLECMDF_INVISIBLE);
                 }
             }
             return base.QueryCommandStatus(ref guidCmdGroup, nCmdId);

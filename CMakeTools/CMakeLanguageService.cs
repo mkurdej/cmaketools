@@ -213,20 +213,8 @@ namespace CMakeTools
             // handle CMakeLists.txt.  Detect if the buffer represents an ordinary text
             // files.  If so, disable syntax highlighting.  This is a kludge, but it's
             // the best that can be done here.
-            bool textFile = true;
             string path = FilePathUtilities.GetFilePath(buffer);
-            if (Path.GetExtension(path).ToLower() == ".cmake")
-            {
-                textFile = false;
-            }
-            else if (Path.GetExtension(path).ToLower() == ".txt")
-            {
-                if (Path.GetFileName(path).ToLower() == "cmakelists.txt")
-                {
-                    textFile = false;
-                }
-            }
-            return new CMakeScanner(textFile);
+            return new CMakeScanner(!CMakeSource.IsCMakeFile(path));
         }
 
         public override LanguagePreferences GetLanguagePreferences()
