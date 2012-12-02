@@ -128,6 +128,11 @@ namespace CMakeTools
                         scope.SetDeclarations(new CMakeSubdirectoryDeclarations(
                             req.FileName, requireCMakeLists));
                     }
+                    else if (id == CMakeCommandId.EnableLanguage)
+                    {
+                        scope.SetDeclarations(new CMakeLanguageDeclarations(
+                            req.FileName));
+                    }
                     else
                     {
                         scope.SetDeclarations(

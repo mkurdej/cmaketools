@@ -921,11 +921,12 @@ namespace CMakeTools
                 _memberSelectionCommands[(int)id] = true;
             }
 
-            // The INCLUDE, FIND_PACKAGE, and ADD_SUBDIRECTORY commands don't have
-            // subcommands but should still trigger member selection.
+            // The INCLUDE, FIND_PACKAGE, ADD_SUBDIRECTORY, and ENABLE_LANGUAGE commands
+            // don't have subcommands but should still trigger member selection.
             _memberSelectionCommands[(int)CMakeCommandId.Include] = true;
             _memberSelectionCommands[(int)CMakeCommandId.FindPackage] = true;
             _memberSelectionCommands[(int)CMakeCommandId.AddSubdirectory] = true;
+            _memberSelectionCommands[(int)CMakeCommandId.EnableLanguage] = true;
 
             // These commands should trigger member selection on whitespace.
             _memberSelectionWSCommands = new bool[_commands.Length];

@@ -43,6 +43,7 @@
     <Compile Include="CMakeFunctionDeclarations.cs" />
     <Compile Include="CMakeIncludeDeclarations.cs" />
     <Compile Include="CMakeKeywords.cs" />
+    <Compile Include="CMakeLanguageDeclarations.cs" />
     <Compile Include="CMakeLanguageService.cs" />
     <Compile Include="CMakeMethods.cs" />
     <Compile Include="CMakeOptionPage.cs">
