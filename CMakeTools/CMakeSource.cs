@@ -57,6 +57,11 @@ namespace CMakeTools
             LanguageService.Preferences.EnableAsyncCompletion = oldValue;
         }
 
+        public override ExpansionProvider GetExpansionProvider()
+        {
+            return new CMakeExpansionProvider(this);
+        }
+
         /// <summary>
         /// Test whether the given path specifies the name of a CMake file.
         /// </summary>

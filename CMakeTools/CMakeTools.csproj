@@ -39,6 +39,7 @@
   <ItemGroup>
     <Compile Include="CMakeAuthoringScope.cs" />
     <Compile Include="CMakeCmdIds.cs" />
+    <Compile Include="CMakeExpansionProvider.cs" />
     <Compile Include="CMakeFunctionDeclarations.cs" />
     <Compile Include="CMakeIncludeDeclarations.cs" />
     <Compile Include="CMakeKeywords.cs" />
