@@ -33,14 +33,7 @@ namespace CMakeTools
                 return new string[] {};
             }
 
-            // Each language X supported by CMake has a file called
-            // CMakeXInformation.cmake.
-            IEnumerable<string> files = Directory.EnumerateFiles(dirPath,
-                "CMake*.cmake");
-            files = files.Select(Path.GetFileNameWithoutExtension);
-            files = files.Where(x => x.EndsWith("Information"));
-            files = files.Select(x => x.Substring(5, x.Length - 16));
-            return files;
+            return GetLanguagesFromDir(dirPath);
         }
 
         protected override IEnumerable<string> GetDefaultModules()
@@ -58,6 +51,18 @@ namespace CMakeTools
         {
             // Always return the index for a reference.
             return 192;
+        }
+
+        public static IEnumerable<string> GetLanguagesFromDir(string dirPath)
+        {
+            // Each language X supported by CMake has a file called
+            // CMakeXInformation.cmake.
+            IEnumerable<string> files = Directory.EnumerateFiles(dirPath,
+                "CMake*.cmake");
+            files = files.Select(Path.GetFileNameWithoutExtension);
+            files = files.Where(x => x.EndsWith("Information"));
+            files = files.Select(x => x.Substring(5, x.Length - 16));
+            return files;
         }
     }
 }

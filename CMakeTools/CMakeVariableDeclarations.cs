@@ -12,6 +12,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.VisualStudio.Package;
 
 namespace CMakeTools
@@ -167,6 +168,40 @@ namespace CMakeTools
             "XCODE_VERSION"
         };
 
+        // Array of standard CMake variables defined for each language.
+        private static string[] _standardLangVariables = new string[]
+        {
+            "CMAKE_{0}_ARCHIVE_APPEND",
+            "CMAKE_{0}_ARCHIVE_CREATE",
+            "CMAKE_{0}_ARCHIVE_FINISH",
+            "CMAKE_{0}_COMPILER",
+            "CMAKE_{0}_COMPILER_ABI",
+            "CMAKE_{0}_COMPILER_ID",
+            "CMAKE_{0}_COMPILER_LOADED",
+            "CMAKE_{0}_COMPILER_VERSION",
+            "CMAKE_{0}_COMPILE_OBJECT",
+            "CMAKE_{0}_CREATE_SHARED_LIBRARY",
+            "CMAKE_{0}_CREATE_SHARED_MODULE",
+            "CMAKE_{0}_CREATE_STATIC_LIBRARY",
+            "CMAKE_{0}_FLAGS_DEBUG",
+            "CMAKE_{0}_FLAGS_MINSIZEREL",
+            "CMAKE_{0}_FLAGS_RELEASE",
+            "CMAKE_{0}_FLAGS_RELWITHDEBINFO",
+            "CMAKE_{0}_IGNORE_EXTENSIONS",
+            "CMAKE_{0}_IMPLICIT_INCLUDE_DIRECTORIES",
+            "CMAKE_{0}_IMPLICIT_LINK_DIRECTORIES",
+            "CMAKE_{0}_IMPLICIT_LINK_LIBRARIES",
+            "CMAKE_{0}_LIBRARY_ARCHITECTURE",
+            "CMAKE_{0}_LINKER_PREFERENCE",
+            "CMAKE_{0}_LINKER_PREFERENCE_PROPAGATES",
+            "CMAKE_{0}_LINK_EXECUTABLE",
+            "CMAKE_{0}_OUTPUT_EXTENSION",
+            "CMAKE_{0}_PLATFORM_ID",
+            "CMAKE_{0}_SIZEOF_DATA_PTR",
+            "CMAKE_{0}_SOURCE_FILE_EXTENSIONS",
+            "CMAKE_USER_MAKE_RULES_OVERRIDE_{0}"
+        };
+
         // Array of standard environment variables.  This list was taken from
         // http://en.wikipedia.org/wiki/Environment_variable.
         private static string[] _standardEnvVariables = new string[]
@@ -205,6 +240,17 @@ namespace CMakeTools
         {
             _variables = new List<string>(
                 useEnv ? _standardEnvVariables : _standardVariables);
+            string path = CMakePath.FindCMakeModules();
+            if (path != null)
+            {
+                IEnumerable<string> languages =
+                    CMakeLanguageDeclarations.GetLanguagesFromDir(path);
+                foreach (string language in languages)
+                {
+                    _variables.AddRange(_standardLangVariables.Select(
+                        x => string.Format(x, language)));
+                }
+            }
             if (userVariables != null)
             {
                 _variables.AddRange(userVariables);
