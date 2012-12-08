@@ -225,11 +225,19 @@ namespace CMakeTools
                 {
                     // Scan a keyword, identifier, or file name token.
                     bool isFileName = false;
+                    bool isNumeric = false;
                     tokenInfo.StartIndex = _offset;
                     while (_offset < _source.Length - 1)
                     {
                         char ch = _source[_offset + 1];
-                        if (!expectVariable && ScanFileNameChar())
+                        if (ch == '-')
+                        {
+                            // Variable names may contain hyphens but function names
+                            // can't.  There classify an identifier with a hyphen in it
+                            // as a numeric identifier.
+                            isNumeric = true;
+                        }
+                        else if (!expectVariable && ScanFileNameChar())
                         {
                             isFileName = true;
                         }
@@ -261,6 +269,11 @@ namespace CMakeTools
                         tokenInfo.Color = TokenColor.Identifier;
                         tokenInfo.Token = (int)CMakeToken.VariableStartSetEnv;
                         _offset = tokenInfo.EndIndex + 1;
+                    }
+                    else if (isNumeric)
+                    {
+                        tokenInfo.Color = TokenColor.Identifier;
+                        tokenInfo.Token = (int)CMakeToken.NumericIdentifier;
                     }
                     else if (isFileName)
                     {
@@ -310,11 +323,11 @@ namespace CMakeTools
                     }
                     return true;
                 }
-                else if (char.IsDigit(_source[_offset]))
+                else if (char.IsDigit(_source[_offset]) || _source[_offset] == '-')
                 {
-                    // Variable names can start with numbers in CMake, but function names
-                    // can't.  We'll call these tokens "numeric identifiers" here and
-                    // treat them accordingly when parsing.
+                    // Variable names can start with numbers or hyphens in CMake, but
+                    // function names can't.  We'll call these tokens "numeric
+                    // identifiers" here and treat them accordingly when parsing.
                     tokenInfo.StartIndex = _offset;
                     bool isFileName = false;
                     while (_offset < _source.Length - 1)
@@ -436,9 +449,9 @@ namespace CMakeTools
                 return true;
             }
             else if (ch == '~' || ch == '`' || ch == '!' || ch == '%' || ch == '^' ||
-                ch == '&' || ch == '*' || ch == '-' || ch == '+' || ch == '=' ||
-                ch == '[' || ch == ']' || ch == '{' || ch == '}' || ch == ':' ||
-                ch == '\'' || ch == ',' || ch == '.' || ch == '?' || ch == '/')
+                ch == '&' || ch == '*' || ch == '+' || ch == '=' || ch == '[' ||
+                ch == ']' || ch == '{' || ch == '}' || ch == ':' || ch == '\'' ||
+                ch == ',' || ch == '.' || ch == '?' || ch == '/')
             {
                 return true;
             }

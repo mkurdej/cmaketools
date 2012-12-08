@@ -422,6 +422,34 @@ namespace CMakeTools
             Assert.IsFalse(CMakeParsing.ParseForVariableDefinition(lines, "set",
                 out span));
             
+            // Test a declaration of a variable whose name contains a hyphen.
+            lines.Clear();
+            lines.Add("set(foo-bar abc)");
+            Assert.IsTrue(CMakeParsing.ParseForVariableDefinition(lines, "foo-bar",
+                out span));
+            Assert.AreEqual(0, span.iStartLine);
+            Assert.AreEqual(4, span.iStartIndex);
+            Assert.AreEqual(0, span.iEndLine);
+            Assert.AreEqual(10, span.iEndIndex);
+            Assert.IsFalse(CMakeParsing.ParseForVariableDefinition(lines, "abc",
+                out span));
+            Assert.IsFalse(CMakeParsing.ParseForVariableDefinition(lines, "set",
+                out span));
+
+            // Test a declaration of a variable whose name begins with a hyphen.
+            lines.Clear();
+            lines.Add("set(-foo abc)");
+            Assert.IsTrue(CMakeParsing.ParseForVariableDefinition(lines, "-foo",
+                out span));
+            Assert.AreEqual(0, span.iStartLine);
+            Assert.AreEqual(4, span.iStartIndex);
+            Assert.AreEqual(0, span.iEndLine);
+            Assert.AreEqual(7, span.iEndIndex);
+            Assert.IsFalse(CMakeParsing.ParseForVariableDefinition(lines, "abc",
+                out span));
+            Assert.IsFalse(CMakeParsing.ParseForVariableDefinition(lines, "set",
+                out span));
+
             // Test a declaration with an illegal line break.  This should fail.
             lines.Clear();
             lines.Add("set");

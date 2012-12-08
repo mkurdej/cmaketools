@@ -288,6 +288,17 @@ namespace CMakeTools
             return _variables[index];
         }
 
+        public override bool IsCommitChar(string textSoFar, int selected,
+            char commitCharacter)
+        {
+            if (commitCharacter == '-')
+            {
+                // Hyphens are allowed in CMake variable names.
+                return false;
+            }
+            return base.IsCommitChar(textSoFar, selected, commitCharacter);
+        }
+
         /// <summary>
         /// Check whether the given string names a standard variable.
         /// </summary>

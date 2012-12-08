@@ -524,6 +524,60 @@ namespace CMakeTools
             Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
             Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
 
+            // Test setting a variable whose name contains a hyphen.
+            scanner.SetSource("set(foo-bar)", 0);
+            state = 0;
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(0, tokenInfo.StartIndex);
+            Assert.AreEqual(2, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.Keyword, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(3, tokenInfo.StartIndex);
+            Assert.AreEqual(3, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.OpenParen, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.ParameterStart | TokenTriggers.MatchBraces,
+                tokenInfo.Trigger);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(4, tokenInfo.StartIndex);
+            Assert.AreEqual(10, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.NumericIdentifier, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(11, tokenInfo.StartIndex);
+            Assert.AreEqual(11, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.CloseParen, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.ParameterEnd | TokenTriggers.MatchBraces,
+                tokenInfo.Trigger);
+            Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+
+            // Test setting a variable whose begins with a hyphen.
+            scanner.SetSource("set(-foo)", 0);
+            state = 0;
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(0, tokenInfo.StartIndex);
+            Assert.AreEqual(2, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.Keyword, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(3, tokenInfo.StartIndex);
+            Assert.AreEqual(3, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.OpenParen, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.ParameterStart | TokenTriggers.MatchBraces,
+                tokenInfo.Trigger);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(4, tokenInfo.StartIndex);
+            Assert.AreEqual(7, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.NumericIdentifier, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(8, tokenInfo.StartIndex);
+            Assert.AreEqual(8, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.CloseParen, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.ParameterEnd | TokenTriggers.MatchBraces,
+                tokenInfo.Trigger);
+            Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+
             // Test that a file name starting with a digit is identified as a file name
             // and not as a numeric identifier or something else.
             scanner.SetSource("8xy.txt", 0);
