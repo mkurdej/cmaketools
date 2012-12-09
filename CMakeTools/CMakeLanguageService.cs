@@ -133,6 +133,13 @@ namespace CMakeTools
                         scope.SetDeclarations(new CMakeLanguageDeclarations(
                             req.FileName));
                     }
+                    else if (id == CMakeCommandId.AddDependencies ||
+                        id == CMakeCommandId.TargetLinkLibraries)
+                    {
+                        List<string> targets = CMakeParsing.ParseForTargetNames(
+                            source.GetLines());
+                        scope.SetDeclarations(new CMakeTargetDeclarations(targets));
+                    }
                     else
                     {
                         scope.SetDeclarations(

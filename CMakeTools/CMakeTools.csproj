@@ -64,6 +64,7 @@
     <Compile Include="CMakeSubcommandDeclarations.cs" />
     <Compile Include="CMakeSubcommandMethods.cs" />
     <Compile Include="CMakeSubdirectoryDeclarations.cs" />
+    <Compile Include="CMakeTargetDeclarations.cs" />
     <Compile Include="CMakeUserMethods.cs" />
     <Compile Include="CMakeVariableDeclarations.cs" />
     <Compile Include="CMakeGuids.cs" />
