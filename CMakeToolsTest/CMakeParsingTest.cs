@@ -968,6 +968,49 @@ namespace CMakeTools
         }
 
         /// <summary>
+        /// Test parsing for target names.
+        /// </summary>
+        [TestMethod]
+        public void TestParseForTargetNames()
+        {
+            // Test parsing an executable and a library.
+            List<string> lines = new List<string>();
+            lines.Add("add_executable(foo foo.cpp)");
+            lines.Add("add_library(bar bar.cpp)");
+            List<string> targets = CMakeParsing.ParseForTargetNames(lines);
+            Assert.IsNotNull(targets);
+            Assert.AreEqual(2, targets.Count);
+            Assert.AreEqual("foo", targets[0]);
+            Assert.AreEqual("bar", targets[1]);
+
+            // Test parsing a target with extra whitespace.
+            lines.Clear();
+            lines.Add("add_executable( foo foo.cpp )");
+            targets = CMakeParsing.ParseForTargetNames(lines);
+            Assert.IsNotNull(targets);
+            Assert.AreEqual(1, targets.Count);
+            Assert.AreEqual("foo", targets[0]);
+
+            // Test parsing a target with line breaks and comments.
+            lines.Clear();
+            lines.Add("add_executable( # comment");
+            lines.Add("  foo # another comment");
+            lines.Add("  foo.cpp)");
+            targets = CMakeParsing.ParseForTargetNames(lines);
+            Assert.IsNotNull(targets);
+            Assert.AreEqual(1, targets.Count);
+            Assert.AreEqual("foo", targets[0]);
+
+            // Test parsing a target with an illegal line break.  This should fail.
+            lines.Clear();
+            lines.Add("add_executable");
+            lines.Add("(foo foo.cpp)");
+            targets = CMakeParsing.ParseForTargetNames(lines);
+            Assert.IsNotNull(targets);
+            Assert.AreEqual(0, targets.Count);
+        }
+
+        /// <summary>
         /// Test parsing for matching pairs of parentheses.
         /// </summary>
         [TestMethod]

@@ -1097,6 +1097,73 @@ namespace CMakeTools
         }
 
         /// <summary>
+        /// Parse for the names of all targets in the given code.
+        /// </summary>
+        /// <param name="lines">A collection of lines of code to parse.</param>
+        /// <returns>A list of target names.</returns>
+        public static List<string> ParseForTargetNames(IEnumerable<string> lines)
+        {
+            List<string> results = new List<string>();
+            CMakeScanner scanner = new CMakeScanner();
+            TokenInfo tokenInfo = new TokenInfo();
+            FunctionNameParseState state = FunctionNameParseState.NeedKeyword;
+            int scannerState = 0;
+            foreach (string line in lines)
+            {
+                scanner.SetSource(line, 0);
+                while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo,
+                    ref scannerState))
+                {
+                    string tokenText = line.ExtractToken(tokenInfo);
+                    switch (state)
+                    {
+                    case FunctionNameParseState.NeedKeyword:
+                        if (tokenInfo.Token == (int)CMakeToken.Keyword)
+                        {
+                            CMakeCommandId id = CMakeKeywords.GetCommandId(tokenText);
+                            if (id == CMakeCommandId.AddExecutable ||
+                                id == CMakeCommandId.AddLibrary)
+                            {
+                                state = FunctionNameParseState.NeedOpenParen;
+                            }
+                        }
+                        break;
+                    case FunctionNameParseState.NeedOpenParen:
+                        if (tokenInfo.Token == (int)CMakeToken.OpenParen)
+                        {
+                            state = FunctionNameParseState.NeedIdentifier;
+                        }
+                        else if (tokenInfo.Token != (int)CMakeToken.WhiteSpace &&
+                            tokenInfo.Token != (int)CMakeToken.Comment)
+                        {
+                            state = FunctionNameParseState.NeedKeyword;
+                        }
+                        break;
+                    case FunctionNameParseState.NeedIdentifier:
+                        if (tokenInfo.Token != (int)CMakeToken.WhiteSpace &&
+                            tokenInfo.Token != (int)CMakeToken.Comment)
+                        {
+                            if (tokenInfo.Token == (int)CMakeToken.Identifier)
+                            {
+                                results.Add(tokenText);
+                            }
+                            state = FunctionNameParseState.NeedKeyword;
+                        }
+                        break;
+                    }
+                }
+                if (state == FunctionNameParseState.NeedOpenParen)
+                {
+                    // A line break may not appear between the command and the opening
+                    // parenthesis that follows it.  If there is one, there is a syntax
+                    // error and the target should be ignored.
+                    state = FunctionNameParseState.NeedKeyword;
+                }
+            }
+            return results;
+        }
+
+        /// <summary>
         /// Parse to see if there is an identifier at a given position.
         /// </summary>
         /// <param name="lines">A collection of lines to parse.</param>
