@@ -110,41 +110,9 @@ namespace CMakeTools
                 {
                     CMakeCommandId id = CMakeParsing.ParseForTriggerCommandId(
                         source.GetLines(), req.Line, req.TokenInfo.StartIndex);
-                    if (id == CMakeCommandId.Include)
-                    {
-                        scope.SetDeclarations(new CMakeIncludeDeclarations(
-                            req.FileName));
-                    }
-                    else if (id == CMakeCommandId.FindPackage)
-                    {
-                        scope.SetDeclarations(new CMakePackageDeclarations(
-                            req.FileName));
-                    }
-                    else if (id == CMakeCommandId.AddSubdirectory)
-                    {
-                        bool requireCMakeLists =
-                            (_package.CMakeOptionPage.ShowSubdirectories ==
-                            CMakeOptionPage.SubdirectorySetting.CMakeListsOnly);
-                        scope.SetDeclarations(new CMakeSubdirectoryDeclarations(
-                            req.FileName, requireCMakeLists));
-                    }
-                    else if (id == CMakeCommandId.EnableLanguage)
-                    {
-                        scope.SetDeclarations(new CMakeLanguageDeclarations(
-                            req.FileName));
-                    }
-                    else if (id == CMakeCommandId.AddDependencies ||
-                        id == CMakeCommandId.TargetLinkLibraries)
-                    {
-                        List<string> targets = CMakeParsing.ParseForTargetNames(
-                            source.GetLines());
-                        scope.SetDeclarations(new CMakeTargetDeclarations(targets));
-                    }
-                    else
-                    {
-                        scope.SetDeclarations(
-                            CMakeSubcommandDeclarations.GetSubcommandDeclarations(id));
-                    }
+                    Declarations decls = CMakeDeclarationsFactory.CreateDeclarations(
+                        id, req, source, _package);
+                    scope.SetDeclarations(decls);
                 }
                 else if (req.TokenInfo.Token == (int)CMakeToken.WhiteSpace)
                 {

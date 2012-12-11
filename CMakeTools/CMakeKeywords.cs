@@ -916,19 +916,10 @@ namespace CMakeTools
             // trigger member selection.
             _memberSelectionCommands = new bool[_commands.Length];
             foreach (CMakeCommandId id in
-                CMakeSubcommandMethods.GetMemberSelectionTriggers())
+                CMakeDeclarationsFactory.GetMemberSelectionTriggers())
             {
                 _memberSelectionCommands[(int)id] = true;
             }
-
-            // These commands don't have subcommands but should still trigger member
-            // selection.
-            _memberSelectionCommands[(int)CMakeCommandId.Include] = true;
-            _memberSelectionCommands[(int)CMakeCommandId.FindPackage] = true;
-            _memberSelectionCommands[(int)CMakeCommandId.AddSubdirectory] = true;
-            _memberSelectionCommands[(int)CMakeCommandId.EnableLanguage] = true;
-            _memberSelectionCommands[(int)CMakeCommandId.AddDependencies] = true;
-            _memberSelectionCommands[(int)CMakeCommandId.TargetLinkLibraries] = true;
 
             // These commands should trigger member selection on whitespace.
             _memberSelectionWSCommands = new bool[_commands.Length];
