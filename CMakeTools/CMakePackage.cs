@@ -60,13 +60,26 @@ namespace CMakeTools
     [Guid(CMakeGuids.guidCMakeTools)]
     public class CMakePackage : Package, IOleComponent
     {
+        /// <summary>
+        /// The one and only instance of the class.
+        /// </summary>
+        public static CMakePackage Instance { get; private set; }
+
+        public CMakePackage()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+        }
+
         protected override void Initialize()
         {
             base.Initialize();
 
             // Register the language service.
             IServiceContainer container = this as IServiceContainer;
-            CMakeLanguageService service = new CMakeLanguageService(this);
+            CMakeLanguageService service = new CMakeLanguageService();
             service.SetSite(this);
             container.AddService(typeof(CMakeLanguageService), service, true);
 

@@ -20,18 +20,13 @@ namespace CMakeTools
     /// </summary>
     class ToCommandCaseExpansionFunction : ExpansionFunction
     {
-        private bool _commandsLower;
-
-        public ToCommandCaseExpansionFunction(bool commandsLower,
-            ExpansionProvider provider) : base(provider)
-        {
-            _commandsLower = commandsLower;
-        }
+        public ToCommandCaseExpansionFunction(ExpansionProvider provider)
+            : base(provider) {}
 
         public override string GetCurrentValue()
         {
             string commandName = GetArgument(0);
-            if (_commandsLower)
+            if (CMakePackage.Instance.CMakeOptionPage.CommandsLower)
             {
                 return commandName.ToLower();
             }

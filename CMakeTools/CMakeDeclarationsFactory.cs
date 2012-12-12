@@ -21,7 +21,7 @@ namespace CMakeTools
     static class CMakeDeclarationsFactory
     {
         private delegate Declarations FactoryMethod(CMakeCommandId id,
-            ParseRequest req, Source source, CMakePackage package);
+            ParseRequest req, Source source);
 
         // Map from CMake commands to factory methods to create their corresponding
         // declarations objects.
@@ -48,41 +48,41 @@ namespace CMakeTools
         }
 
         private static Declarations CreateIncludeDeclarations(CMakeCommandId id,
-            ParseRequest req, Source source, CMakePackage package)
+            ParseRequest req, Source source)
         {
             return new CMakeIncludeDeclarations(req.FileName);
         }
 
         private static Declarations CreatePackageDeclarations(CMakeCommandId id,
-            ParseRequest req, Source source, CMakePackage package)
+            ParseRequest req, Source source)
         {
             return new CMakePackageDeclarations(req.FileName);
         }
 
         private static Declarations CreateSubdirectoryDeclarations(CMakeCommandId id,
-            ParseRequest req, Source source, CMakePackage package)
+            ParseRequest req, Source source)
         {
             bool requireCMakeLists =
-                (package.CMakeOptionPage.ShowSubdirectories ==
+                (CMakePackage.Instance.CMakeOptionPage.ShowSubdirectories ==
                 CMakeOptionPage.SubdirectorySetting.CMakeListsOnly);
             return new CMakeSubdirectoryDeclarations(req.FileName, requireCMakeLists);
         }
 
         private static Declarations CreateLanguageDeclarations(CMakeCommandId id,
-            ParseRequest req, Source source, CMakePackage package)
+            ParseRequest req, Source source)
         {
             return new CMakeLanguageDeclarations(req.FileName);
         }
 
         private static Declarations CreateTargetDeclarations(CMakeCommandId id,
-            ParseRequest req, Source source, CMakePackage package)
+            ParseRequest req, Source source)
         {
             List<string> targets = CMakeParsing.ParseForTargetNames(source.GetLines());
             return new CMakeTargetDeclarations(targets);
         }
 
         private static Declarations CreateSubcommandDeclarations(CMakeCommandId id,
-            ParseRequest req, Source source, CMakePackage package)
+            ParseRequest req, Source source)
         {
             return CMakeSubcommandDeclarations.GetSubcommandDeclarations(id);
         }
@@ -93,16 +93,15 @@ namespace CMakeTools
         /// <param name="id">The CMake command for which to create the object.</param>
         /// <param name="req">The parse request for which to create the object.</param>
         /// <param name="source">The CMake source file.</param>
-        /// <param name="package">The CMake Tools for Visual Studio package.</param>
         /// <returns>The newly created declarations object.</returns>
         public static Declarations CreateDeclarations(CMakeCommandId id,
-            ParseRequest req, Source source, CMakePackage package)
+            ParseRequest req, Source source)
         {
             if (!_methods.ContainsKey(id))
             {
                 return null;
             }
-            return _methods[id](id, req, source, package);
+            return _methods[id](id, req, source);
         }
 
         /// <summary>

@@ -25,12 +25,6 @@ namespace CMakeTools
     public class CMakeLanguageService : LanguageService
     {
         private LanguagePreferences _preferences;
-        private CMakePackage _package;
-
-        public CMakeLanguageService(CMakePackage package)
-        {
-            _package = package;
-        }
 
         public override string GetFormatFilterList()
         {
@@ -96,7 +90,8 @@ namespace CMakeTools
                             source.GetLines(), false);
                         List<string> macros = CMakeParsing.ParseForFunctionNames(
                             source.GetLines(), true);
-                        bool commandsLower = _package.CMakeOptionPage.CommandsLower;
+                        bool commandsLower =
+                            CMakePackage.Instance.CMakeOptionPage.CommandsLower;
                         scope.SetDeclarations(new CMakeFunctionDeclarations(functions,
                             macros, commandsLower));
                     }
@@ -111,7 +106,7 @@ namespace CMakeTools
                     CMakeCommandId id = CMakeParsing.ParseForTriggerCommandId(
                         source.GetLines(), req.Line, req.TokenInfo.StartIndex);
                     Declarations decls = CMakeDeclarationsFactory.CreateDeclarations(
-                        id, req, source, _package);
+                        id, req, source);
                     scope.SetDeclarations(decls);
                 }
                 else if (req.TokenInfo.Token == (int)CMakeToken.WhiteSpace)
@@ -213,8 +208,7 @@ namespace CMakeTools
         {
             if (functionName == "ToCommandCase")
             {
-                return new ToCommandCaseExpansionFunction(
-                    _package.CMakeOptionPage.CommandsLower, provider);
+                return new ToCommandCaseExpansionFunction(provider);
             }
             return base.CreateExpansionFunction(provider, functionName);
         }
