@@ -11,6 +11,7 @@
  * **************************************************************************/
 
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.VisualStudio.Package;
 
 namespace CMakeTools
@@ -78,13 +79,22 @@ namespace CMakeTools
             ParseRequest req, Source source)
         {
             List<string> targets = CMakeParsing.ParseForTargetNames(source.GetLines());
-            return new CMakeTargetDeclarations(targets);
+
+            // Use the icon index for a VC++ project.
+            return new SimpleDeclarations(targets, 199);
         }
 
         private static Declarations CreateSubcommandDeclarations(CMakeCommandId id,
             ParseRequest req, Source source)
         {
-            return CMakeSubcommandDeclarations.GetSubcommandDeclarations(id);
+            IEnumerable<string> subcommands = CMakeSubcommandMethods.GetSubcommands(id);
+            if (subcommands == null)
+            {
+                return null;
+            }
+
+            // Use the icon index for a keyword.
+            return new SimpleDeclarations(subcommands.ToList(), 206);
         }
 
         /// <summary>

@@ -15,18 +15,24 @@ using Microsoft.VisualStudio.Package;
 
 namespace CMakeTools
 {
-    class CMakeTargetDeclarations : Declarations
+    /// <summary>
+    /// Simple declarations object to display a set of items for member selection all
+    /// with the sample icon.
+    /// </summary>
+    class SimpleDeclarations : Declarations
     {
-        private List<string> _targets;
+        private List<string> _items;
+        private int _glyphIndex;
 
-        public CMakeTargetDeclarations(List<string> targets)
+        public SimpleDeclarations(List<string> items, int glyphIndex)
         {
-            _targets = targets;
+            _items = items;
+            _glyphIndex = glyphIndex;
         }
 
         public override int GetCount()
         {
-            return _targets.Count;
+            return _items.Count;
         }
 
         public override string GetDescription(int index)
@@ -41,17 +47,16 @@ namespace CMakeTools
 
         public override int GetGlyph(int index)
         {
-            // Always return the icon for a VC++ project.
-            return 199;
+            return _glyphIndex;
         }
 
         public override string GetName(int index)
         {
-            if (index < 0 || index >= _targets.Count)
+            if (index < 0 || index >= _items.Count)
             {
                 return null;
             }
-            return _targets[index];
+            return _items[index];
         }
     }
 }
