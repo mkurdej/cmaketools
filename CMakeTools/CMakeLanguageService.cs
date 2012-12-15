@@ -116,8 +116,9 @@ namespace CMakeTools
                         req.TokenInfo.StartIndex, out tokenData);
                     if (tokenData.ParameterIndex > 0)
                     {
-                        scope.SetDeclarations(new CMakeSourceDeclarations(req.FileName,
-                            tokenData.PriorParameters, tokenData.Command));
+                        Declarations decls = CMakeDeclarationsFactory.CreateDeclarations(
+                            tokenData.Command, req, source, tokenData.PriorParameters);
+                        scope.SetDeclarations(decls);
                     }
                 }
             }

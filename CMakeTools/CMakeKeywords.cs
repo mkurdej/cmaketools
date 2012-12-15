@@ -920,11 +920,12 @@ namespace CMakeTools
             {
                 _memberSelectionCommands[(int)id] = true;
             }
-
-            // These commands should trigger member selection on whitespace.
             _memberSelectionWSCommands = new bool[_commands.Length];
-            _memberSelectionWSCommands[(int)CMakeCommandId.AddExecutable] = true;
-            _memberSelectionWSCommands[(int)CMakeCommandId.AddLibrary] = true;
+            foreach (CMakeCommandId id in
+                CMakeDeclarationsFactory.GetWSMemberSelectionTriggers())
+            {
+                _memberSelectionWSCommands[(int)id] = true;
+            }
         }
 
         /// <summary>
