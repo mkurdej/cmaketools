@@ -121,12 +121,10 @@ namespace CMakeTools
                     CMakeParsing.TokenData tokenData;
                     CMakeParsing.ParseForToken(source.GetLines(), req.Line,
                         req.TokenInfo.StartIndex, out tokenData);
-                    if (tokenData.ParameterIndex > 0)
-                    {
-                        Declarations decls = CMakeDeclarationsFactory.CreateDeclarations(
-                            tokenData.Command, req, source, tokenData.PriorParameters);
-                        scope.SetDeclarations(decls);
-                    }
+                    Declarations decls = CMakeDeclarationsFactory.CreateDeclarations(
+                        tokenData.Command, req, source,
+                        tokenData.ParameterIndex > 0 ? tokenData.PriorParameters : null);
+                    scope.SetDeclarations(decls);
                 }
             }
             else if (req.Reason == ParseReason.MethodTip)

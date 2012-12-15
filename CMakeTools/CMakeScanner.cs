@@ -109,29 +109,33 @@ namespace CMakeTools
                     tokenInfo.Color = TokenColor.Text;
                     tokenInfo.Token = (int)CMakeToken.WhiteSpace;
                     CMakeCommandId id = GetLastCommand(state);
-                    if (!noSeparator && InsideParens(state))
+                    if (InsideParens(state))
                     {
-                        if (CMakeSubcommandMethods.HasSubcommands(id))
+                        if (!noSeparator)
                         {
-                            // The first whitespace token after a subcommand marks the
-                            // beginning of the parameters.  The remaining whitespace
-                            // parameters separate consecutive parameters.
-                            if (GetNeedSubcommandFlag(state))
+                            if (CMakeSubcommandMethods.HasSubcommands(id))
                             {
-                                SetNeedSubcommandFlag(ref state, false);
-                                tokenInfo.Trigger = TokenTriggers.ParameterStart;
+                                // The first whitespace token after a subcommand marks
+                                // the beginning of the parameters.  The remaining
+                                // whitespace parameters separate consecutive parameters.
+                                if (GetNeedSubcommandFlag(state))
+                                {
+                                    SetNeedSubcommandFlag(ref state, false);
+                                    tokenInfo.Trigger = TokenTriggers.ParameterStart;
+                                }
+                                else
+                                {
+                                    tokenInfo.Trigger = TokenTriggers.ParameterNext;
+                                }
                             }
-                            else
+                            else if (id == CMakeCommandId.Unspecified ||
+                                DecSeparatorCount(ref state))
                             {
                                 tokenInfo.Trigger = TokenTriggers.ParameterNext;
                             }
                         }
-                        else if (id == CMakeCommandId.Unspecified ||
-                            DecSeparatorCount(ref state))
-                        {
-                            tokenInfo.Trigger = TokenTriggers.ParameterNext;
-                        }
-                        if (CMakeKeywords.TriggersMemberSelectionOnWhiteSpace(id))
+                        if (CMakeKeywords.TriggersMemberSelection(id) ||
+                            CMakeKeywords.TriggersMemberSelectionOnWhiteSpace(id))
                         {
                             tokenInfo.Trigger |= TokenTriggers.MemberSelect;
                         }
