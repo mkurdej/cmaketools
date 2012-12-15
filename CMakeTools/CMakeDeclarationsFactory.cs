@@ -42,8 +42,9 @@ namespace CMakeTools
         private static Dictionary<CMakeCommandId, FactoryMethod> _wsMethods =
             new Dictionary<CMakeCommandId, FactoryMethod>()
         {
-            { CMakeCommandId.AddExecutable, CreateSourceDeclarations },
-            { CMakeCommandId.AddLibrary,    CreateSourceDeclarations }
+            { CMakeCommandId.AddExecutable,     CreateSourceDeclarations },
+            { CMakeCommandId.AddLibrary,        CreateSourceDeclarations },
+            { CMakeCommandId.AddDependencies,   CreateTargetDeclarations }
         };
 
         static CMakeDeclarationsFactory()
@@ -88,6 +89,11 @@ namespace CMakeTools
             ParseRequest req, Source source, List<string> priorParameters)
         {
             List<string> targets = CMakeParsing.ParseForTargetNames(source.GetLines());
+            if (priorParameters != null)
+            {
+                // Don't list targets that have already been specified as parameters.
+                targets.RemoveAll(x => priorParameters.Contains(x));
+            }
 
             // Use the icon index for a VC++ project.
             return new SimpleDeclarations(targets, 199);
