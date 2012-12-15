@@ -97,8 +97,15 @@ namespace CMakeTools
                     }
                     else if (tokenData.ParameterIndex > 0)
                     {
-                        scope.SetDeclarations(new CMakeSourceDeclarations(req.FileName,
-                            tokenData.PriorParameters, tokenData.Command));
+                        Declarations decls = CMakeDeclarationsFactory.CreateDeclarations(
+                            tokenData.Command, req, source, tokenData.PriorParameters);
+                        scope.SetDeclarations(decls);
+                    }
+                    else
+                    {
+                        Declarations decls = CMakeDeclarationsFactory.CreateDeclarations(
+                            tokenData.Command, req, source);
+                        scope.SetDeclarations(decls);
                     }
                 }
                 else if (req.TokenInfo.Token == (int)CMakeToken.OpenParen)

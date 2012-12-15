@@ -314,8 +314,8 @@ namespace CMakeTools
                         {
                             // Always trigger member selection in response to certain
                             // commands.
-                            if (CMakeKeywords.TriggersMemberSelectionOnWhiteSpace(
-                                GetLastCommand(state)))
+                            if (CMakeKeywords.TriggersMemberSelection(id) ||
+                                CMakeKeywords.TriggersMemberSelectionOnWhiteSpace(id))
                             {
                                 tokenInfo.Trigger |= TokenTriggers.MemberSelect;
                             }
