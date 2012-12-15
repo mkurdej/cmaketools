@@ -95,16 +95,11 @@ namespace CMakeTools
                         scope.SetDeclarations(new CMakeFunctionDeclarations(functions,
                             macros, commandsLower));
                     }
-                    else if (tokenData.ParameterIndex > 0)
-                    {
-                        Declarations decls = CMakeDeclarationsFactory.CreateDeclarations(
-                            tokenData.Command, req, source, tokenData.PriorParameters);
-                        scope.SetDeclarations(decls);
-                    }
                     else
                     {
                         Declarations decls = CMakeDeclarationsFactory.CreateDeclarations(
-                            tokenData.Command, req, source);
+                            tokenData.Command, req, source,
+                            tokenData.ParameterIndex > 0 ? tokenData.PriorParameters : null);
                         scope.SetDeclarations(decls);
                     }
                 }
