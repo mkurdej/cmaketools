@@ -166,6 +166,14 @@ namespace CMakeTools
                     }
                 }
             }
+            else if (guidCmdGroup == VSConstants.GUID_VSStandardCommandSet97)
+            {
+                if (nCmdId == (uint)VSConstants.VSStd97CmdID.F1Help)
+                {
+                    DoContextHelp();
+                    return true;
+                }
+            }
             return base.HandlePreExec(ref guidCmdGroup, nCmdId, nCmdexecopt, pvaIn,
                 pvaOut);
         }
@@ -240,6 +248,45 @@ namespace CMakeTools
                 break;
             }
             return null;
+        }
+
+        private void DoContextHelp()
+        {
+            // Open CMake help for the command, standard variables, or standard module
+            // at the caret.
+            int line;
+            int col;
+            CMakeParsing.TokenData tokenData;
+            if (TextView != null &&
+                TextView.GetCaretPos(out line, out col) == VSConstants.S_OK &&
+                CMakeParsing.ParseForToken(Source.GetLines(), line, col, out tokenData))
+            {
+                string text = Source.GetText(tokenData.TokenInfo.ToTextSpan(line));
+                if (tokenData.TokenInfo.Token == (int)CMakeToken.Keyword &&
+                    !tokenData.InParens)
+                {
+                    CMakePackage.Instance.OpenCMakeHelpPage(
+                        "cmake-commands.html#command:" + text.ToLower());
+                }
+                else if (tokenData.TokenInfo.Token == (int)CMakeToken.Variable &&
+                    CMakeVariableDeclarations.IsStandardVariable(text))
+                {
+                    CMakePackage.Instance.OpenCMakeHelpPage(
+                        "cmake-variables.html#variable:" + text);
+                }
+                else if (tokenData.TokenInfo.Token == (int)CMakeToken.Identifier &&
+                    tokenData.Command == CMakeCommandId.Include)
+                {
+                    CMakePackage.Instance.OpenCMakeHelpPage(
+                        "cmake-modules.html#module:" + text);
+                }
+                else if (tokenData.TokenInfo.Token == (int)CMakeToken.Identifier &&
+                    tokenData.Command == CMakeCommandId.FindPackage)
+                {
+                    CMakePackage.Instance.OpenCMakeHelpPage(
+                        "cmake-modules.html#module:Find" + text);
+                }
+            }
         }
 
         public override bool HandleSmartIndent()

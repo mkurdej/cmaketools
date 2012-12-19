@@ -205,7 +205,12 @@ namespace CMakeTools
             }
         }
 
-        private void OpenCMakeHelpPage(string fileName)
+        /// <summary>
+        /// Open the specified CMake Help HTML file in Visual Studio's built-in web
+        /// browser.
+        /// </summary>
+        /// <param name="fileName">The name of HTML file to open.</param>
+        public void OpenCMakeHelpPage(string fileName)
         {
             // Attempt to find CMake in the registry.
             string location = CMakePath.FindCMakeHelp();
