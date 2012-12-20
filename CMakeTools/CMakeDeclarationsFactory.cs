@@ -44,7 +44,8 @@ namespace CMakeTools
         {
             { CMakeCommandId.AddExecutable,     CreateSourceDeclarations },
             { CMakeCommandId.AddLibrary,        CreateSourceDeclarations },
-            { CMakeCommandId.AddDependencies,   CreateTargetDeclarations }
+            { CMakeCommandId.AddDependencies,   CreateTargetDeclarations },
+            { CMakeCommandId.GetTargetProperty, CreateGetXPropertyDeclarations }
         };
 
         static CMakeDeclarationsFactory()
@@ -116,6 +117,22 @@ namespace CMakeTools
             ParseRequest req, Source source, List<string> priorParameters)
         {
             return new CMakeSourceDeclarations(req.FileName, priorParameters, id);
+        }
+
+        private static Declarations CreateGetXPropertyDeclarations(CMakeCommandId id,
+            ParseRequest req, Source source, List<string> priorParameters)
+        {
+            if (priorParameters != null &&
+                priorParameters.Count == CMakeProperties.GetPropertyParameterIndex(id))
+            {
+                IEnumerable<string> properties = CMakeProperties.GetPropertiesForCommand(id);
+                if (properties != null)
+                {
+                    // Use the icon index for a property.
+                    return new SimpleDeclarations(properties.ToList(), 102);
+                }
+            }
+            return null;
         }
 
         /// <summary>

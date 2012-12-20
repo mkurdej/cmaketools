@@ -54,6 +54,7 @@
     <Compile Include="CMakePackageDeclarations.cs" />
     <Compile Include="CMakeParsing.cs" />
     <Compile Include="CMakePath.cs" />
+    <Compile Include="CMakeProperties.cs" />
     <Compile Include="CMakeScanner.cs" />
     <Compile Include="CMakeSource.cs" />
     <Compile Include="CMakeSourceDeclarations.cs" />
