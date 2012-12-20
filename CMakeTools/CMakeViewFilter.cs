@@ -262,29 +262,35 @@ namespace CMakeTools
                 CMakeParsing.ParseForToken(Source.GetLines(), line, col, out tokenData))
             {
                 string text = Source.GetText(tokenData.TokenInfo.ToTextSpan(line));
-                if (tokenData.TokenInfo.Token == (int)CMakeToken.Keyword &&
-                    !tokenData.InParens)
+                string htmlFile = null;
+                switch ((CMakeToken)tokenData.TokenInfo.Token)
                 {
-                    CMakePackage.Instance.OpenCMakeHelpPage(
-                        "cmake-commands.html#command:" + text.ToLower());
+                case CMakeToken.Keyword:
+                    if (!tokenData.InParens)
+                    {
+                        htmlFile = "cmake-commands.html#command:" + text.ToLower();
+                    }
+                    break;
+                case CMakeToken.Variable:
+                    if (CMakeVariableDeclarations.IsStandardVariable(text))
+                    {
+                        htmlFile = "cmake-variables.html#variable:" + text;
+                    }
+                    break;
+                case CMakeToken.Identifier:
+                    if (tokenData.Command == CMakeCommandId.Include)
+                    {
+                        htmlFile = "cmake-modules.html#module:" + text;
+                    }
+                    else if (tokenData.Command == CMakeCommandId.FindPackage)
+                    {
+                        htmlFile = "cmake-modules.html#module:Find" + text;
+                    }
+                    break;
                 }
-                else if (tokenData.TokenInfo.Token == (int)CMakeToken.Variable &&
-                    CMakeVariableDeclarations.IsStandardVariable(text))
+                if (htmlFile != null)
                 {
-                    CMakePackage.Instance.OpenCMakeHelpPage(
-                        "cmake-variables.html#variable:" + text);
-                }
-                else if (tokenData.TokenInfo.Token == (int)CMakeToken.Identifier &&
-                    tokenData.Command == CMakeCommandId.Include)
-                {
-                    CMakePackage.Instance.OpenCMakeHelpPage(
-                        "cmake-modules.html#module:" + text);
-                }
-                else if (tokenData.TokenInfo.Token == (int)CMakeToken.Identifier &&
-                    tokenData.Command == CMakeCommandId.FindPackage)
-                {
-                    CMakePackage.Instance.OpenCMakeHelpPage(
-                        "cmake-modules.html#module:Find" + text);
+                    CMakePackage.Instance.OpenCMakeHelpPage(htmlFile);
                 }
             }
         }
