@@ -19,7 +19,7 @@ namespace CMakeTools
     /// </summary>
     static class CMakeProperties
     {
-        // Array of CMake target properties
+        // Array of CMake target properties.
         private static string[] _targetProperties = new string[]
         {
             "ARCHIVE_OUTPUT_DIRECTORY",
@@ -113,11 +113,33 @@ namespace CMakeTools
             "WIN32_EXECUTABLE"
         };
 
+        // Array of CMake source file properties.
+        private static string[] _sourceFileProperties = new string[]
+        {
+            "ABSTRACT",
+            "COMPILE_DEFINITIONS",
+            "COMPILE_FLAGS",
+            "EXTERNAL_OBJECT",
+            "Fortran_FORMAT",
+            "GENERATED",
+            "HEADER_FILE_ONLY",
+            "KEEP_EXTENSION",
+            "LABELS",
+            "LANGUAGE",
+            "LOCATION",
+            "MACOSX_PACKAGE_LOCATION",
+            "OBJECT_DEPENDS",
+            "OBJECT_OUTPUTS",
+            "SYMBOLIC",
+            "WRAP_EXCLUDE"
+        };
+
         // Map from CMake commands to standard properties.
         private static Dictionary<CMakeCommandId, string[]> _commandProperties =
             new Dictionary<CMakeCommandId, string[]>()
         {
-            { CMakeCommandId.GetTargetProperty, _targetProperties }
+            { CMakeCommandId.GetTargetProperty,     _targetProperties },
+            { CMakeCommandId.GetSourceFileProperty, _sourceFileProperties }
         };
 
         /// <summary>
@@ -145,6 +167,7 @@ namespace CMakeTools
             switch (id)
             {
             case CMakeCommandId.GetTargetProperty:
+            case CMakeCommandId.GetSourceFileProperty:
                 return 2;
             default:
                 return -1;

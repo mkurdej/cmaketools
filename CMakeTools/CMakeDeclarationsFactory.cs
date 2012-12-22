@@ -42,10 +42,11 @@ namespace CMakeTools
         private static Dictionary<CMakeCommandId, FactoryMethod> _wsMethods =
             new Dictionary<CMakeCommandId, FactoryMethod>()
         {
-            { CMakeCommandId.AddExecutable,     CreateSourceDeclarations },
-            { CMakeCommandId.AddLibrary,        CreateSourceDeclarations },
-            { CMakeCommandId.AddDependencies,   CreateTargetDeclarations },
-            { CMakeCommandId.GetTargetProperty, CreateGetXPropertyDeclarations }
+            { CMakeCommandId.AddExecutable,         CreateSourceDeclarations },
+            { CMakeCommandId.AddLibrary,            CreateSourceDeclarations },
+            { CMakeCommandId.AddDependencies,       CreateTargetDeclarations },
+            { CMakeCommandId.GetTargetProperty,     CreateGetXPropertyDeclarations },
+            { CMakeCommandId.GetSourceFileProperty, CreateGetXPropertyDeclarations }
         };
 
         static CMakeDeclarationsFactory()
