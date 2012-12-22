@@ -13,6 +13,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
@@ -86,14 +87,20 @@ namespace CMakeTools
                         req.TokenInfo.StartIndex, out tokenData);
                     if (!tokenData.InParens)
                     {
-                        List<string> functions = CMakeParsing.ParseForFunctionNames(
-                            source.GetLines(), false);
-                        List<string> macros = CMakeParsing.ParseForFunctionNames(
-                            source.GetLines(), true);
-                        bool commandsLower =
-                            CMakePackage.Instance.CMakeOptionPage.CommandsLower;
-                        scope.SetDeclarations(new CMakeFunctionDeclarations(functions,
-                            macros, commandsLower));
+                        CMakeItemDeclarations decls = new CMakeItemDeclarations();
+                        IEnumerable<string> commands = CMakeKeywords.GetAllCommands();
+                        if (!CMakePackage.Instance.CMakeOptionPage.CommandsLower)
+                        {
+                            commands = commands.Select(x => x.ToUpper());
+                        }
+                        decls.AddItems(commands, CMakeItemDeclarations.ItemType.Command);
+                        decls.AddItems(
+                            CMakeParsing.ParseForFunctionNames(source.GetLines(), false),
+                            CMakeItemDeclarations.ItemType.Function);
+                        decls.AddItems(
+                            CMakeParsing.ParseForFunctionNames(source.GetLines(), true),
+                            CMakeItemDeclarations.ItemType.Macro);
+                        scope.SetDeclarations(decls);
                     }
                     else
                     {

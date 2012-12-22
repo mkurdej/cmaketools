@@ -18,11 +18,14 @@ using Microsoft.VisualStudio.Package;
 namespace CMakeTools
 {
     /// <summary>
-    /// Declarations object for CMake functions, macros, and commands.
+    /// Declarations objects for various types of member selection for CMake.
     /// </summary>
-    class CMakeFunctionDeclarations : Declarations
+    class CMakeItemDeclarations : Declarations
     {
-        private enum ItemType
+        /// <summary>
+        /// Item types indicating which icon should be displayed next to an item.
+        /// </summary>
+        public enum ItemType
         {
             Command,
             Function,
@@ -36,25 +39,25 @@ namespace CMakeTools
 
             public int CompareTo(Item other)
             {
-                // Perform a case-insensitive comparision of the names.
+                // Perform a case-insensitive comparison of the names.
                 return string.Compare(Name, other.Name, true);
             }
         }
 
-        private List<Item> _items;
+        private List<Item> _items = new List<Item>();
+        private bool _sorted;
 
-        public CMakeFunctionDeclarations(IEnumerable<string> functions,
-            IEnumerable<string> macros, bool commandsLower)
+        /// <summary>
+        /// Add a collection of items.
+        /// </summary>
+        /// <param name="names">A collection of item names.</param>
+        /// <param name="type">An item type.</param>
+        public void AddItems(IEnumerable<string> names, ItemType type)
         {
-            IEnumerable<string> commands = CMakeKeywords.GetAllCommands();
-            if (!commandsLower)
-            {
-                commands = commands.Select(x => x.ToUpper());
-            }
-            _items = ConvertToItems(commands, ItemType.Command).ToList();
-            _items.AddRange(ConvertToItems(functions, ItemType.Function));
-            _items.AddRange(ConvertToItems(macros, ItemType.Macro));
-            _items.Sort();
+            // Convert a list of names to a list of items of the specified type.
+            _items.AddRange(names.Select(
+                name => new Item() { Name = name, Type = type }));
+            _sorted = false;
         }
 
         public override int GetCount()
@@ -74,11 +77,12 @@ namespace CMakeTools
 
         public override int GetGlyph(int index)
         {
-            // Return the icon index for a keyword, function, or macro.
+            // Return the appropriate icon index, depending on the item type.
             if (index < 0 || index >= _items.Count)
             {
                 return -1;
             }
+            EnsureSorted();
             switch (_items[index].Type)
             {
             case ItemType.Command:
@@ -86,8 +90,9 @@ namespace CMakeTools
             case ItemType.Macro:
                 return 54;
             case ItemType.Function:
-            default:
                 return 72;
+            default:
+                return -1;
             }
         }
 
@@ -97,14 +102,18 @@ namespace CMakeTools
             {
                 return null;
             }
+            EnsureSorted();
             return _items[index].Name;
         }
 
-        private static IEnumerable<Item> ConvertToItems(IEnumerable<string> names,
-            ItemType type)
+        private void EnsureSorted()
         {
-            // Convert a list of names to a list of items of the specified type.
-            return names.Select(name => new Item() { Name = name, Type = type });
+            // Sort the items if they're not already sorted.
+            if (!_sorted)
+            {
+                _items.Sort();
+                _sorted = true;
+            }
         }
     }
 }

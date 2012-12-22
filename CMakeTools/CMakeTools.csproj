@@ -41,8 +41,8 @@
     <Compile Include="CMakeCmdIds.cs" />
     <Compile Include="CMakeDeclarationsFactory.cs" />
     <Compile Include="CMakeExpansionProvider.cs" />
-    <Compile Include="CMakeFunctionDeclarations.cs" />
     <Compile Include="CMakeIncludeDeclarations.cs" />
+    <Compile Include="CMakeItemDeclarations.cs" />
     <Compile Include="CMakeKeywords.cs" />
     <Compile Include="CMakeLanguageDeclarations.cs" />
     <Compile Include="CMakeLanguageService.cs" />
