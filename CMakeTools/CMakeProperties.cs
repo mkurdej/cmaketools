@@ -155,6 +155,30 @@ namespace CMakeTools
             "WORKING_DIRECTORY"
         };
 
+        // Array of CMake directory properties.
+        private static string[] _directoryProperties = new string[]
+        {
+            "ADDITIONAL_MAKE_CLEAN_FILES",
+            "CACHE_VARIABLES",
+            "CLEAN_NO_CUSTOM",
+            "COMPILE_DEFINITIONS",
+            "DEFINITIONS",
+            "EXCLUDE_FROM_ALL",
+            "IMPLICIT_DEPENDS_INCLUDE_TRANSFORM",
+            "INCLUDE_DIRECTORIES",
+            "INCLUDE_REGULAR_EXPRESSION",
+            "INTERPROCEDURAL_OPTIMIZATION",
+            "LINK_DIRECTORIES",
+            "LISTFILE_STACK",
+            "MACROS",
+            "PARENT_DIRECTORY",
+            "RULE_LAUNCH_COMPILE",
+            "RULE_LAUNCH_CUSTOM",
+            "RULE_LAUNCH_LINK",
+            "TEST_INCLUDE_FILE",
+            "VARIABLES"
+        };
+
         // Array of CMake instance properties that are not also properties of
         // global scope.
         private static string[] _instanceOnlyProperties = new string[]
@@ -206,6 +230,7 @@ namespace CMakeTools
             { CMakeCommandId.SetSourceFilesProperties,  _sourceFileProperties },
             { CMakeCommandId.GetTestProperty,           _testProperties },
             { CMakeCommandId.SetTestsProperties,        _testProperties },
+            { CMakeCommandId.SetDirectoryProperties,    _directoryProperties },
             { CMakeCommandId.GetCMakeProperty,          _instanceProperties }
         };
 

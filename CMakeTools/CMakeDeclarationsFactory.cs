@@ -51,7 +51,8 @@ namespace CMakeTools
             { CMakeCommandId.GetCMakeProperty,          CreateGetXPropertyDeclarations },
             { CMakeCommandId.SetTargetProperties,       CreateSetXPropertyDeclarations },
             { CMakeCommandId.SetSourceFilesProperties,  CreateSetXPropertyDeclarations },
-            { CMakeCommandId.SetTestsProperties,        CreateSetXPropertyDeclarations }
+            { CMakeCommandId.SetTestsProperties,        CreateSetXPropertyDeclarations },
+            { CMakeCommandId.SetDirectoryProperties,    CreateSetXPropertyDeclarations }
         };
 
         static CMakeDeclarationsFactory()
