@@ -23,7 +23,7 @@ namespace CMakeTools
     {
         // Map from commands that define variables to the number of parameter before the
         // variable defined.
-        private static Dictionary<CMakeCommandId, int> _paramsBeforeVariable =
+        private static readonly Dictionary<CMakeCommandId, int> _paramsBeforeVariable =
             new Dictionary<CMakeCommandId, int>
         {
             { CMakeCommandId.AuxSourceDirectory,    1 },

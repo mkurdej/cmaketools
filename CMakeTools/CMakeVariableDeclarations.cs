@@ -23,7 +23,7 @@ namespace CMakeTools
     class CMakeVariableDeclarations : Declarations
     {
         // Array of standard CMake variables.
-        private static string[] _standardVariables = new string[]
+        private static readonly string[] _standardVariables = new string[]
         {
             "APPLE",
             "BORLAND",
@@ -169,7 +169,7 @@ namespace CMakeTools
         };
 
         // Array of standard CMake variables defined for each language.
-        private static string[] _standardLangVariables = new string[]
+        private static readonly string[] _standardLangVariables = new string[]
         {
             "CMAKE_{0}_ARCHIVE_APPEND",
             "CMAKE_{0}_ARCHIVE_CREATE",
@@ -204,7 +204,7 @@ namespace CMakeTools
 
         // Array of standard environment variables.  This list was taken from
         // http://en.wikipedia.org/wiki/Environment_variable.
-        private static string[] _standardEnvVariables = new string[]
+        private static readonly string[] _standardEnvVariables = new string[]
         {
             "ALLUSERSPROFILE",
             "APPDATA",

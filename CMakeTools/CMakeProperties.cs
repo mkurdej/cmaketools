@@ -20,7 +20,7 @@ namespace CMakeTools
     static class CMakeProperties
     {
         // Array of CMake target properties.
-        private static string[] _targetProperties = new string[]
+        private static readonly string[] _targetProperties = new string[]
         {
             "ARCHIVE_OUTPUT_DIRECTORY",
             "ARCHIVE_OUTPUT_NAME",
@@ -114,7 +114,7 @@ namespace CMakeTools
         };
 
         // Array of CMake source file properties.
-        private static string[] _sourceFileProperties = new string[]
+        private static readonly string[] _sourceFileProperties = new string[]
         {
             "ABSTRACT",
             "COMPILE_DEFINITIONS",
@@ -135,7 +135,7 @@ namespace CMakeTools
         };
 
         // Array of CMake test properties.
-        private static string[] _testProperties = new string[]
+        private static readonly string[] _testProperties = new string[]
         {
             "ATTACHED_FILES",
             "ATTACHED_FILES_ON_FAIL",
@@ -156,7 +156,7 @@ namespace CMakeTools
         };
 
         // Array of CMake directory properties.
-        private static string[] _directoryProperties = new string[]
+        private static readonly string[] _directoryProperties = new string[]
         {
             "ADDITIONAL_MAKE_CLEAN_FILES",
             "CACHE_VARIABLES",
@@ -181,7 +181,7 @@ namespace CMakeTools
 
         // Array of CMake instance properties that are not also properties of
         // global scope.
-        private static string[] _instanceOnlyProperties = new string[]
+        private static readonly string[] _instanceOnlyProperties = new string[]
         {
             "CACHE_VARIABLES",
             "COMMANDS",
@@ -192,10 +192,10 @@ namespace CMakeTools
 
         // List of all CMake instances properties.  This must be filled in by
         // the static constructor.
-        private static List<string> _instanceProperties = new List<string>();
+        private static readonly List<string> _instanceProperties = new List<string>();
         
         // Array of CMake properties of global scope.
-        private static string[] _globalProperties = new string[]
+        private static readonly string[] _globalProperties = new string[]
         {
             "ALLOW_DUPLICATE_CUSTOM_TARGETS",
             "DEBUG_CONFIGURATIONS",
@@ -221,8 +221,8 @@ namespace CMakeTools
         };
 
         // Map from CMake commands to standard properties.
-        private static Dictionary<CMakeCommandId, IEnumerable<string>> _commandProperties =
-            new Dictionary<CMakeCommandId, IEnumerable<string>>()
+        private static readonly Dictionary<CMakeCommandId, IEnumerable<string>>
+            _commandProperties = new Dictionary<CMakeCommandId, IEnumerable<string>>()
         {
             { CMakeCommandId.GetTargetProperty,         _targetProperties },
             { CMakeCommandId.SetTargetProperties,       _targetProperties },

@@ -21,7 +21,7 @@ namespace CMakeTools
     /// </summary>
     class CMakeSourceDeclarations : CMakeIncludeDeclarations
     {
-        private static string[] _fileExtensions = new string[]
+        private static readonly string[] _fileExtensions = new string[]
         {
             ".c",
             ".cc",
@@ -29,14 +29,14 @@ namespace CMakeTools
             ".cxx"
         };
 
-        private static string[] _addExecutableKeywords = new string[]
+        private static readonly string[] _addExecutableKeywords = new string[]
         {
             "EXCLUDE_FROM_ALL",
             "MACOSX_BUNDLE",
             "WIN32"
         };
 
-        private static string[] _addLibraryKeywords = new string[]
+        private static readonly string[] _addLibraryKeywords = new string[]
         {
             "EXCLUDE_FROM_ALL",
             "MODULE",
@@ -44,7 +44,7 @@ namespace CMakeTools
             "STATIC"
         };
 
-        private static Dictionary<CMakeCommandId, string[]> _commandKeywords =
+        private static readonly Dictionary<CMakeCommandId, string[]> _commandKeywords =
             new Dictionary<CMakeCommandId, string[]>()
         {
             { CMakeCommandId.AddExecutable, _addExecutableKeywords },

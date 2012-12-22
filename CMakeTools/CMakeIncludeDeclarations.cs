@@ -25,7 +25,7 @@ namespace CMakeTools
     class CMakeIncludeDeclarations : Declarations
     {
         // Default set of CMake modules to show in list if CMake is not installed.
-        private static string[] _defaultModules =
+        private static readonly string[] _defaultModules =
         {
             "AddFileDependencies",
             "BundleUtilities",
@@ -299,7 +299,7 @@ namespace CMakeTools
 
         // Modules used internally by CMake that should be excluded from the
         // member selection list.
-        private static string[] _internalModules =
+        private static readonly string[] _internalModules =
         {
             "CMakeDetermineCompilerABI",
             "CMakeDetermineCompilerId",

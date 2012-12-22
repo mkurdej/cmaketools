@@ -21,28 +21,28 @@ namespace CMakeTools
     public class CMakeMethods : Methods
     {
         // Parameters to the ADD_DEPENDENCIES command.
-        private static string[] _addDependenciesParams = new string[]
+        private static readonly string[] _addDependenciesParams = new string[]
         {
             "target_name",
             "depend_target1 depend_target2 ..."
         };
 
         // Parameters to the ADD_EXECUTABLE command.
-        private static string[] _addExecutableParams = new string[]
+        private static readonly string[] _addExecutableParams = new string[]
         {
             "name",
             "source1 source2 ..."
         };
 
         // Parameters to the ADD_SUBDIRECTORY command.
-        private static string[] _addSubdirectoryParams = new string[]
+        private static readonly string[] _addSubdirectoryParams = new string[]
         {
             "source_dir",
             "[binary_dir]"
         };
 
         // Parameters to the ADD_TEST command.
-        private static string[] _addTestParams = new string[]
+        private static readonly string[] _addTestParams = new string[]
         {
             "test_name",
             "exe_name",
@@ -50,72 +50,74 @@ namespace CMakeTools
         };
 
         // Parameters to the AUX_SOURCE_DIRECTORY command.
-        private static string[] _auxSourceDirectoryParams = new string[]
+        private static readonly string[] _auxSourceDirectoryParams = new string[]
         {
             "dir",
             "variable"
         };
 
         // Parameters to the CONFIGURE_FILE command.
-        private static string[] _configureFileParams = new string[]
+        private static readonly string[] _configureFileParams = new string[]
         {
             "input",
             "output"
         };
 
         // Parameters to the ENABLE_LANGUAGE command.
-        private static string[] _enableLanguageParams = new string[] { "language_name" };
+        private static readonly string[] _enableLanguageParams =
+            new string[] { "language_name" };
 
         // Parameters to the ENDFUNCTION command.
-        private static string[] _endFunctionParams = new string[] { "[name]" };
+        private static readonly string[] _endFunctionParams = new string[] { "[name]" };
 
         // Parameters to the ENDMACRO command.
-        private static string[] _endMacroParams = _endFunctionParams;
+        private static readonly string[] _endMacroParams = _endFunctionParams;
 
         // Parameters to the FIND_FILE command.
-        private static string[] _findFileParams = new string[]
+        private static readonly string[] _findFileParams = new string[]
         {
             "variable",
             "name",
             "[path1 path2 ...]"
         };
 
-        private static string[] _findPathParams = _findFileParams;
-        private static string[] _findProgramParams = _findFileParams;
+        private static readonly string[] _findPathParams = _findFileParams;
+        private static readonly string[] _findProgramParams = _findFileParams;
 
         // Parameters to the FLTK_WRAP_UI command.
-        private static string[] _fltkWrapUiParams = new string[]
+        private static readonly string[] _fltkWrapUiParams = new string[]
         {
             "resulting_library_name",
             "source1 source2 ..."
         };
 
         // Parameters to the FOREACH command.
-        private static string[] _forEachParams = new string[]
+        private static readonly string[] _forEachParams = new string[]
         {
             "loop_variable",
             "arg1 arg2 ..."
         };
 
         // Parameters to the FUNCTION command.
-        private static string[] _functionParams = new string[]
+        private static readonly string[] _functionParams = new string[]
         {
             "name",
             "arg1 arg2 ..."
         };
 
         // Parameters to the GET_CMAKE_PROPERTY command.
-        private static string[] _getCMakePropertyParams = new string[]
+        private static readonly string[] _getCMakePropertyParams = new string[]
         {
             "variable",
             "property"
         };
 
         // Parameters to the GET_DIRECTORY_PROPERTY command.
-        private static string[] _getDirectoryPropertyParams = _getCMakePropertyParams;
+        private static readonly string[] _getDirectoryPropertyParams =
+            _getCMakePropertyParams;
 
         // Parameters to the GET_FILENAME_COMPONENT command.
-        private static string[] _getFileNameComponentParams = new string[]
+        private static readonly string[] _getFileNameComponentParams = new string[]
         {
             "variable",
             "filename",
@@ -123,7 +125,7 @@ namespace CMakeTools
         };
 
         // Parameters to the GET_SOURCE_FILE_PROPERTY command.
-        private static string[] _getSourceFilePropertyParams = new string[]
+        private static readonly string[] _getSourceFilePropertyParams = new string[]
         {
             "variable",
             "filename",
@@ -131,7 +133,7 @@ namespace CMakeTools
         };
 
         // Parameters to the GET_TARGET_PROPERTY command.
-        private static string[] _getTargetPropertyParams = new string[]
+        private static readonly string[] _getTargetPropertyParams = new string[]
         {
             "variable",
             "target",
@@ -139,7 +141,7 @@ namespace CMakeTools
         };
 
         // Parameters to the GET_TEST_PROPERTY command.
-        private static string[] _getTestPropertyParams = new string[]
+        private static readonly string[] _getTestPropertyParams = new string[]
         {
             "test",
             "property",
@@ -147,13 +149,13 @@ namespace CMakeTools
         };
 
         // Parameters to the INCLUDE_DIRECTORIES command.
-        private static string[] _includeDirectoriesParams = new string[]
+        private static readonly string[] _includeDirectoriesParams = new string[]
         {
             "directory1 directory2 ..."
         };
 
         // Parameters to the INCLUDE_EXTERNAL_MSPROJECT command.
-        private static string[] _includeExternalMsProjectParams = new string[]
+        private static readonly string[] _includeExternalMsProjectParams = new string[]
         {
             "project_name",
             "location",
@@ -161,20 +163,20 @@ namespace CMakeTools
         };
 
         // Parameters to the INCLUDE_REGULAR_EXPRESSION command.
-        private static string[] _includeRegularExpressionParams = new string[]
+        private static readonly string[] _includeRegularExpressionParams = new string[]
         {
             "regex_match",
             "[regex_complain]"
         };
 
         // Parameters to the LINK_DIRECTORIES command.
-        private static string[] _linkDirectoriesParams = _includeDirectoriesParams;
+        private static readonly string[] _linkDirectoriesParams = _includeDirectoriesParams;
 
         // Parameters to the MACRO command.
-        private static string[] _macroParams = _functionParams;
+        private static readonly string[] _macroParams = _functionParams;
 
         // Parameters to the OPTION command.
-        private static string[] _optionParams = new string[]
+        private static readonly string[] _optionParams = new string[]
         {
             "variable",
             "help_string",
@@ -182,53 +184,54 @@ namespace CMakeTools
         };
 
         // Parameters to the PROJECT command.
-        private static string[] _projectParams = new string[]
+        private static readonly string[] _projectParams = new string[]
         {
             "project_name",
             "[language1 language2 ...]"
         };
 
         // Parameters to the SET command.
-        private static string[] _setParams = new string[]
+        private static readonly string[] _setParams = new string[]
         {
             "variable",
             "value"
         };
 
         // Parameters to the SOURCE_GROUP command.
-        private static string[] _sourceGroupParams = new string[]
+        private static readonly string[] _sourceGroupParams = new string[]
         {
             "name"
         };
 
         // Parameters to the TARGET_LINK_LIBRARIES command.
-        private static string[] _targetLinkLibrariesParams = new string[]
+        private static readonly string[] _targetLinkLibrariesParams = new string[]
         {
             "target",
             "item1 item2 ..."
         };
 
         // Parameters to the VARIABLE_WATCH command.
-        private static string[] _variableWatchParams = new string[]
+        private static readonly string[] _variableWatchParams = new string[]
         {
             "variable",
             "[command]"
         };
 
         // Parameters to commands that take a single expression.
-        private static string[] _expression = new string[] { "expression" };
+        private static readonly string[] _expression = new string[] { "expression" };
 
         // Parameters to commands that take an optional expression.
-        private static string[] _optionalExpression = new string[] { "[expression]" };
+        private static readonly string[] _optionalExpression =
+            new string[] { "[expression]" };
 
         // Parameters to commands that take a single variable name.
-        private static string[] _variable = new string[] { "variable" };
+        private static readonly string[] _variable = new string[] { "variable" };
 
         // Parameters to commands that take no parameters.
-        private static string[] _noParams = new string[] { };
+        private static readonly string[] _noParams = new string[] { };
 
         // Dictionary mapping command identifiers to arrays of parameter names.
-        private static Dictionary<CMakeCommandId, string[]> _parameters =
+        private static readonly Dictionary<CMakeCommandId, string[]> _parameters =
             new Dictionary<CMakeCommandId, string[]>
         {
             { CMakeCommandId.AddDependencies,           _addDependenciesParams },

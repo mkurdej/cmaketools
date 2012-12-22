@@ -16,7 +16,7 @@ namespace CMakeTools
 {
     class YesNoConverter : EnumToDisplayNameConverter<bool>
     {
-        private static Dictionary<bool, string> _map =
+        private static readonly Dictionary<bool, string> _map =
             new Dictionary<bool, string>()
         {
             { true, CMakeStrings.Yes },

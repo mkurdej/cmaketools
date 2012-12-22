@@ -23,12 +23,12 @@ namespace CMakeTools
     class CMakeSubdirectoryDeclarations : CMakeIncludeDeclarations
     {
         // Directories created by CMake that should not be included in the build.
-        private static string[] _internalDirectories = new string[]
+        private static readonly string[] _internalDirectories = new string[]
         {
             "CMakeFiles"
         };
 
-        private static char[] _quoteChars = new char[] { '#', '(', ')' };
+        private static readonly char[] _quoteChars = new char[] { '#', '(', ')' };
 
         private bool _requireCMakeLists;
 

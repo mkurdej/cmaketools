@@ -108,7 +108,7 @@ namespace CMakeTools
     public static class CMakeKeywords
     {
         // Array of CMake commands.  These should be in alphabetical order.
-        private static string[] _commands = new string[]
+        private static readonly string[] _commands = new string[]
         {
             "add_custom_command",
             "add_custom_target",
@@ -192,7 +192,7 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the ADD_CUSTOM_COMMAND command.
-        private static string[] _addCustomCommandKeywords = new string[]
+        private static readonly string[] _addCustomCommandKeywords = new string[]
         {
             "APPEND",
             "ARGS",
@@ -211,7 +211,7 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the ADD_CUSTOM_TARGET command.
-        private static string[] _addCustomTargetKeywords = new string[]
+        private static readonly string[] _addCustomTargetKeywords = new string[]
         {
             "ALL",
             "COMMAND",
@@ -223,7 +223,7 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the ADD_EXECUTABLE command.
-        private static string[] _addExecutableKeywords = new string[]
+        private static readonly string[] _addExecutableKeywords = new string[]
         {
             "EXCLUDE_FROM_ALL",
             "MACOSX_BUNDLE",
@@ -231,7 +231,7 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the ADD_LIBRARY command.
-        private static string[] _addLibraryKeywords = new string[]
+        private static readonly string[] _addLibraryKeywords = new string[]
         {
             "EXCLUDE_FROM_ALL",
             "IMPORTED",
@@ -242,13 +242,13 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the ADD_SUBDIRECTORY command.
-        private static string[] _addSubdirectoryKeywords = new string[]
+        private static readonly string[] _addSubdirectoryKeywords = new string[]
         {
             "EXCLUDE_FROM_ALL"
         };
 
         // Array of keywords used with the ADD_TEST command.
-        private static string[] _addTestKeywords = new string[]
+        private static readonly string[] _addTestKeywords = new string[]
         {
             "COMMAND",
             "CONFIGURATIONS",
@@ -257,7 +257,7 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the BUILD_COMMAND command.
-        private static string[] _buildCommandKeywords = new string[]
+        private static readonly string[] _buildCommandKeywords = new string[]
         {
             "CONFIGURATION",
             "PROJECT_NAME",
@@ -265,14 +265,14 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the CMAKE_MINIMUM_REQUIRED command.
-        private static string[] _cmakeMinimumRequiredKeywords = new string[]
+        private static readonly string[] _cmakeMinimumRequiredKeywords = new string[]
         {
             "FATAL_ERROR",
             "VERSION"
         };
 
         // Array of keywords used with the CMAKE_POLICY command.
-        private static string[] _cmakePolicyKeywords = new string[]
+        private static readonly string[] _cmakePolicyKeywords = new string[]
         {
             "GET",
             "NEW",
@@ -284,7 +284,7 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the CONFIGURE_FILE command.
-        private static string[] _configureFileKeywords = new string[]
+        private static readonly string[] _configureFileKeywords = new string[]
         {
             "COPYONLY",
             "CRLF",
@@ -297,14 +297,14 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the CREATE_TEST_SOURCELIST command.
-        private static string[] _createTestSourcelistKeywords = new string[]
+        private static readonly string[] _createTestSourcelistKeywords = new string[]
         {
             "EXTRA_INCLUDE",
             "FUNCTION"
         };
 
         // Array of keywords used with the DEFINE_PROPERTY command.
-        private static string[] _definePropertyKeywords = new string[]
+        private static readonly string[] _definePropertyKeywords = new string[]
         {
             "BRIEF_DOCS",
             "CACHED_VARIABLE",
@@ -320,13 +320,13 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the ENABLE_LANGUAGE command.
-        private static string[] _enableLanguageKeywords = new string[]
+        private static readonly string[] _enableLanguageKeywords = new string[]
         {
             "OPTIONAL"
         };
 
         // Array of keywords used with the EXECUTE_PROCESS command.
-        private static string[] _executeProcessKeywords = new string[]
+        private static readonly string[] _executeProcessKeywords = new string[]
         {
             "COMMAND",
             "ERROR_FILE",
@@ -344,7 +344,7 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the EXPORT command.
-        private static string[] _exportKeywords = new string[]
+        private static readonly string[] _exportKeywords = new string[]
         {
             "APPEND",
             "FILE",
@@ -354,7 +354,7 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the FILE command.
-        private static string[] _fileKeywords = new string[]
+        private static readonly string[] _fileKeywords = new string[]
         {
             "APPEND",
             "COPY",
@@ -421,7 +421,7 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the FIND_FILE command.
-        private static string[] _findFileKeywords = new string[]
+        private static readonly string[] _findFileKeywords = new string[]
         {
             "CMAKE_FIND_ROOT_PATH_BOTH",
             "DOC",
@@ -439,12 +439,12 @@ namespace CMakeTools
             "PATHS"
         };
 
-        private static string[] _findLibraryKeywords = _findFileKeywords;
-        private static string[] _findPathKeywords = _findFileKeywords;
-        private static string[] _findProgramKeywords = _findFileKeywords;
+        private static readonly string[] _findLibraryKeywords = _findFileKeywords;
+        private static readonly string[] _findPathKeywords = _findFileKeywords;
+        private static readonly string[] _findProgramKeywords = _findFileKeywords;
 
         // Array of keywords used with the FIND_PACKAGE command.
-        private static string[] _findPackageKeywords = new string[]
+        private static readonly string[] _findPackageKeywords = new string[]
         {
             "CMAKE_FIND_ROOT_PATH_BOTH",
             "COMPONENTS",
@@ -471,7 +471,7 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the FOREACH command.
-        private static string[] _forEachKeywords = new string[]
+        private static readonly string[] _forEachKeywords = new string[]
         {
             "IN",
             "ITEMS",
@@ -479,17 +479,17 @@ namespace CMakeTools
             "RANGE"
         };
 
-        private static string[] _endForEachKeywords = _forEachKeywords;
+        private static readonly string[] _endForEachKeywords = _forEachKeywords;
 
         // Array of keywords used with the GET_DIRECTORY_PROPERTY command.
-        private static string[] _getDirectoryPropertyKeywords = new string[]
+        private static readonly string[] _getDirectoryPropertyKeywords = new string[]
         {
             "DEFINITION",
             "DIRECTORY"
         };
         
         // Array of keywords used with the GET_FILENAME_COMPONENT command.
-        private static string[] _getFileNameComponentKeywords = new string[]
+        private static readonly string[] _getFileNameComponentKeywords = new string[]
         {
             "ABSOLUTE",
             "CACHE",
@@ -503,7 +503,7 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the GET_PROPERTY command.
-        private static string[] _getPropertyKeywords = new string[]
+        private static readonly string[] _getPropertyKeywords = new string[]
         {
             "BRIEF_DOCS",
             "CACHE",
@@ -520,7 +520,7 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the IF command.
-        private static string[] _ifKeywords = new string[]
+        private static readonly string[] _ifKeywords = new string[]
         {
             "AND",
             "COMMAND",
@@ -546,14 +546,14 @@ namespace CMakeTools
             "VERSION_LESS"
         };
 
-        private static string[] _endIfKeywords = _ifKeywords;
-        private static string[] _elseKeywords = _ifKeywords;
-        private static string[] _elseIfKeywords = _ifKeywords;
-        private static string[] _whileKeywords = _ifKeywords;
-        private static string[] _endWhileKeywords = _ifKeywords;
+        private static readonly string[] _endIfKeywords = _ifKeywords;
+        private static readonly string[] _elseKeywords = _ifKeywords;
+        private static readonly string[] _elseIfKeywords = _ifKeywords;
+        private static readonly string[] _whileKeywords = _ifKeywords;
+        private static readonly string[] _endWhileKeywords = _ifKeywords;
 
         // Array of keywords used with the INCLUDE command.
-        private static string[] _includeKeywords = new string[]
+        private static readonly string[] _includeKeywords = new string[]
         {
             "NO_POLICY_SCOPE",
             "OPTIONAL",
@@ -561,7 +561,7 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the INCLUDE_DIRECTORIES command.
-        private static string[] _includeDirectoriesKeywords = new string[]
+        private static readonly string[] _includeDirectoriesKeywords = new string[]
         {
             "AFTER",
             "BEFORE",
@@ -569,7 +569,7 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the INSTALL command.
-        private static string[] _installKeywords = new string[]
+        private static readonly string[] _installKeywords = new string[]
         {
             "ARCHIVE",
             "BUNDLE",
@@ -616,7 +616,7 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the LIST command.
-        private static string[] _listKeywords = new string[]
+        private static readonly string[] _listKeywords = new string[]
         {
             "APPEND",
             "FIND",
@@ -631,7 +631,7 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the LOAD_CACHE command.
-        private static string[] _loadCacheKeywords = new string[]
+        private static readonly string[] _loadCacheKeywords = new string[]
         {
             "EXCLUDE",
             "INCLUDE_INTERNALS",
@@ -639,20 +639,20 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the LOAD_COMMAND command.
-        private static string[] _loadCommandKeywords = new string[]
+        private static readonly string[] _loadCommandKeywords = new string[]
         {
             "COMMAND_NAME"
         };
 
         // Array of keywords used with the MARK_AS_ADVANCED command.
-        private static string[] _markAsAdvancedKeywords = new string[]
+        private static readonly string[] _markAsAdvancedKeywords = new string[]
         {
             "CLEAR",
             "FORCE"
         };
 
         // Array of keywords used with the MESSAGE command.
-        private static string[] _messageKeywords = new string[]
+        private static readonly string[] _messageKeywords = new string[]
         {
             "AUTHOR_WARNING",
             "FATAL_ERROR",
@@ -662,21 +662,21 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the OPTION command.
-        private static string[] _optionKeywords = new string[]
+        private static readonly string[] _optionKeywords = new string[]
         {
             "OFF",
             "ON"
         };
 
         // Array of keywords used with the SEPARATE_ARGUMENTS command.
-        private static string[] _separateArgumentsKeywords = new string[]
+        private static readonly string[] _separateArgumentsKeywords = new string[]
         {
             "UNIX_COMMAND",
             "WINDOWS_COMMAND"
         };
 
         // Array of keywords used with the SET command.
-        private static string[] _setKeywords = new string[]
+        private static readonly string[] _setKeywords = new string[]
         {
             "BOOL",
             "CACHE",
@@ -689,20 +689,20 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the SET_DIRECTORY_PROPERTIES command.
-        private static string[] _setDirectoryPropertiesKeywords = new string[]
+        private static readonly string[] _setDirectoryPropertiesKeywords = new string[]
         {
             "PROPERTIES"
         };
 
-        private static string[] _setSourceFilesPropertiesKeywords =
+        private static readonly string[] _setSourceFilesPropertiesKeywords =
             _setDirectoryPropertiesKeywords;
-        private static string[] _setTargetPropertiesKeywords =
+        private static readonly string[] _setTargetPropertiesKeywords =
             _setDirectoryPropertiesKeywords;
-        private static string[] _setTestsPropertiesKeywords =
+        private static readonly string[] _setTestsPropertiesKeywords =
             _setDirectoryPropertiesKeywords;
 
         // Array of keywords used with the SET_PROPERTY command.
-        private static string[] _setPropertyKeywords = new string[]
+        private static readonly string[] _setPropertyKeywords = new string[]
         {
             "APPEND",
             "APPEND_STRING",
@@ -716,14 +716,14 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the SOURCE_GROUP command.
-        private static string[] _sourceGroupKeywords = new string[]
+        private static readonly string[] _sourceGroupKeywords = new string[]
         {
             "FILES",
             "REGULAR_EXPRESSION"
         };
 
         // Array of keywords used with the STRING command.
-        private static string[] _stringKeywords = new string[]
+        private static readonly string[] _stringKeywords = new string[]
         {
             "ALPHABET",
             "ASCII",
@@ -756,7 +756,7 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the TARGET_LINK_LIBRARIES command.
-        private static string[] _targetLinkLibrariesKeywords = new string[]
+        private static readonly string[] _targetLinkLibrariesKeywords = new string[]
         {
             "LINK_INTERFACE_LIBRARIES",
             "LINK_PRIVATE",
@@ -764,7 +764,7 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the TRY_COMPILE command.
-        private static string[] _tryCompileKeywords = new string[]
+        private static readonly string[] _tryCompileKeywords = new string[]
         {
             "CMAKE_FLAGS",
             "COMPILE_DEFINITIONS",
@@ -773,7 +773,7 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the TRY_RUN command.
-        private static string[] _tryRunKeywords = new string[]
+        private static readonly string[] _tryRunKeywords = new string[]
         {
             "ARGS",
             "CMAKE_FLAGS",
@@ -784,42 +784,42 @@ namespace CMakeTools
         };
 
         // Array of keywords used with the UNSET command.
-        private static string[] _unsetKeywords = new string[]
+        private static readonly string[] _unsetKeywords = new string[]
         {
             "CACHE"
         };
 
         // Dummy arrays for commands that have no associated keywords.
-        private static string[] _addDefinitionsKeywords = null;
-        private static string[] _addDependenciesKeywords = null;
-        private static string[] _auxSourceDirectoriesKeywords = null;
-        private static string[] _breakKeywords = null;
-        private static string[] _enableTestingKeywords = null;
-        private static string[] _endFunctionKeywords = null;
-        private static string[] _endMacroKeywords = null;
-        private static string[] _fltkWrapUiKeywords = null;
-        private static string[] _functionKeywords = null;
-        private static string[] _getCMakePropertyKeywords = null;
-        private static string[] _getSourceFilePropertyKeywords = null;
-        private static string[] _getTargetPropertyKeywords = null;
-        private static string[] _getTestPropertyKeywords = null;
-        private static string[] _includeExternalMsProjectKeywords = null;
-        private static string[] _includeRegularExpressionKeywords = null;
-        private static string[] _linkDirectoryiesKeywords = null;
-        private static string[] _macroKeywords = null;
-        private static string[] _mathKeywords = null;
-        private static string[] _projectKeywords = null;
-        private static string[] _qtWrapCppKeywords = null;
-        private static string[] _qtWrapUiKeywords = null;
-        private static string[] _removeDefinitionsKeywords = null;
-        private static string[] _returnKeywords = null;
-        private static string[] _siteNameKeywords = null;
-        private static string[] _variableWatchKeywords = null;
+        private static readonly string[] _addDefinitionsKeywords = null;
+        private static readonly string[] _addDependenciesKeywords = null;
+        private static readonly string[] _auxSourceDirectoriesKeywords = null;
+        private static readonly string[] _breakKeywords = null;
+        private static readonly string[] _enableTestingKeywords = null;
+        private static readonly string[] _endFunctionKeywords = null;
+        private static readonly string[] _endMacroKeywords = null;
+        private static readonly string[] _fltkWrapUiKeywords = null;
+        private static readonly string[] _functionKeywords = null;
+        private static readonly string[] _getCMakePropertyKeywords = null;
+        private static readonly string[] _getSourceFilePropertyKeywords = null;
+        private static readonly string[] _getTargetPropertyKeywords = null;
+        private static readonly string[] _getTestPropertyKeywords = null;
+        private static readonly string[] _includeExternalMsProjectKeywords = null;
+        private static readonly string[] _includeRegularExpressionKeywords = null;
+        private static readonly string[] _linkDirectoryiesKeywords = null;
+        private static readonly string[] _macroKeywords = null;
+        private static readonly string[] _mathKeywords = null;
+        private static readonly string[] _projectKeywords = null;
+        private static readonly string[] _qtWrapCppKeywords = null;
+        private static readonly string[] _qtWrapUiKeywords = null;
+        private static readonly string[] _removeDefinitionsKeywords = null;
+        private static readonly string[] _returnKeywords = null;
+        private static readonly string[] _siteNameKeywords = null;
+        private static readonly string[] _variableWatchKeywords = null;
 
         // Arrays of keywords that appear in parentheses after other keywords.
         // The items in this list must be in the same order as the their corresponding
         // keyword identifier in the CMakeKeywordId enumeration.
-        private static string[][] _keywordArrays = new string[][]
+        private static readonly string[][] _keywordArrays = new string[][]
         {
             _addCustomCommandKeywords,
             _addCustomTargetKeywords,
@@ -904,11 +904,11 @@ namespace CMakeTools
 
         // Array of Booleans indicating whether a command should trigger member
         // selection after the opening parenthesis.
-        private static bool[] _memberSelectionCommands;
+        private static readonly bool[] _memberSelectionCommands;
 
         // Array of Booleans indicating whether a command should trigger member
         // selection after whitespace.
-        private static bool[] _memberSelectionWSCommands;
+        private static readonly bool[] _memberSelectionWSCommands;
 
         static CMakeKeywords()
         {

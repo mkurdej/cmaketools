@@ -26,7 +26,7 @@ namespace CMakeTools
 
         // Map from CMake commands to factory methods to create their corresponding
         // declarations objects for use after an opening parenthesis.
-        private static Dictionary<CMakeCommandId, FactoryMethod> _methods =
+        private readonly static Dictionary<CMakeCommandId, FactoryMethod> _methods =
             new Dictionary<CMakeCommandId, FactoryMethod>()
         {
             { CMakeCommandId.Include,               CreateIncludeDeclarations },
@@ -39,7 +39,7 @@ namespace CMakeTools
 
         // Map from CMake commands to factory methods to create their corresponding
         // declarations object for use after whitespace.
-        private static Dictionary<CMakeCommandId, FactoryMethod> _wsMethods =
+        private readonly static Dictionary<CMakeCommandId, FactoryMethod> _wsMethods =
             new Dictionary<CMakeCommandId, FactoryMethod>()
         {
             { CMakeCommandId.AddExecutable,             CreateSourceDeclarations },
