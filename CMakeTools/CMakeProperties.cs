@@ -134,13 +134,62 @@ namespace CMakeTools
             "WRAP_EXCLUDE"
         };
 
+        // Array of CMake instance properties that are not also properties of
+        // global scope.
+        private static string[] _instanceOnlyProperties = new string[]
+        {
+            "CACHE_VARIABLES",
+            "COMMANDS",
+            "COMPONENTS",
+            "MACROS",
+            "VARIABLES"
+        };
+
+        // List of all CMake instances properties.  This must be filled in by
+        // the static constructor.
+        private static List<string> _instanceProperties = new List<string>();
+        
+        // Array of CMake properties of global scope.
+        private static string[] _globalProperties = new string[]
+        {
+            "ALLOW_DUPLICATE_CUSTOM_TARGETS",
+            "DEBUG_CONFIGURATIONS",
+            "DISABLED_FEATURES",
+            "ENABLED_FEATURES",
+            "ENABLED_LANGUAGES",
+            "FIND_LIBRARY_USE_LIB64_PATHS",
+            "FIND_LIBRARY_USE_OPENBSD_VERSIONING",
+            "GLOBAL_DEPENDS_DEBUG_MODE",
+            "GLOBAL_DEPENDS_NO_CYCLES",
+            "IN_TRY_COMPILE",
+            "PACKAGES_FOUND",
+            "PACKAGES_NOT_FOUND",
+            "PREDEFINED_TARGETS_FOLDER",
+            "REPORT_UNDEFINED_PROPERTIES",
+            "RULE_LAUNCH_COMPILE",
+            "RULE_LAUNCH_CUSTOM",
+            "RULE_LAUNCH_LINK",
+            "RULE_MESSAGES",
+            "TARGET_ARCHIVES_MAY_BE_SHARED_LIBS",
+            "TARGET_SUPPORTES_SHARED_LIBS",
+            "USE_FOLDERS"
+        };
+
         // Map from CMake commands to standard properties.
-        private static Dictionary<CMakeCommandId, string[]> _commandProperties =
-            new Dictionary<CMakeCommandId, string[]>()
+        private static Dictionary<CMakeCommandId, IEnumerable<string>> _commandProperties =
+            new Dictionary<CMakeCommandId, IEnumerable<string>>()
         {
             { CMakeCommandId.GetTargetProperty,     _targetProperties },
-            { CMakeCommandId.GetSourceFileProperty, _sourceFileProperties }
+            { CMakeCommandId.GetSourceFileProperty, _sourceFileProperties },
+            { CMakeCommandId.GetCMakeProperty,      _instanceProperties }
         };
+
+        static CMakeProperties()
+        {
+            // All properties of global scope are also properties of the CMake instance.
+            _instanceProperties.AddRange(_instanceOnlyProperties);
+            _instanceProperties.AddRange(_globalProperties);
+        }
 
         /// <summary>
         /// Get the CMake properties to be displayed for use with the specified command.
@@ -166,6 +215,8 @@ namespace CMakeTools
         {
             switch (id)
             {
+            case CMakeCommandId.GetCMakeProperty:
+                return 1;
             case CMakeCommandId.GetTargetProperty:
             case CMakeCommandId.GetSourceFileProperty:
                 return 2;

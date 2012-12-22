@@ -46,7 +46,8 @@ namespace CMakeTools
             { CMakeCommandId.AddLibrary,            CreateSourceDeclarations },
             { CMakeCommandId.AddDependencies,       CreateTargetDeclarations },
             { CMakeCommandId.GetTargetProperty,     CreateGetXPropertyDeclarations },
-            { CMakeCommandId.GetSourceFileProperty, CreateGetXPropertyDeclarations }
+            { CMakeCommandId.GetSourceFileProperty, CreateGetXPropertyDeclarations },
+            { CMakeCommandId.GetCMakeProperty,      CreateGetXPropertyDeclarations }
         };
 
         static CMakeDeclarationsFactory()
@@ -129,8 +130,12 @@ namespace CMakeTools
                 IEnumerable<string> properties = CMakeProperties.GetPropertiesForCommand(id);
                 if (properties != null)
                 {
+                    // Sort the properties
+                    List<string> propertiesList = properties.ToList();
+                    propertiesList.Sort();
+
                     // Use the icon index for a property.
-                    return new SimpleDeclarations(properties.ToList(), 102);
+                    return new SimpleDeclarations(propertiesList, 102);
                 }
             }
             return null;
