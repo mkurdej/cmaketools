@@ -134,6 +134,27 @@ namespace CMakeTools
             "WRAP_EXCLUDE"
         };
 
+        // Array of CMake test properties.
+        private static string[] _testProperties = new string[]
+        {
+            "ATTACHED_FILES",
+            "ATTACHED_FILES_ON_FAIL",
+            "COST",
+            "DEPENDS",
+            "ENVIRONMENT",
+            "FAIL_REGULAR_EXPRESSION",
+            "LABELS",
+            "MEASUREMENT",
+            "PASS_REGULAR_EXPRESSION",
+            "PROCESSORS",
+            "REQUIRED_FILES",
+            "RESOURCE_LOCK",
+            "RUN_SERIAL",
+            "TIMEOUT",
+            "WILL_FAIL",
+            "WORKING_DIRECTORY"
+        };
+
         // Array of CMake instance properties that are not also properties of
         // global scope.
         private static string[] _instanceOnlyProperties = new string[]
@@ -181,6 +202,7 @@ namespace CMakeTools
         {
             { CMakeCommandId.GetTargetProperty,     _targetProperties },
             { CMakeCommandId.GetSourceFileProperty, _sourceFileProperties },
+            { CMakeCommandId.GetTestProperty,       _testProperties },
             { CMakeCommandId.GetCMakeProperty,      _instanceProperties }
         };
 
@@ -215,6 +237,7 @@ namespace CMakeTools
         {
             switch (id)
             {
+            case CMakeCommandId.GetTestProperty:
             case CMakeCommandId.GetCMakeProperty:
                 return 1;
             case CMakeCommandId.GetTargetProperty:

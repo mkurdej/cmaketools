@@ -47,6 +47,7 @@ namespace CMakeTools
             { CMakeCommandId.AddDependencies,       CreateTargetDeclarations },
             { CMakeCommandId.GetTargetProperty,     CreateGetXPropertyDeclarations },
             { CMakeCommandId.GetSourceFileProperty, CreateGetXPropertyDeclarations },
+            { CMakeCommandId.GetTestProperty,       CreateGetXPropertyDeclarations },
             { CMakeCommandId.GetCMakeProperty,      CreateGetXPropertyDeclarations }
         };
 
