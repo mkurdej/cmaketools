@@ -200,10 +200,13 @@ namespace CMakeTools
         private static Dictionary<CMakeCommandId, IEnumerable<string>> _commandProperties =
             new Dictionary<CMakeCommandId, IEnumerable<string>>()
         {
-            { CMakeCommandId.GetTargetProperty,     _targetProperties },
-            { CMakeCommandId.GetSourceFileProperty, _sourceFileProperties },
-            { CMakeCommandId.GetTestProperty,       _testProperties },
-            { CMakeCommandId.GetCMakeProperty,      _instanceProperties }
+            { CMakeCommandId.GetTargetProperty,         _targetProperties },
+            { CMakeCommandId.SetTargetProperties,       _targetProperties },
+            { CMakeCommandId.GetSourceFileProperty,     _sourceFileProperties },
+            { CMakeCommandId.SetSourceFilesProperties,  _sourceFileProperties },
+            { CMakeCommandId.GetTestProperty,           _testProperties },
+            { CMakeCommandId.SetTestsProperties,        _testProperties },
+            { CMakeCommandId.GetCMakeProperty,          _instanceProperties }
         };
 
         static CMakeProperties()

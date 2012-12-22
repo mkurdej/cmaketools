@@ -42,13 +42,16 @@ namespace CMakeTools
         private static Dictionary<CMakeCommandId, FactoryMethod> _wsMethods =
             new Dictionary<CMakeCommandId, FactoryMethod>()
         {
-            { CMakeCommandId.AddExecutable,         CreateSourceDeclarations },
-            { CMakeCommandId.AddLibrary,            CreateSourceDeclarations },
-            { CMakeCommandId.AddDependencies,       CreateTargetDeclarations },
-            { CMakeCommandId.GetTargetProperty,     CreateGetXPropertyDeclarations },
-            { CMakeCommandId.GetSourceFileProperty, CreateGetXPropertyDeclarations },
-            { CMakeCommandId.GetTestProperty,       CreateGetXPropertyDeclarations },
-            { CMakeCommandId.GetCMakeProperty,      CreateGetXPropertyDeclarations }
+            { CMakeCommandId.AddExecutable,             CreateSourceDeclarations },
+            { CMakeCommandId.AddLibrary,                CreateSourceDeclarations },
+            { CMakeCommandId.AddDependencies,           CreateTargetDeclarations },
+            { CMakeCommandId.GetTargetProperty,         CreateGetXPropertyDeclarations },
+            { CMakeCommandId.GetSourceFileProperty,     CreateGetXPropertyDeclarations },
+            { CMakeCommandId.GetTestProperty,           CreateGetXPropertyDeclarations },
+            { CMakeCommandId.GetCMakeProperty,          CreateGetXPropertyDeclarations },
+            { CMakeCommandId.SetTargetProperties,       CreateSetXPropertyDeclarations },
+            { CMakeCommandId.SetSourceFilesProperties,  CreateSetXPropertyDeclarations },
+            { CMakeCommandId.SetTestsProperties,        CreateSetXPropertyDeclarations }
         };
 
         static CMakeDeclarationsFactory()
@@ -131,12 +134,36 @@ namespace CMakeTools
                 IEnumerable<string> properties = CMakeProperties.GetPropertiesForCommand(id);
                 if (properties != null)
                 {
-                    // Sort the properties
+                    // Sort the properties.
                     List<string> propertiesList = properties.ToList();
                     propertiesList.Sort();
 
                     // Use the icon index for a property.
                     return new SimpleDeclarations(propertiesList, 102);
+                }
+            }
+            return null;
+        }
+
+        private static Declarations CreateSetXPropertyDeclarations(CMakeCommandId id,
+            ParseRequest req, Source source, List<string> priorParameters)
+        {
+            if (priorParameters != null)
+            {
+                int index = priorParameters.FindIndex(x => x.Equals("PROPERTIES"));
+                if (index >= 0 && (priorParameters.Count - index) % 2 == 1)
+                {
+                    IEnumerable<string> properties =
+                        CMakeProperties.GetPropertiesForCommand(id);
+                    if (properties != null)
+                    {
+                        // Sort the properties.
+                        List<string> propertiesList = properties.ToList();
+                        propertiesList.Sort();
+
+                        // Use the icon index for a property.
+                        return new SimpleDeclarations(propertiesList, 102);
+                    }
                 }
             }
             return null;
