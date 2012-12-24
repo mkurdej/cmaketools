@@ -21,7 +21,7 @@ namespace CMakeTools
     /// </summary>
     static class CMakeDeclarationsFactory
     {
-        private delegate Declarations FactoryMethod(CMakeCommandId id,
+        private delegate CMakeItemDeclarations FactoryMethod(CMakeCommandId id,
             ParseRequest req, Source source, List<string> priorParameters);
 
         // Map from CMake commands to factory methods to create their corresponding
@@ -58,6 +58,28 @@ namespace CMakeTools
             { CMakeCommandId.SetDirectoryProperties,    CreateSetXPropertyDeclarations }
         };
 
+        private static readonly string[] _addExecutableKeywords = new string[]
+        {
+            "EXCLUDE_FROM_ALL",
+            "MACOSX_BUNDLE",
+            "WIN32"
+        };
+
+        private static readonly string[] _addLibraryKeywords = new string[]
+        {
+            "EXCLUDE_FROM_ALL",
+            "MODULE",
+            "SHARED",
+            "STATIC"
+        };
+
+        private static readonly Dictionary<CMakeCommandId, string[]> _commandKeywords =
+            new Dictionary<CMakeCommandId, string[]>()
+        {
+            { CMakeCommandId.AddExecutable, _addExecutableKeywords },
+            { CMakeCommandId.AddLibrary,    _addLibraryKeywords }
+        };
+
         static CMakeDeclarationsFactory()
         {
             // Display subcommands for all commands that have them.
@@ -69,20 +91,21 @@ namespace CMakeTools
             }
         }
 
-        private static Declarations CreateIncludeDeclarations(CMakeCommandId id,
+        private static CMakeItemDeclarations CreateIncludeDeclarations(CMakeCommandId id,
             ParseRequest req, Source source, List<string> priorParameters)
         {
             return new CMakeIncludeDeclarations(req.FileName);
         }
 
-        private static Declarations CreatePackageDeclarations(CMakeCommandId id,
+        private static CMakeItemDeclarations CreatePackageDeclarations(CMakeCommandId id,
             ParseRequest req, Source source, List<string> priorParameters)
         {
             return new CMakePackageDeclarations(req.FileName);
         }
 
-        private static Declarations CreateSubdirectoryDeclarations(CMakeCommandId id,
-            ParseRequest req, Source source, List<string> priorParameters)
+        private static CMakeItemDeclarations CreateSubdirectoryDeclarations(
+            CMakeCommandId id, ParseRequest req, Source source,
+            List<string> priorParameters)
         {
             bool requireCMakeLists =
                 (CMakePackage.Instance.CMakeOptionPage.ShowSubdirectories ==
@@ -90,13 +113,14 @@ namespace CMakeTools
             return new CMakeSubdirectoryDeclarations(req.FileName, requireCMakeLists);
         }
 
-        private static Declarations CreateLanguageDeclarations(CMakeCommandId id,
-            ParseRequest req, Source source, List<string> priorParameters)
+        private static CMakeItemDeclarations CreateLanguageDeclarations(
+            CMakeCommandId id, ParseRequest req, Source source,
+            List<string> priorParameters)
         {
             return new CMakeLanguageDeclarations(req.FileName);
         }
 
-        private static Declarations CreateTargetDeclarations(CMakeCommandId id,
+        private static CMakeItemDeclarations CreateTargetDeclarations(CMakeCommandId id,
             ParseRequest req, Source source, List<string> priorParameters)
         {
             List<string> targets = CMakeParsing.ParseForTargetNames(source.GetLines());
@@ -111,8 +135,9 @@ namespace CMakeTools
             return decls;
         }
 
-        private static Declarations CreateSubcommandDeclarations(CMakeCommandId id,
-            ParseRequest req, Source source, List<string> priorParameters)
+        private static CMakeItemDeclarations CreateSubcommandDeclarations(
+            CMakeCommandId id, ParseRequest req, Source source,
+            List<string> priorParameters)
         {
             IEnumerable<string> subcommands = CMakeSubcommandMethods.GetSubcommands(id);
             if (subcommands == null)
@@ -125,14 +150,28 @@ namespace CMakeTools
             return decls;
         }
 
-        private static Declarations CreateSourceDeclarations(CMakeCommandId id,
+        private static CMakeItemDeclarations CreateSourceDeclarations(CMakeCommandId id,
             ParseRequest req, Source source, List<string> priorParameters)
         {
-            return new CMakeSourceDeclarations(req.FileName, priorParameters, id);
+            CMakeSourceDeclarations decls = new CMakeSourceDeclarations(req.FileName);
+            if (_commandKeywords.ContainsKey(id))
+            {
+                decls.AddItems(_commandKeywords[id],
+                    CMakeItemDeclarations.ItemType.Command);
+            }
+            if (id == CMakeCommandId.AddExecutable || id == CMakeCommandId.AddLibrary)
+            {
+                // Exclude all files that already appear in the parameter list, except
+                // for the first token, which is the name of the executable to be
+                // generated.
+                decls.ExcludeItems(priorParameters.Skip(1));
+            }
+            return decls;
         }
 
-        private static Declarations CreateGetXPropertyDeclarations(CMakeCommandId id,
-            ParseRequest req, Source source, List<string> priorParameters)
+        private static CMakeItemDeclarations CreateGetXPropertyDeclarations(
+            CMakeCommandId id, ParseRequest req, Source source,
+            List<string> priorParameters)
         {
             if (priorParameters != null &&
                 priorParameters.Count == CMakeProperties.GetPropertyParameterIndex(id))
@@ -148,8 +187,9 @@ namespace CMakeTools
             return null;
         }
 
-        private static Declarations CreateSetXPropertyDeclarations(CMakeCommandId id,
-            ParseRequest req, Source source, List<string> priorParameters)
+        private static CMakeItemDeclarations CreateSetXPropertyDeclarations(
+            CMakeCommandId id, ParseRequest req, Source source, 
+            List<string> priorParameters)
         {
             bool afterPropsKeyword = false;
             if (priorParameters != null)
@@ -197,7 +237,7 @@ namespace CMakeTools
         /// parse request, if it was triggered by whitespace, or null otherwise.
         /// </param>
         /// <returns>The newly created declarations object.</returns>
-        public static Declarations CreateDeclarations(CMakeCommandId id,
+        public static CMakeItemDeclarations CreateDeclarations(CMakeCommandId id,
             ParseRequest req, Source source, List<string> priorParameters = null)
         {
             Dictionary<CMakeCommandId, FactoryMethod> map =

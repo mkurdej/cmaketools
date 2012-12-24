@@ -29,47 +29,9 @@ namespace CMakeTools
             ".cxx"
         };
 
-        private static readonly string[] _addExecutableKeywords = new string[]
-        {
-            "EXCLUDE_FROM_ALL",
-            "MACOSX_BUNDLE",
-            "WIN32"
-        };
-
-        private static readonly string[] _addLibraryKeywords = new string[]
-        {
-            "EXCLUDE_FROM_ALL",
-            "MODULE",
-            "SHARED",
-            "STATIC"
-        };
-
-        private static readonly Dictionary<CMakeCommandId, string[]> _commandKeywords =
-            new Dictionary<CMakeCommandId, string[]>()
-        {
-            { CMakeCommandId.AddExecutable, _addExecutableKeywords },
-            { CMakeCommandId.AddLibrary,    _addLibraryKeywords }
-        };
-
-        private List<string> _filesToExclude;
-        private CMakeCommandId _id;
-
-        public CMakeSourceDeclarations(string sourceFilePath,
-            IEnumerable<string> priorParameters, CMakeCommandId id)
+        public CMakeSourceDeclarations(string sourceFilePath)
             : base(sourceFilePath)
-        {
-            // Exclude all files that already appear in the parameter list, except for
-            // the first token, which is the name of the executable to be generated.
-            // Sort the files so that we can quick check if a file is in the list using
-            // a binary search.
-            _filesToExclude = new List<string>(priorParameters);
-            if (_filesToExclude.Count > 0)
-            {
-                _filesToExclude.RemoveAt(0);
-            }
-            _filesToExclude.Sort();
-            _id = id;
-        }
+        {}
 
         protected override IEnumerable<string> GetFilesFromDir(string dirPath,
             bool treatAsModules = false)
@@ -86,16 +48,9 @@ namespace CMakeTools
                 IEnumerable<string> files = Directory.EnumerateFiles(dirPath,
                     "*" + extension);
                 files = files.Select(Path.GetFileName);
-                files = files.Where(x => _filesToExclude.BinarySearch(x) < 0);
                 allFiles.AddRange(files);
             }
 
-            // Add in any keywords that are allowed with the specified command.
-            if (_commandKeywords.ContainsKey(_id))
-            {
-                allFiles.AddRange(_commandKeywords[_id]);
-            }
-            allFiles.Sort();
             return allFiles;
         }
 
@@ -105,18 +60,9 @@ namespace CMakeTools
             return new string[] {};
         }
 
-        public override int GetGlyph(int index)
+        protected override ItemType GetIncludeFileItemType()
         {
-            // If the index specifies a keyword, return the index for a keyword.
-            string name = GetName(index);
-            if (name != null && !_fileExtensions.Any(x => name.ToLower().EndsWith(x)))
-            {
-                return 206;
-            }
-
-            // Return the icon for a snippet.  It's the closest thing to a file
-            // that's available in the standard icon set.
-            return 205;
+            return ItemType.SourceFile;
         }
     }
 }

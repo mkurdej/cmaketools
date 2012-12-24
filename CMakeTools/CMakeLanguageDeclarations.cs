@@ -47,10 +47,9 @@ namespace CMakeTools
             return files;
         }
 
-        public override int GetGlyph(int index)
+        protected override ItemType GetModuleItemType()
         {
-            // Always return the index for a reference.
-            return 192;
+            return ItemType.Language;
         }
 
         public static IEnumerable<string> GetLanguagesFromDir(string dirPath)

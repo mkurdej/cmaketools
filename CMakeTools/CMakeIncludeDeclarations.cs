@@ -22,7 +22,7 @@ namespace CMakeTools
     /// <summary>
     /// Declarations object for CMake include files.
     /// </summary>
-    class CMakeIncludeDeclarations : Declarations
+    class CMakeIncludeDeclarations : CMakeItemDeclarations
     {
         // Default set of CMake modules to show in list if CMake is not installed.
         private static readonly string[] _defaultModules =
@@ -307,12 +307,12 @@ namespace CMakeTools
         };
 
         // Array of include files to be displayed.
-        private List<string> _includeFiles;
         private string _sourceFilePath;
 
         public CMakeIncludeDeclarations(string sourceFilePath)
         {
             _sourceFilePath = sourceFilePath;
+            FindIncludeFiles();
         }
 
         private void FindIncludeFiles()
@@ -322,7 +322,7 @@ namespace CMakeTools
             // configuration.
             string dirPath = Path.GetDirectoryName(_sourceFilePath);
             IEnumerable<string> files = GetFilesFromDir(dirPath);
-            _includeFiles = files.ToList();
+            AddItems(files, GetIncludeFileItemType());
 
             // Find all *.cmake files in the Modules directory inside the CMake
             // installation, if there is one.
@@ -332,15 +332,14 @@ namespace CMakeTools
             {
                 foundModules = true;
                 files = GetFilesFromDir(pathToModules, true);
-                _includeFiles.AddRange(files);
+                AddItems(files, GetModuleItemType());
             }
             if (!foundModules)
             {
                 // If we couldn't find modules in a CMake installation, show a default
                 // hard-code listing.
-                _includeFiles.AddRange(GetDefaultModules());
+                AddItems(GetDefaultModules(), GetModuleItemType());
             }
-            _includeFiles.Sort();
         }
 
         /// <summary>
@@ -362,7 +361,7 @@ namespace CMakeTools
 
                 // Remove certain modules that are used internally by CMake and
                 // shouldn't be included by user code.
-                _includeFiles = _includeFiles.Where(
+                files = files.Where(
                     x => Array.BinarySearch(_internalModules, x) < 0).ToList();
             }
             else
@@ -383,45 +382,22 @@ namespace CMakeTools
             return _defaultModules;
         }
 
-        public override int GetCount()
+        /// <summary>
+        /// Get the item type to be used for include files.
+        /// </summary>
+        /// <returns>An item type.</returns>
+        protected virtual ItemType GetIncludeFileItemType()
         {
-            if (_includeFiles == null)
-            {
-                FindIncludeFiles();
-            }
-            return _includeFiles.Count;
+            return ItemType.IncludeFile;
         }
 
-        public override string GetDescription(int index)
+        /// <summary>
+        /// Get the item type to be used for modules.
+        /// </summary>
+        /// <returns>An item type.</returns>
+        protected virtual ItemType GetModuleItemType()
         {
-            return null;
-        }
-
-        public override string GetDisplayText(int index)
-        {
-            return GetFileName(index);
-        }
-
-        public override int GetGlyph(int index)
-        {
-            if (_includeFiles == null)
-            {
-                FindIncludeFiles();
-            }
-
-            // If the item is for a module, return the icon index for a module.
-            // Otherwise, return the index for a call.
-            if (index >= 0 && index < _includeFiles.Count &&
-                _includeFiles[index].EndsWith(".cmake"))
-            {
-                return 208;
-            }
-            return 84;
-        }
-
-        public override string GetName(int index)
-        {
-            return GetFileName(index);
+            return ItemType.Module;
         }
 
         public override string OnCommit(IVsTextView textView, string textSoFar,
@@ -435,23 +411,6 @@ namespace CMakeTools
             }
             return base.OnCommit(textView, textSoFar, commitCharacter, index,
                 ref initialExtent);
-        }
-
-        private string GetFileName(int index)
-        {
-            if (_includeFiles == null)
-            {
-                FindIncludeFiles();
-            }
-
-            // The purpose of this function is to ensure that either GetName() or
-            // GetDisplayText() can be overriden without affecting the behavior of the
-            // other.
-            if (index < 0 || index >= _includeFiles.Count)
-            {
-                return null;
-            }
-            return _includeFiles[index];
         }
     }
 }

@@ -20,7 +20,7 @@ namespace CMakeTools
     /// <summary>
     /// Declarations object containing CMake variables
     /// </summary>
-    class CMakeVariableDeclarations : Declarations
+    class CMakeVariableDeclarations : CMakeItemDeclarations
     {
         // Array of standard CMake variables.
         private static readonly string[] _standardVariables = new string[]
@@ -233,13 +233,10 @@ namespace CMakeTools
             "WINDIR"
         };
 
-        // Array of variables to be displayed.
-        private List<string> _variables;
-
         public CMakeVariableDeclarations(List<string> userVariables, bool useEnv = false)
         {
-            _variables = new List<string>(
-                useEnv ? _standardEnvVariables : _standardVariables);
+            AddItems(useEnv ? _standardEnvVariables : _standardVariables,
+                ItemType.Variable);
             string path = CMakePath.FindCMakeModules();
             if (path != null)
             {
@@ -247,45 +244,14 @@ namespace CMakeTools
                     CMakeLanguageDeclarations.GetLanguagesFromDir(path);
                 foreach (string language in languages)
                 {
-                    _variables.AddRange(_standardLangVariables.Select(
-                        x => string.Format(x, language)));
+                    AddItems(_standardLangVariables.Select(
+                        x => string.Format(x, language)), ItemType.Variable);
                 }
             }
             if (userVariables != null)
             {
-                _variables.AddRange(userVariables);
+                AddItems(userVariables, ItemType.Variable);
             }
-            _variables.Sort();
-        }
-
-        public override int GetCount()
-        {
-            return _variables.Count;
-        }
-
-        public override string GetDescription(int index)
-        {
-            return "";
-        }
-
-        public override string GetDisplayText(int index)
-        {
-            return GetName(index);
-        }
-
-        public override int GetGlyph(int index)
-        {
-            // Always return the icon index for a public variable.
-            return 138;
-        }
-
-        public override string GetName(int index)
-        {
-            if (index < 0 || index >= _variables.Count)
-            {
-                return null;
-            }
-            return _variables[index];
         }
 
         public override bool IsCommitChar(string textSoFar, int selected,

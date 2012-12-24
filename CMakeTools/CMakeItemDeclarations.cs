@@ -30,8 +30,14 @@ namespace CMakeTools
             Command,
             Function,
             Macro,
+            Variable,
             Property,
-            Target
+            Target,
+            IncludeFile,
+            Module,
+            Language,
+            Package,
+            SourceFile
         }
 
         private struct Item : IComparable<Item>
@@ -72,6 +78,17 @@ namespace CMakeTools
             _sorted = false;
         }
 
+        /// <summary>
+        /// Remove a collection of items from the list.
+        /// </summary>
+        /// <param name="names">A collection of item names.</param>
+        public void ExcludeItems(IEnumerable<string> names)
+        {
+            List<string> sortedNames = names.ToList();
+            sortedNames.Sort();
+            _items.RemoveAll(x => sortedNames.BinarySearch(x.Name) >= 0);
+        }
+
         public override int GetCount()
         {
             return _items.Count;
@@ -106,12 +123,31 @@ namespace CMakeTools
             case ItemType.Function:
                 // Return the icon index for a public method.
                 return 72;
+            case ItemType.Variable:
+                // Return the icon index for a public variable.
+                return 138;
             case ItemType.Property:
                 // Return the icon index for a public property.
                 return 102;
             case ItemType.Target:
                 // Return the icon index for a VC++ project.
                 return 199;
+            case ItemType.IncludeFile:
+                // Return the icon index for a call.
+                return 208;
+            case ItemType.Module:
+                // Return the icon index for a module
+                return 84;
+            case ItemType.Language:
+                // Return the icon index for a reference.
+                return 192;
+            case ItemType.Package:
+                // Return the icon index for a library.
+                return 193;
+            case ItemType.SourceFile:
+                // Return the icon index for a snippet.  It's the closest thing to a file
+                // that's available in the standard icon set.
+                return 205;
             default:
                 return -1;
             }

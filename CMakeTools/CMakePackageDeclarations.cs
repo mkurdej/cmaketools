@@ -43,10 +43,9 @@ namespace CMakeTools
             return files.Select(x => x.Substring(4));
         }
 
-        public override int GetGlyph(int index)
+        protected override ItemType GetModuleItemType()
         {
-            // Always return the index for a library.
-            return 193;
+            return ItemType.Package;
         }
     }
 }
