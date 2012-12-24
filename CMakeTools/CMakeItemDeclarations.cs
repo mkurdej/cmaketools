@@ -84,9 +84,12 @@ namespace CMakeTools
         /// <param name="names">A collection of item names.</param>
         public void ExcludeItems(IEnumerable<string> names)
         {
-            List<string> sortedNames = names.ToList();
-            sortedNames.Sort();
-            _items.RemoveAll(x => sortedNames.BinarySearch(x.Name) >= 0);
+            if (names != null)
+            {
+                List<string> sortedNames = names.ToList();
+                sortedNames.Sort();
+                _items.RemoveAll(x => sortedNames.BinarySearch(x.Name) >= 0);
+            }
         }
 
         public override int GetCount()

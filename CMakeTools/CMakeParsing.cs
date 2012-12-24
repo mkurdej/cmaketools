@@ -1100,8 +1100,13 @@ namespace CMakeTools
         /// Parse for the names of all targets in the given code.
         /// </summary>
         /// <param name="lines">A collection of lines of code to parse.</param>
+        /// <param name="findTests">
+        /// Boolean value indicating whether to parse for tests instead of ordinary
+        /// targets.
+        /// </param>
         /// <returns>A list of target names.</returns>
-        public static List<string> ParseForTargetNames(IEnumerable<string> lines)
+        public static List<string> ParseForTargetNames(IEnumerable<string> lines,
+            bool findTests = false)
         {
             List<string> results = new List<string>();
             CMakeScanner scanner = new CMakeScanner();
@@ -1121,8 +1126,9 @@ namespace CMakeTools
                         if (tokenInfo.Token == (int)CMakeToken.Keyword)
                         {
                             CMakeCommandId id = CMakeKeywords.GetCommandId(tokenText);
-                            if (id == CMakeCommandId.AddExecutable ||
-                                id == CMakeCommandId.AddLibrary)
+                            if (findTests ? id == CMakeCommandId.AddTest :
+                                (id == CMakeCommandId.AddExecutable ||
+                                id == CMakeCommandId.AddLibrary))
                             {
                                 state = FunctionNameParseState.NeedOpenParen;
                             }

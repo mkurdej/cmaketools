@@ -977,11 +977,16 @@ namespace CMakeTools
             List<string> lines = new List<string>();
             lines.Add("add_executable(foo foo.cpp)");
             lines.Add("add_library(bar bar.cpp)");
+            lines.Add("add_test(test test.cpp)");
             List<string> targets = CMakeParsing.ParseForTargetNames(lines);
             Assert.IsNotNull(targets);
             Assert.AreEqual(2, targets.Count);
             Assert.AreEqual("foo", targets[0]);
             Assert.AreEqual("bar", targets[1]);
+            targets = CMakeParsing.ParseForTargetNames(lines, true);
+            Assert.IsNotNull(targets);
+            Assert.AreEqual(1, targets.Count);
+            Assert.AreEqual("test", targets[0]);
 
             // Test parsing a target with extra whitespace.
             lines.Clear();

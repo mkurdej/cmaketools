@@ -37,6 +37,7 @@ namespace CMakeTools
             { CMakeCommandId.TargetLinkLibraries,       CreateTargetDeclarations },
             { CMakeCommandId.SetTargetProperties,       CreateSetXPropertyDeclarations },
             { CMakeCommandId.SetSourceFilesProperties,  CreateSetXPropertyDeclarations },
+            { CMakeCommandId.SetTestsProperties,        CreateSetXPropertyDeclarations },
             { CMakeCommandId.SetDirectoryProperties,    CreateSetXPropertyDeclarations }
         };
 
@@ -64,7 +65,8 @@ namespace CMakeTools
             _propObjMethods = new Dictionary<CMakeCommandId, FactoryMethod>()
         {
             { CMakeCommandId.SetTargetProperties,       CreateTargetDeclarations },
-            { CMakeCommandId.SetSourceFilesProperties,  CreateSourceDeclarations }
+            { CMakeCommandId.SetSourceFilesProperties,  CreateSourceDeclarations },
+            { CMakeCommandId.SetTestsProperties,        CreateTestDeclarations }
         };
 
         private static readonly string[] _addExecutableKeywords = new string[]
@@ -133,14 +135,20 @@ namespace CMakeTools
             ParseRequest req, Source source, List<string> priorParameters)
         {
             List<string> targets = CMakeParsing.ParseForTargetNames(source.GetLines());
-            if (priorParameters != null)
-            {
-                // Don't list targets that have already been specified as parameters.
-                targets.RemoveAll(x => priorParameters.Contains(x));
-            }
-
             CMakeItemDeclarations decls = new CMakeItemDeclarations();
             decls.AddItems(targets, CMakeItemDeclarations.ItemType.Target);
+            decls.ExcludeItems(priorParameters);
+            return decls;
+        }
+
+        private static CMakeItemDeclarations CreateTestDeclarations(CMakeCommandId id,
+            ParseRequest req, Source source, List<string> priorParameters)
+        {
+            List<string> tests = CMakeParsing.ParseForTargetNames(source.GetLines(),
+                true);
+            CMakeItemDeclarations decls = new CMakeItemDeclarations();
+            decls.AddItems(tests, CMakeItemDeclarations.ItemType.Target);
+            decls.ExcludeItems(priorParameters);
             return decls;
         }
 
