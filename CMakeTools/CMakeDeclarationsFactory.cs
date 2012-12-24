@@ -29,12 +29,15 @@ namespace CMakeTools
         private readonly static Dictionary<CMakeCommandId, FactoryMethod> _methods =
             new Dictionary<CMakeCommandId, FactoryMethod>()
         {
-            { CMakeCommandId.Include,               CreateIncludeDeclarations },
-            { CMakeCommandId.FindPackage,           CreatePackageDeclarations },
-            { CMakeCommandId.AddSubdirectory,       CreateSubdirectoryDeclarations },
-            { CMakeCommandId.EnableLanguage,        CreateLanguageDeclarations },
-            { CMakeCommandId.AddDependencies,       CreateTargetDeclarations },
-            { CMakeCommandId.TargetLinkLibraries,   CreateTargetDeclarations }
+            { CMakeCommandId.Include,                   CreateIncludeDeclarations },
+            { CMakeCommandId.FindPackage,               CreatePackageDeclarations },
+            { CMakeCommandId.AddSubdirectory,           CreateSubdirectoryDeclarations },
+            { CMakeCommandId.EnableLanguage,            CreateLanguageDeclarations },
+            { CMakeCommandId.AddDependencies,           CreateTargetDeclarations },
+            { CMakeCommandId.TargetLinkLibraries,       CreateTargetDeclarations },
+            { CMakeCommandId.SetTargetProperties,       CreateSetXPropertyDeclarations },
+            { CMakeCommandId.SetSourceFilesProperties,  CreateSetXPropertyDeclarations },
+            { CMakeCommandId.SetDirectoryProperties,    CreateSetXPropertyDeclarations }
         };
 
         // Map from CMake commands to factory methods to create their corresponding
@@ -148,11 +151,13 @@ namespace CMakeTools
         private static Declarations CreateSetXPropertyDeclarations(CMakeCommandId id,
             ParseRequest req, Source source, List<string> priorParameters)
         {
+            bool afterPropsKeyword = false;
             if (priorParameters != null)
             {
                 int index = priorParameters.FindIndex(x => x.Equals("PROPERTIES"));
                 if (index >= 0 && (priorParameters.Count - index) % 2 == 1)
                 {
+                    afterPropsKeyword = true;
                     IEnumerable<string> properties =
                         CMakeProperties.GetPropertiesForCommand(id);
                     if (properties != null)
@@ -163,6 +168,20 @@ namespace CMakeTools
                         return decls;
                     }
                 }
+            }
+            if (!afterPropsKeyword)
+            {
+                CMakeItemDeclarations decls = new CMakeItemDeclarations();
+                if ((priorParameters != null && priorParameters.Count > 0) ||
+                    id == CMakeCommandId.SetSourceFilesProperties ||
+                    id == CMakeCommandId.SetDirectoryProperties)
+                {
+                    // The PROPERTIES can appear in the SET_SOURCE_FILES_PROPERTIES and
+                    // SET_DIRECTORY_PROPERTIES command without another parameter before
+                    // it.
+                    decls.AddItem("PROPERTIES", CMakeItemDeclarations.ItemType.Command);
+                }
+                return decls;
             }
             return null;
         }

@@ -50,6 +50,16 @@ namespace CMakeTools
         private bool _sorted;
 
         /// <summary>
+        /// Add a single item.
+        /// </summary>
+        /// <param name="name">The item name.</param>
+        /// <param name="type">The item type</param>
+        public void AddItem(string name, ItemType type)
+        {
+            _items.Add(new Item() { Name = name, Type = type });
+        }
+
+        /// <summary>
         /// Add a collection of items.
         /// </summary>
         /// <param name="names">A collection of item names.</param>
