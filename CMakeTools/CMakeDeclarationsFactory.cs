@@ -58,6 +58,15 @@ namespace CMakeTools
             { CMakeCommandId.SetDirectoryProperties,    CreateSetXPropertyDeclarations }
         };
 
+        // Map from SET_*_PROPERTIES commands to factory methods to create declarations
+        // objects for the objects on which properties can be set.
+        private readonly static Dictionary<CMakeCommandId, FactoryMethod>
+            _propObjMethods = new Dictionary<CMakeCommandId, FactoryMethod>()
+        {
+            { CMakeCommandId.SetTargetProperties,       CreateTargetDeclarations },
+            { CMakeCommandId.SetSourceFilesProperties,  CreateSourceDeclarations }
+        };
+
         private static readonly string[] _addExecutableKeywords = new string[]
         {
             "EXCLUDE_FROM_ALL",
@@ -211,7 +220,15 @@ namespace CMakeTools
             }
             if (!afterPropsKeyword)
             {
-                CMakeItemDeclarations decls = new CMakeItemDeclarations();
+                CMakeItemDeclarations decls;
+                if (_propObjMethods.ContainsKey(id))
+                {
+                    decls = _propObjMethods[id](id, req, source, priorParameters);
+                }
+                else
+                {
+                    decls = new CMakeItemDeclarations();
+                }
                 if ((priorParameters != null && priorParameters.Count > 0) ||
                     id == CMakeCommandId.SetSourceFilesProperties ||
                     id == CMakeCommandId.SetDirectoryProperties)
