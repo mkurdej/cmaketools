@@ -103,8 +103,9 @@ namespace CMakeTools
                 targets.RemoveAll(x => priorParameters.Contains(x));
             }
 
-            // Use the icon index for a VC++ project.
-            return new SimpleDeclarations(targets, 199);
+            CMakeItemDeclarations decls = new CMakeItemDeclarations();
+            decls.AddItems(targets, CMakeItemDeclarations.ItemType.Target);
+            return decls;
         }
 
         private static Declarations CreateSubcommandDeclarations(CMakeCommandId id,
@@ -116,8 +117,9 @@ namespace CMakeTools
                 return null;
             }
 
-            // Use the icon index for a keyword.
-            return new SimpleDeclarations(subcommands.ToList(), 206);
+            CMakeItemDeclarations decls = new CMakeItemDeclarations();
+            decls.AddItems(subcommands, CMakeItemDeclarations.ItemType.Command);
+            return decls;
         }
 
         private static Declarations CreateSourceDeclarations(CMakeCommandId id,
@@ -135,12 +137,9 @@ namespace CMakeTools
                 IEnumerable<string> properties = CMakeProperties.GetPropertiesForCommand(id);
                 if (properties != null)
                 {
-                    // Sort the properties.
-                    List<string> propertiesList = properties.ToList();
-                    propertiesList.Sort();
-
-                    // Use the icon index for a property.
-                    return new SimpleDeclarations(propertiesList, 102);
+                    CMakeItemDeclarations decls = new CMakeItemDeclarations();
+                    decls.AddItems(properties, CMakeItemDeclarations.ItemType.Property);
+                    return decls;
                 }
             }
             return null;
@@ -158,12 +157,10 @@ namespace CMakeTools
                         CMakeProperties.GetPropertiesForCommand(id);
                     if (properties != null)
                     {
-                        // Sort the properties.
-                        List<string> propertiesList = properties.ToList();
-                        propertiesList.Sort();
-
-                        // Use the icon index for a property.
-                        return new SimpleDeclarations(propertiesList, 102);
+                        CMakeItemDeclarations decls = new CMakeItemDeclarations();
+                        decls.AddItems(properties,
+                            CMakeItemDeclarations.ItemType.Property);
+                        return decls;
                     }
                 }
             }

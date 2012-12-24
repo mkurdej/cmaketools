@@ -29,7 +29,9 @@ namespace CMakeTools
         {
             Command,
             Function,
-            Macro
+            Macro,
+            Property,
+            Target
         }
 
         private struct Item : IComparable<Item>
@@ -86,11 +88,20 @@ namespace CMakeTools
             switch (_items[index].Type)
             {
             case ItemType.Command:
+                // Return the icon index for a keyword.
                 return 206;
             case ItemType.Macro:
+                // Return the icon index for a macro.
                 return 54;
             case ItemType.Function:
+                // Return the icon index for a public method.
                 return 72;
+            case ItemType.Property:
+                // Return the icon index for a public property.
+                return 102;
+            case ItemType.Target:
+                // Return the icon index for a VC++ project.
+                return 199;
             default:
                 return -1;
             }

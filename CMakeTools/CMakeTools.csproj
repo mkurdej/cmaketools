@@ -72,7 +72,6 @@
     <Compile Include="EnumToDisplayNameConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProvideFileFilterAttribute.cs" />
-    <Compile Include="SimpleDeclarations.cs" />
     <Compile Include="StringHelpers.cs" />
     <Compile Include="ToCommandCaseExpansionFunction.cs" />
     <Compile Include="YesNoConverter.cs" />
