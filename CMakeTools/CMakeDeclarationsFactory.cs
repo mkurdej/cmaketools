@@ -38,7 +38,8 @@ namespace CMakeTools
             { CMakeCommandId.SetTargetProperties,       CreateSetXPropertyDeclarations },
             { CMakeCommandId.SetSourceFilesProperties,  CreateSetXPropertyDeclarations },
             { CMakeCommandId.SetTestsProperties,        CreateSetXPropertyDeclarations },
-            { CMakeCommandId.SetDirectoryProperties,    CreateSetXPropertyDeclarations }
+            { CMakeCommandId.SetDirectoryProperties,    CreateSetXPropertyDeclarations },
+            { CMakeCommandId.GetTestProperty,           CreateGetXPropertyDeclarations }
         };
 
         // Map from CMake commands to factory methods to create their corresponding
@@ -52,6 +53,7 @@ namespace CMakeTools
             { CMakeCommandId.GetTargetProperty,         CreateGetXPropertyDeclarations },
             { CMakeCommandId.GetSourceFileProperty,     CreateGetXPropertyDeclarations },
             { CMakeCommandId.GetTestProperty,           CreateGetXPropertyDeclarations },
+            { CMakeCommandId.GetDirectoryProperty,      CreateGetXPropertyDeclarations },
             { CMakeCommandId.GetCMakeProperty,          CreateGetXPropertyDeclarations },
             { CMakeCommandId.SetTargetProperties,       CreateSetXPropertyDeclarations },
             { CMakeCommandId.SetSourceFilesProperties,  CreateSetXPropertyDeclarations },
@@ -65,8 +67,11 @@ namespace CMakeTools
             _propObjMethods = new Dictionary<CMakeCommandId, FactoryMethod>()
         {
             { CMakeCommandId.SetTargetProperties,       CreateTargetDeclarations },
+            { CMakeCommandId.GetTargetProperty,         CreateTargetDeclarations },
             { CMakeCommandId.SetSourceFilesProperties,  CreateSourceDeclarations },
-            { CMakeCommandId.SetTestsProperties,        CreateTestDeclarations }
+            { CMakeCommandId.GetSourceFileProperty,     CreateSourceDeclarations },
+            { CMakeCommandId.SetTestsProperties,        CreateTestDeclarations },
+            { CMakeCommandId.GetTestProperty,           CreateTestDeclarations }
         };
 
         private static readonly string[] _addExecutableKeywords = new string[]
@@ -190,10 +195,44 @@ namespace CMakeTools
             CMakeCommandId id, ParseRequest req, Source source,
             List<string> priorParameters)
         {
-            if (priorParameters != null &&
-                priorParameters.Count == CMakeProperties.GetPropertyParameterIndex(id))
+            int priorParameterCount =
+                priorParameters != null ? priorParameters.Count : 0;
+            if (priorParameterCount == CMakeProperties.GetPropertyParameterIndex(id))
             {
                 IEnumerable<string> properties = CMakeProperties.GetPropertiesForCommand(id);
+                if (properties != null)
+                {
+                    CMakeItemDeclarations decls = new CMakeItemDeclarations();
+                    decls.AddItems(properties, CMakeItemDeclarations.ItemType.Property);
+                    if (id == CMakeCommandId.GetDirectoryProperty)
+                    {
+                        // The DIRECTORY keyword can be specified before the property
+                        // to set a property of a different directory.
+                        decls.AddItem("DIRECTORY",
+                            CMakeItemDeclarations.ItemType.Command);
+                    }
+                    return decls;
+                }
+            }
+            else if (priorParameterCount == CMakeProperties.GetObjectParameterIndex(id))
+            {
+                if (_propObjMethods.ContainsKey(id))
+                {
+                    CMakeItemDeclarations decls = _propObjMethods[id](id, req, source,
+                        priorParameters);
+                    return decls;
+                }
+            }
+            else if (id == CMakeCommandId.GetDirectoryProperty &&
+                priorParameterCount == 2 && priorParameters[1] == "DIRECTORY")
+            {
+                return CreateSubdirectoryDeclarations(id, req, source, priorParameters);
+            }
+            else if (id == CMakeCommandId.GetDirectoryProperty &&
+                priorParameterCount == 3 && priorParameters[1] == "DIRECTORY")
+            {
+                IEnumerable<string> properties = CMakeProperties.GetPropertiesForCommand(
+                    CMakeCommandId.GetDirectoryProperty);
                 if (properties != null)
                 {
                     CMakeItemDeclarations decls = new CMakeItemDeclarations();

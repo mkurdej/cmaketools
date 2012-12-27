@@ -230,6 +230,7 @@ namespace CMakeTools
             { CMakeCommandId.SetSourceFilesProperties,  _sourceFileProperties },
             { CMakeCommandId.GetTestProperty,           _testProperties },
             { CMakeCommandId.SetTestsProperties,        _testProperties },
+            { CMakeCommandId.GetDirectoryProperty,      _directoryProperties },
             { CMakeCommandId.SetDirectoryProperties,    _directoryProperties },
             { CMakeCommandId.GetCMakeProperty,          _instanceProperties }
         };
@@ -266,11 +267,26 @@ namespace CMakeTools
             switch (id)
             {
             case CMakeCommandId.GetTestProperty:
+            case CMakeCommandId.GetDirectoryProperty:
             case CMakeCommandId.GetCMakeProperty:
                 return 1;
             case CMakeCommandId.GetTargetProperty:
             case CMakeCommandId.GetSourceFileProperty:
                 return 2;
+            default:
+                return -1;
+            }
+        }
+
+        public static int GetObjectParameterIndex(CMakeCommandId id)
+        {
+            switch (id)
+            {
+            case CMakeCommandId.GetTestProperty:
+                return 0;
+            case CMakeCommandId.GetTargetProperty:
+            case CMakeCommandId.GetSourceFileProperty:
+                return 1;
             default:
                 return -1;
             }
