@@ -278,6 +278,12 @@ namespace CMakeTools
             }
         }
 
+        /// <summary>
+        /// Get the zero-based index of the parameter to the specified command that
+        /// should specify the object from which a CMake property is retrieved.
+        /// </summary>
+        /// <param name="id">A command identifier</param>
+        /// <returns>The index of the parameter specifying the object.</returns>
         public static int GetObjectParameterIndex(CMakeCommandId id)
         {
             switch (id)
