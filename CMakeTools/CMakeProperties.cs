@@ -15,6 +15,20 @@ using System.Collections.Generic;
 namespace CMakeTools
 {
     /// <summary>
+    /// CMake property types.
+    /// </summary>
+    enum CMakePropertyType
+    {
+        Global,
+        Directory,
+        Target,
+        Source,
+        Test,
+        Cache,
+        Variable
+    }
+
+    /// <summary>
     /// Utility class to identify CMake properties.
     /// </summary>
     static class CMakeProperties
@@ -220,19 +234,28 @@ namespace CMakeTools
             "USE_FOLDERS"
         };
 
-        // Map from CMake commands to standard properties.
-        private static readonly Dictionary<CMakeCommandId, IEnumerable<string>>
-            _commandProperties = new Dictionary<CMakeCommandId, IEnumerable<string>>()
+        // Map from CMake commands to property types.
+        private static readonly Dictionary<CMakeCommandId, CMakePropertyType>
+            _commandPropertyTypes = new Dictionary<CMakeCommandId, CMakePropertyType>()
         {
-            { CMakeCommandId.GetTargetProperty,         _targetProperties },
-            { CMakeCommandId.SetTargetProperties,       _targetProperties },
-            { CMakeCommandId.GetSourceFileProperty,     _sourceFileProperties },
-            { CMakeCommandId.SetSourceFilesProperties,  _sourceFileProperties },
-            { CMakeCommandId.GetTestProperty,           _testProperties },
-            { CMakeCommandId.SetTestsProperties,        _testProperties },
-            { CMakeCommandId.GetDirectoryProperty,      _directoryProperties },
-            { CMakeCommandId.SetDirectoryProperties,    _directoryProperties },
-            { CMakeCommandId.GetCMakeProperty,          _instanceProperties }
+            { CMakeCommandId.GetTargetProperty,         CMakePropertyType.Target },
+            { CMakeCommandId.SetTargetProperties,       CMakePropertyType.Target },
+            { CMakeCommandId.GetSourceFileProperty,     CMakePropertyType.Source },
+            { CMakeCommandId.SetSourceFilesProperties,  CMakePropertyType.Source },
+            { CMakeCommandId.GetTestProperty,           CMakePropertyType.Test },
+            { CMakeCommandId.SetTestsProperties,        CMakePropertyType.Test },
+            { CMakeCommandId.GetDirectoryProperty,      CMakePropertyType.Directory },
+            { CMakeCommandId.SetDirectoryProperties,    CMakePropertyType.Directory }
+        };
+
+        // Map from CMake property types to standard properties.
+        private static readonly Dictionary<CMakePropertyType, IEnumerable<string>>
+            _allProperties = new Dictionary<CMakePropertyType, IEnumerable<string>>()
+        {
+            { CMakePropertyType.Target,     _targetProperties },
+            { CMakePropertyType.Source,     _sourceFileProperties },
+            { CMakePropertyType.Test,       _testProperties },
+            { CMakePropertyType.Directory,  _directoryProperties }
         };
 
         static CMakeProperties()
@@ -243,15 +266,36 @@ namespace CMakeTools
         }
 
         /// <summary>
+        /// Get the CMake properties of the specific type.
+        /// </summary>
+        /// <param name="type">A property type.</param>
+        /// <returns>A collection of property names.</returns>
+        public static IEnumerable<string> GetPropertiesOfType(CMakePropertyType type)
+        {
+            if (_allProperties.ContainsKey(type))
+            {
+                return _allProperties[type];
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Get the CMake properties to be displayed for use with the specified command.
         /// </summary>
         /// <param name="id">A command identifier.</param>
         /// <returns>A collection of property names.</returns>
         public static IEnumerable<string> GetPropertiesForCommand(CMakeCommandId id)
         {
-            if (_commandProperties.ContainsKey(id))
+            if (id == CMakeCommandId.GetCMakeProperty)
             {
-                return _commandProperties[id];
+                // The properties used with this command do not correspond to any of the
+                // property types used with GET_PROPERTY and SET_PROPERTY.  Therefore, it
+                // is treated as a special case here.
+                return _instanceProperties;
+            }
+            if (_commandPropertyTypes.ContainsKey(id))
+            {
+                return GetPropertiesOfType(_commandPropertyTypes[id]);
             }
             return null;
         }
