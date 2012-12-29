@@ -67,10 +67,9 @@ namespace CMakeTools
             return new string[] {};
         }
 
-        public override int GetGlyph(int index)
+        protected override ItemType GetIncludeFileItemType()
         {
-            // Always return the icon for an open folder.
-            return 201;
+            return ItemType.Directory;
         }
 
         public override string GetName(int index)

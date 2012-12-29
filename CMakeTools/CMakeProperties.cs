@@ -10,6 +10,7 @@
  * 
  * **************************************************************************/
 
+using System;
 using System.Collections.Generic;
 
 namespace CMakeTools
@@ -19,12 +20,13 @@ namespace CMakeTools
     /// </summary>
     enum CMakePropertyType
     {
-        Global,
+        Unspecified = -1,
+        Cache = 0,
         Directory,
-        Target,
+        Global,
         Source,
+        Target,
         Test,
-        Cache,
         Variable
     }
 
@@ -33,6 +35,18 @@ namespace CMakeTools
     /// </summary>
     static class CMakeProperties
     {
+        // Array of CMake property type keywords.  These must be in alphabetical order.
+        private static readonly string[] _propertyTypeKeywords = new string[]
+        {
+            "CACHE",
+            "DIRECTORY",
+            "GLOBAL",
+            "SOURCE",
+            "TARGET",
+            "TEST",
+            "VARIABLE"
+        };
+
         // Array of CMake target properties.
         private static readonly string[] _targetProperties = new string[]
         {
@@ -252,10 +266,11 @@ namespace CMakeTools
         private static readonly Dictionary<CMakePropertyType, IEnumerable<string>>
             _allProperties = new Dictionary<CMakePropertyType, IEnumerable<string>>()
         {
-            { CMakePropertyType.Target,     _targetProperties },
+            { CMakePropertyType.Directory,  _directoryProperties },
+            { CMakePropertyType.Global,     _globalProperties },
             { CMakePropertyType.Source,     _sourceFileProperties },
-            { CMakePropertyType.Test,       _testProperties },
-            { CMakePropertyType.Directory,  _directoryProperties }
+            { CMakePropertyType.Target,     _targetProperties },
+            { CMakePropertyType.Test,       _testProperties }
         };
 
         static CMakeProperties()
@@ -263,6 +278,30 @@ namespace CMakeTools
             // All properties of global scope are also properties of the CMake instance.
             _instanceProperties.AddRange(_instanceOnlyProperties);
             _instanceProperties.AddRange(_globalProperties);
+        }
+
+        /// <summary>
+        /// Get the keywords used to identify CMake property types.
+        /// </summary>
+        /// <returns>A collection of keyword.</returns>
+        public static IEnumerable<string> GetPropertyTypeKeywords()
+        {
+            return _propertyTypeKeywords;
+        }
+
+        /// <summary>
+        /// Get the property type represented by the specified keyword.
+        /// </summary>
+        /// <param name="keyword">A property type keyword.</param>
+        /// <returns>A property type identifier.</returns>
+        public static CMakePropertyType GetPropertyTypeFromKeyword(string keyword)
+        {
+            int index = Array.BinarySearch(_propertyTypeKeywords, keyword);
+            if (index < 0)
+            {
+                return CMakePropertyType.Unspecified;
+            }
+            return (CMakePropertyType)index;
         }
 
         /// <summary>
@@ -298,6 +337,20 @@ namespace CMakeTools
                 return GetPropertiesOfType(_commandPropertyTypes[id]);
             }
             return null;
+        }
+
+        /// <summary>
+        /// Get the property type that the specified command gets or sets.
+        /// </summary>
+        /// <param name="id">A command identifier.</param>
+        /// <returns>A property type.</returns>
+        public static CMakePropertyType GetPropertyTypeFromCommand(CMakeCommandId id)
+        {
+            if (_commandPropertyTypes.ContainsKey(id))
+            {
+                return _commandPropertyTypes[id];
+            }
+            return CMakePropertyType.Unspecified;
         }
 
         /// <summary>
@@ -340,6 +393,20 @@ namespace CMakeTools
             default:
                 return -1;
             }
+        }
+
+        /// <summary>
+        /// Check if an object must be specified to retrieve a property of the specified
+        /// type.
+        /// </summary>
+        /// <param name="type">A property type.</param>
+        /// <returns>True if an object is require or false otherwise.</returns>
+        public static bool IsObjectRequired(CMakePropertyType type)
+        {
+            return type == CMakePropertyType.Target ||
+                type == CMakePropertyType.Source ||
+                type == CMakePropertyType.Test ||
+                type == CMakePropertyType.Cache;
         }
     }
 }

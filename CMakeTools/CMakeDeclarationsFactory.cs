@@ -58,20 +58,19 @@ namespace CMakeTools
             { CMakeCommandId.SetTargetProperties,       CreateSetXPropertyDeclarations },
             { CMakeCommandId.SetSourceFilesProperties,  CreateSetXPropertyDeclarations },
             { CMakeCommandId.SetTestsProperties,        CreateSetXPropertyDeclarations },
-            { CMakeCommandId.SetDirectoryProperties,    CreateSetXPropertyDeclarations }
+            { CMakeCommandId.SetDirectoryProperties,    CreateSetXPropertyDeclarations },
+            { CMakeCommandId.GetProperty,               CreateGetPropertyDeclarations }
         };
 
         // Map from SET_*_PROPERTIES commands to factory methods to create declarations
         // objects for the objects on which properties can be set.
-        private readonly static Dictionary<CMakeCommandId, FactoryMethod>
-            _propObjMethods = new Dictionary<CMakeCommandId, FactoryMethod>()
+        private readonly static Dictionary<CMakePropertyType, FactoryMethod>
+            _propObjMethods = new Dictionary<CMakePropertyType, FactoryMethod>()
         {
-            { CMakeCommandId.SetTargetProperties,       CreateTargetDeclarations },
-            { CMakeCommandId.GetTargetProperty,         CreateTargetDeclarations },
-            { CMakeCommandId.SetSourceFilesProperties,  CreateSourceDeclarations },
-            { CMakeCommandId.GetSourceFileProperty,     CreateSourceDeclarations },
-            { CMakeCommandId.SetTestsProperties,        CreateTestDeclarations },
-            { CMakeCommandId.GetTestProperty,           CreateTestDeclarations }
+            { CMakePropertyType.Directory,  CreateSubdirectoryDeclarations },
+            { CMakePropertyType.Source,     CreateSourceDeclarations },
+            { CMakePropertyType.Target,     CreateTargetDeclarations },
+            { CMakePropertyType.Test,       CreateTestDeclarations }
         };
 
         private static readonly string[] _addExecutableKeywords = new string[]
@@ -216,9 +215,10 @@ namespace CMakeTools
             }
             else if (priorParameterCount == CMakeProperties.GetObjectParameterIndex(id))
             {
-                if (_propObjMethods.ContainsKey(id))
+                CMakePropertyType type = CMakeProperties.GetPropertyTypeFromCommand(id);
+                if (_propObjMethods.ContainsKey(type))
                 {
-                    CMakeItemDeclarations decls = _propObjMethods[id](id, req, source,
+                    CMakeItemDeclarations decls = _propObjMethods[type](id, req, source,
                         priorParameters);
                     return decls;
                 }
@@ -268,9 +268,10 @@ namespace CMakeTools
             if (!afterPropsKeyword)
             {
                 CMakeItemDeclarations decls;
-                if (_propObjMethods.ContainsKey(id))
+                CMakePropertyType type = CMakeProperties.GetPropertyTypeFromCommand(id);
+                if (_propObjMethods.ContainsKey(type))
                 {
-                    decls = _propObjMethods[id](id, req, source, priorParameters);
+                    decls = _propObjMethods[type](id, req, source, priorParameters);
                 }
                 else
                 {
@@ -288,6 +289,55 @@ namespace CMakeTools
                 return decls;
             }
             return null;
+        }
+
+        private static CMakeItemDeclarations CreateGetPropertyDeclarations(
+            CMakeCommandId id, ParseRequest req, Source source,
+            List<string> priorParameters)
+        {
+            CMakeItemDeclarations decls = null;
+            if (priorParameters != null)
+            {
+                if (priorParameters.Count == 1)
+                {
+                    decls = new CMakeItemDeclarations();
+                    decls.AddItems(CMakeProperties.GetPropertyTypeKeywords(),
+                        CMakeItemDeclarations.ItemType.Command);
+                }
+                else if (priorParameters.Count > 2 &&
+                    priorParameters[priorParameters.Count - 1] == "PROPERTY")
+                {
+                    IEnumerable<string> properties = CMakeProperties.GetPropertiesOfType(
+                        CMakeProperties.GetPropertyTypeFromKeyword(
+                        priorParameters[1]));
+                    decls = new CMakeItemDeclarations();
+                    decls.AddItems(properties, CMakeItemDeclarations.ItemType.Property);
+                }
+                else if (priorParameters.Count == 2)
+                {
+                    CMakePropertyType type = CMakeProperties.GetPropertyTypeFromKeyword(
+                        priorParameters[1]);
+                    if (_propObjMethods.ContainsKey(type))
+                    {
+                        decls = _propObjMethods[type](id, req, source, priorParameters);
+                    }
+                    else
+                    {
+                        decls = new CMakeItemDeclarations();
+                    }
+                    if (!CMakeProperties.IsObjectRequired(type))
+                    {
+                        decls.AddItem("PROPERTY",
+                            CMakeItemDeclarations.ItemType.Command);
+                    }
+                }
+                else if (priorParameters.Count == 3)
+                {
+                    decls = new CMakeItemDeclarations();
+                    decls.AddItem("PROPERTY", CMakeItemDeclarations.ItemType.Command);
+                }
+            }
+            return decls;
         }
 
         /// <summary>

@@ -37,7 +37,8 @@ namespace CMakeTools
             Module,
             Language,
             Package,
-            SourceFile
+            SourceFile,
+            Directory
         }
 
         private struct Item : IComparable<Item>
@@ -151,6 +152,9 @@ namespace CMakeTools
                 // Return the icon index for a snippet.  It's the closest thing to a file
                 // that's available in the standard icon set.
                 return 205;
+            case ItemType.Directory:
+                // Return the icon index for an open folder.
+                return 201;
             default:
                 return -1;
             }
