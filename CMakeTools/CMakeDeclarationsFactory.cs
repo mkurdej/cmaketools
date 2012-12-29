@@ -251,17 +251,20 @@ namespace CMakeTools
             if (priorParameters != null)
             {
                 int index = priorParameters.FindIndex(x => x.Equals("PROPERTIES"));
-                if (index >= 0 && (priorParameters.Count - index) % 2 == 1)
+                if (index >= 0)
                 {
                     afterPropsKeyword = true;
-                    IEnumerable<string> properties =
-                        CMakeProperties.GetPropertiesForCommand(id);
-                    if (properties != null)
+                    if ((priorParameters.Count - index) % 2 == 1)
                     {
-                        CMakeItemDeclarations decls = new CMakeItemDeclarations();
-                        decls.AddItems(properties,
-                            CMakeItemDeclarations.ItemType.Property);
-                        return decls;
+                        IEnumerable<string> properties =
+                            CMakeProperties.GetPropertiesForCommand(id);
+                        if (properties != null)
+                        {
+                            CMakeItemDeclarations decls = new CMakeItemDeclarations();
+                            decls.AddItems(properties,
+                                CMakeItemDeclarations.ItemType.Property);
+                            return decls;
+                        }
                     }
                 }
             }
