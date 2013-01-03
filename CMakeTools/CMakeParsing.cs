@@ -53,7 +53,8 @@ namespace CMakeTools
             NeedCommand,
             NeedParen,
             NeedSetEnv,
-            NeedVariable
+            NeedVariable,
+            NeedCache
         }
 
         private static void AddVariableToList(List<string> vars, string variable)
@@ -199,7 +200,7 @@ namespace CMakeTools
         /// <summary>
         /// Parse to find all environment variables defined in the code.
         /// </summary>
-        /// <param name="code">The code to parse.</param>
+        /// <param name="lines">The code to parse.</param>
         /// <returns>
         /// A list containing all environment variables defined in the code.
         /// </returns>
@@ -284,6 +285,82 @@ namespace CMakeTools
                     // and the variable declaration shouldn't be recognized.
                     state = VariableParseState.NeedCommand;
                     possibleVariable = null;
+                }
+            }
+            return vars;
+        }
+
+        /// <summary>
+        /// Parse to find all cache variables defined in the code.
+        /// </summary>
+        /// <param name="lines">The code to parse.</param>
+        /// <returns>
+        /// A list containing all cache variables defined in the code.
+        /// </returns>
+        public static List<string> ParseForCacheVariables(IEnumerable<string> lines)
+        {
+            CMakeScanner scanner = new CMakeScanner();
+            List<string> vars = new List<string>();
+            TokenInfo tokenInfo = new TokenInfo();
+            int scannerState = 0;
+            VariableParseState state = VariableParseState.NeedCommand;
+            string possibleVariable = null;
+            foreach (string line in lines)
+            {
+                scanner.SetSource(line, 0);
+                while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref scannerState))
+                {
+                    string tokenText = line.ExtractToken(tokenInfo);
+                    if (state == VariableParseState.NeedCommand &&
+                        tokenInfo.Token == (int)CMakeToken.Keyword)
+                    {
+                        CMakeCommandId id = CMakeKeywords.GetCommandId(tokenText);
+                        if (id == CMakeCommandId.Set || id == CMakeCommandId.Option)
+                        {
+                            // We found the name of a command that may define a cache
+                            // variable.  Now, look for an opening parenthesis.
+                            state = VariableParseState.NeedParen;
+                        }
+                    }
+                    else if (state == VariableParseState.NeedParen &&
+                        tokenInfo.Token == (int)CMakeToken.OpenParen)
+                    {
+                        // We found the opening parenthesis after the command name.  Now,
+                        // look for the variable name.
+                        state = VariableParseState.NeedVariable;
+                    }
+                    else if (state == VariableParseState.NeedVariable &&
+                        tokenInfo.Token == (int)CMakeToken.Identifier)
+                    {
+                        // We found the variable name.  For the SET command, remember it
+                        // and look for the CACHE keyword.  For the OPTION command, just
+                        // go ahead and add it.
+                        if (CMakeScanner.GetLastCommand(scannerState) == CMakeCommandId.Set)
+                        {
+                            possibleVariable = tokenText;
+                            state = VariableParseState.NeedCache;
+                        }
+                        else
+                        {
+                            vars.Add(possibleVariable);
+                            state = VariableParseState.NeedCommand;
+                        }
+                    }
+                    else if (state == VariableParseState.NeedCache &&
+                        tokenInfo.Token == (int)CMakeToken.Keyword &&
+                        tokenText == "CACHE")
+                    {
+                        // We found the CACHE keyword.  Add the variable to the list and
+                        // begin looking for the next one.
+                        vars.Add(possibleVariable);
+                        possibleVariable = null;
+                        state = VariableParseState.NeedCommand;
+                    }
+                    else if (tokenInfo.Token == (int)CMakeToken.CloseParen)
+                    {
+                        possibleVariable = null;
+                        state = VariableParseState.NeedCommand;
+                    }
                 }
             }
             return vars;
