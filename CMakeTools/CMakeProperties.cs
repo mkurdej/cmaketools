@@ -207,6 +207,17 @@ namespace CMakeTools
             "VARIABLES"
         };
 
+        // Array of CMake cache entry properties.
+        private static readonly string[] _cacheProperties = new string[]
+        {
+            "ADVANCED",
+            "HELPSTRING",
+            "MODIFIED",
+            "STRINGS",
+            "TYPE",
+            "VALUE"
+        };
+
         // Array of CMake instance properties that are not also properties of
         // global scope.
         private static readonly string[] _instanceOnlyProperties = new string[]
@@ -266,6 +277,7 @@ namespace CMakeTools
         private static readonly Dictionary<CMakePropertyType, IEnumerable<string>>
             _allProperties = new Dictionary<CMakePropertyType, IEnumerable<string>>()
         {
+            { CMakePropertyType.Cache,      _cacheProperties },
             { CMakePropertyType.Directory,  _directoryProperties },
             { CMakePropertyType.Global,     _globalProperties },
             { CMakePropertyType.Source,     _sourceFileProperties },
