@@ -342,7 +342,7 @@ namespace CMakeTools
                         }
                         else
                         {
-                            vars.Add(possibleVariable);
+                            vars.Add(tokenText);
                             state = VariableParseState.NeedCommand;
                         }
                     }

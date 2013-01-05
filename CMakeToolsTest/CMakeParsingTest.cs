@@ -25,7 +25,7 @@ namespace CMakeTools
     public class CMakeParsingTest
     {
         /// <summary>
-        /// Test the correctness parsing for names of defined variables.
+        /// Test the correctness of parsing for names of defined variables.
         /// </summary>
         [TestMethod]
         public void TestParseForVariables()
@@ -202,6 +202,28 @@ namespace CMakeTools
             vars = CMakeParsing.ParseForEnvVariables(lines);
             Assert.AreEqual(1, vars.Count);
             Assert.AreEqual("CMAKE_CURRENT_BINARY_DIR", vars[0]);
+        }
+
+        /// <summary>
+        /// Test the correctness of parsing for names of defined cache variables.
+        /// </summary>
+        [TestMethod]
+        public void TestParseForCacheVariables()
+        {
+            List<string> lines = new List<string>();
+            lines.Add("OPTION(FOO \"Foo\")");
+            List<string> vars = CMakeParsing.ParseForCacheVariables(lines);
+            Assert.AreEqual(1, vars.Count);
+            Assert.AreEqual("FOO", vars[0]);
+            lines.Clear();
+            lines.Add("SET(FOO)");
+            vars = CMakeParsing.ParseForCacheVariables(lines);
+            Assert.AreEqual(0, vars.Count);
+            lines.Clear();
+            lines.Add("SET(FOO VAL CACHE FILEPATH \"Foo\")");
+            vars = CMakeParsing.ParseForCacheVariables(lines);
+            Assert.AreEqual(1, vars.Count);
+            Assert.AreEqual("FOO", vars[0]);
         }
 
         /// <summary>
