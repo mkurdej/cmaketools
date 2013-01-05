@@ -272,7 +272,8 @@ namespace CMakeTools
                     }
                     break;
                 case CMakeToken.Variable:
-                    if (CMakeVariableDeclarations.IsStandardVariable(text))
+                    if (CMakeVariableDeclarations.IsStandardVariable(text,
+                        CMakeVariableType.Variable))
                     {
                         htmlFile = "cmake-variables.html#variable:" + text;
                     }

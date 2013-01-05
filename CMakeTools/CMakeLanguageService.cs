@@ -72,13 +72,22 @@ namespace CMakeTools
                 {
                     List<string> vars = CMakeParsing.ParseForVariables(
                         source.GetLines());
-                    scope.SetDeclarations(new CMakeVariableDeclarations(vars));
+                    scope.SetDeclarations(new CMakeVariableDeclarations(vars,
+                        CMakeVariableType.Variable));
                 }
                 else if (req.TokenInfo.Token == (int)CMakeToken.VariableStartEnv)
                 {
                     List<string> vars = CMakeParsing.ParseForEnvVariables(
                         source.GetLines());
-                    scope.SetDeclarations(new CMakeVariableDeclarations(vars, true));
+                    scope.SetDeclarations(new CMakeVariableDeclarations(vars,
+                        CMakeVariableType.EnvVariable));
+                }
+                else if (req.TokenInfo.Token == (int)CMakeToken.VariableStartCache)
+                {
+                    List<string> vars = CMakeParsing.ParseForCacheVariables(
+                        source.GetLines());
+                    scope.SetDeclarations(new CMakeVariableDeclarations(vars,
+                        CMakeVariableType.CacheVariable));
                 }
                 else if (req.TokenInfo.Token == (int)CMakeToken.Identifier)
                 {

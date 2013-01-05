@@ -18,6 +18,16 @@ using Microsoft.VisualStudio.Package;
 namespace CMakeTools
 {
     /// <summary>
+    /// Type of CMake variables.
+    /// </summary>
+    enum CMakeVariableType
+    {
+        Variable,
+        EnvVariable,
+        CacheVariable
+    }
+
+    /// <summary>
     /// Declarations object containing CMake variables
     /// </summary>
     class CMakeVariableDeclarations : CMakeItemDeclarations
@@ -233,21 +243,10 @@ namespace CMakeTools
             "WINDIR"
         };
 
-        public CMakeVariableDeclarations(List<string> userVariables, bool useEnv = false)
+        public CMakeVariableDeclarations(List<string> userVariables,
+            CMakeVariableType type)
         {
-            AddItems(useEnv ? _standardEnvVariables : _standardVariables,
-                ItemType.Variable);
-            string path = CMakePath.FindCMakeModules();
-            if (path != null)
-            {
-                IEnumerable<string> languages =
-                    CMakeLanguageDeclarations.GetLanguagesFromDir(path);
-                foreach (string language in languages)
-                {
-                    AddItems(_standardLangVariables.Select(
-                        x => string.Format(x, language)), ItemType.Variable);
-                }
-            }
+            AddItems(GetStandardVariables(type), ItemType.Variable);
             if (userVariables != null)
             {
                 AddItems(userVariables, ItemType.Variable);
@@ -269,17 +268,41 @@ namespace CMakeTools
         /// Check whether the given string names a standard variable.
         /// </summary>
         /// <param name="varName">The string to check.</param>
-        /// <param name="useEnv">
-        /// Boolean value indicating whether to check for standard environment variables
-        /// instead of standard CMake variables.
-        /// </param>
+        /// <param name="type">The type of variable to check for.</param>
         /// <returns>
         /// True if the string names a standard variable or false otherwise.
         /// </returns>
-        public static bool IsStandardVariable(string varName, bool useEnv = false)
+        public static bool IsStandardVariable(string varName, CMakeVariableType type)
         {
-            string[] variables = useEnv ? _standardEnvVariables : _standardVariables;
-            return Array.BinarySearch(variables, varName.ToUpper()) >= 0;
+            return GetStandardVariables(type).IndexOf(varName) >= 0;
+        }
+
+        private static List<string> GetStandardVariables(CMakeVariableType type)
+        {
+            List<string> vars = new List<string>();
+            switch (type)
+            {
+            case CMakeVariableType.Variable:
+                vars.AddRange(_standardVariables);
+                string path = CMakePath.FindCMakeModules();
+                if (path != null)
+                {
+                    IEnumerable<string> languages =
+                        CMakeLanguageDeclarations.GetLanguagesFromDir(path);
+                    foreach (string language in languages)
+                    {
+                        vars.AddRange(_standardLangVariables.Select(
+                            x => string.Format(x, language)));
+                    }
+                }
+                break;
+            case CMakeVariableType.EnvVariable:
+                vars.AddRange(_standardEnvVariables);
+                break;
+            case CMakeVariableType.CacheVariable:
+                break;
+            }
+            return vars;
         }
     }
 }

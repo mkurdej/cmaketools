@@ -61,7 +61,8 @@ namespace CMakeTools
         {
             // This is a private helper function to handle adding a variable to a list
             // if it is not already there and is not a standard CMake variable.
-            if (!CMakeVariableDeclarations.IsStandardVariable(variable))
+            if (!CMakeVariableDeclarations.IsStandardVariable(variable,
+                CMakeVariableType.Variable))
             {
                 if (vars.FindIndex(x => x.ToUpper().Equals(variable.ToUpper())) < 0)
                 {
@@ -250,7 +251,7 @@ namespace CMakeTools
                         // already there and isn't a standard variable.
                         state = VariableParseState.NeedCommand;
                         if (!CMakeVariableDeclarations.IsStandardVariable(
-                            possibleVariable, true))
+                            possibleVariable, CMakeVariableType.EnvVariable))
                         {
                             if (vars.FindIndex(x => x.ToUpper().Equals(
                                 possibleVariable.ToUpper())) < 0)

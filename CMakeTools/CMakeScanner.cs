@@ -29,6 +29,7 @@ namespace CMakeTools
         Variable,
         VariableStart,
         VariableStartEnv,
+        VariableStartCache,
         VariableStartSetEnv,
         VariableEnd,
         OpenParen,
@@ -383,6 +384,14 @@ namespace CMakeTools
                         tokenInfo.Token = (int)CMakeToken.VariableStartEnv;
                         tokenInfo.Trigger = TokenTriggers.MemberSelect;
                         _offset += 4;
+                    }
+                    else if (_offset + 5 < _source.Length &&
+                        _source.Substring(_offset, 6).Equals("CACHE{"))
+                    {
+                        SetVariableFlag(ref state, true);
+                        tokenInfo.Token = (int)CMakeToken.VariableStartCache;
+                        tokenInfo.Trigger = TokenTriggers.MemberSelect;
+                        _offset += 6;
                     }
                     tokenInfo.EndIndex = _offset - 1;
                     tokenInfo.Color = TokenColor.Identifier;
