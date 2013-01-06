@@ -67,6 +67,7 @@ namespace CMakeTools
         private readonly static Dictionary<CMakePropertyType, FactoryMethod>
             _propObjMethods = new Dictionary<CMakePropertyType, FactoryMethod>()
         {
+            { CMakePropertyType.Cache,      CreateCacheVariableDeclarations },
             { CMakePropertyType.Directory,  CreateSubdirectoryDeclarations },
             { CMakePropertyType.Source,     CreateSourceDeclarations },
             { CMakePropertyType.Target,     CreateTargetDeclarations },
@@ -188,6 +189,14 @@ namespace CMakeTools
                 decls.ExcludeItems(priorParameters.Skip(1));
             }
             return decls;
+        }
+
+        private static CMakeItemDeclarations CreateCacheVariableDeclarations(
+            CMakeCommandId id, ParseRequest req, Source source,
+            List<string> priorParameters)
+        {
+            List<string> vars = CMakeParsing.ParseForCacheVariables(source.GetLines());
+            return new CMakeVariableDeclarations(vars, CMakeVariableType.CacheVariable);
         }
 
         private static CMakeItemDeclarations CreateGetXPropertyDeclarations(
