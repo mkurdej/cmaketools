@@ -781,39 +781,39 @@ namespace CMakeTools
 
             // Test a subcommand.
             lines.Clear();
-            lines.Add("FILE(COPY foo.txt bar.txt)");
+            lines.Add("FILE(WRITE foo.txt \"bar\")");
             result = CMakeParsing.ParseForParameterInfo(lines, 0, 25);
             Assert.IsNotNull(result.CommandName);
             Assert.AreEqual("FILE", result.CommandName);
             Assert.IsNotNull(result.SubcommandName);
-            Assert.AreEqual("COPY", result.SubcommandName);
+            Assert.AreEqual("WRITE", result.SubcommandName);
             Assert.IsTrue(result.CommandSpan.HasValue);
             Assert.AreEqual(0, result.CommandSpan.Value.iStartLine);
             Assert.AreEqual(0, result.CommandSpan.Value.iStartIndex);
             Assert.AreEqual(0, result.CommandSpan.Value.iEndLine);
-            Assert.AreEqual(8, result.CommandSpan.Value.iEndIndex);
+            Assert.AreEqual(9, result.CommandSpan.Value.iEndIndex);
             Assert.IsTrue(result.BeginSpan.HasValue);
             Assert.AreEqual(0, result.BeginSpan.Value.iStartLine);
-            Assert.AreEqual(9, result.BeginSpan.Value.iStartIndex);
+            Assert.AreEqual(10, result.BeginSpan.Value.iStartIndex);
             Assert.AreEqual(0, result.BeginSpan.Value.iEndLine);
-            Assert.AreEqual(9, result.BeginSpan.Value.iEndIndex);
+            Assert.AreEqual(10, result.BeginSpan.Value.iEndIndex);
             Assert.AreEqual(1, result.SeparatorSpans.Count);
             Assert.AreEqual(0, result.SeparatorSpans[0].iStartLine);
-            Assert.AreEqual(17, result.SeparatorSpans[0].iStartIndex);
+            Assert.AreEqual(18, result.SeparatorSpans[0].iStartIndex);
             Assert.AreEqual(0, result.SeparatorSpans[0].iEndLine);
-            Assert.AreEqual(17, result.SeparatorSpans[0].iEndIndex);
+            Assert.AreEqual(18, result.SeparatorSpans[0].iEndIndex);
             Assert.IsTrue(result.EndSpan.HasValue);
             Assert.AreEqual(0, result.EndSpan.Value.iStartLine);
-            Assert.AreEqual(25, result.EndSpan.Value.iStartIndex);
+            Assert.AreEqual(24, result.EndSpan.Value.iStartIndex);
             Assert.AreEqual(0, result.EndSpan.Value.iEndLine);
-            Assert.AreEqual(25, result.EndSpan.Value.iEndIndex);
+            Assert.AreEqual(24, result.EndSpan.Value.iEndIndex);
 
             // Ensure that we can parse for names only.
             result = CMakeParsing.ParseForParameterInfo(lines, 0, -1, true);
             Assert.IsNotNull(result.CommandName);
             Assert.AreEqual("FILE", result.CommandName);
             Assert.IsNotNull(result.SubcommandName);
-            Assert.AreEqual("COPY", result.SubcommandName);
+            Assert.AreEqual("WRITE", result.SubcommandName);
             Assert.IsFalse(result.CommandSpan.HasValue);
             Assert.IsFalse(result.BeginSpan.HasValue);
             Assert.AreEqual(0, result.SeparatorSpans.Count);
