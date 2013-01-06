@@ -119,14 +119,17 @@ namespace CMakeTools
                                 // The first whitespace token after a subcommand marks
                                 // the beginning of the parameters.  The remaining
                                 // whitespace parameters separate consecutive parameters.
-                                if (GetNeedSubcommandFlag(state))
+                                if (GetSubcommandParamsFlag(state))
                                 {
-                                    SetNeedSubcommandFlag(ref state, false);
-                                    tokenInfo.Trigger = TokenTriggers.ParameterStart;
-                                }
-                                else
-                                {
-                                    tokenInfo.Trigger = TokenTriggers.ParameterNext;
+                                    if (GetNeedSubcommandFlag(state))
+                                    {
+                                        SetNeedSubcommandFlag(ref state, false);
+                                        tokenInfo.Trigger = TokenTriggers.ParameterStart;
+                                    }
+                                    else
+                                    {
+                                        tokenInfo.Trigger = TokenTriggers.ParameterNext;
+                                    }
                                 }
                             }
                             else if (id == CMakeCommandId.Unspecified ||
@@ -302,6 +305,12 @@ namespace CMakeTools
                         {
                             isKeyword = CMakeKeywords.IsKeyword(GetLastCommand(state),
                                 tokenText);
+                            if (isKeyword)
+                            {
+                                SetSubcommandParamsFlag(ref state,
+                                    CMakeSubcommandMethods.HasSubcommandParameters(
+                                    GetLastCommand(state), tokenText));
+                            }
                         }
                         tokenInfo.Color = isKeyword ? TokenColor.Keyword :
                             TokenColor.Identifier;
@@ -476,10 +485,11 @@ namespace CMakeTools
         private const int VariableFlag          = 0x40000000;
         private const int NoSeparatorFlag       = 0x20000000;
         private const int NeedSubcommandFlag    = 0x10000000;
+        private const int SubcommandParmsFlag   = 0x08000000;
         private const int ParenDepthMask        = 0x000000FF;
         private const int SeparatorCountMask    = 0x0000FF00;
         private const int SeparatorCountShift   = 8;
-        private const int LastCommandMask       = 0x0FFF0000;
+        private const int LastCommandMask       = 0x00FF0000;
         private const int LastCommandShift      = 16;
 
         public static bool GetStringFlag(int state)
@@ -562,6 +572,26 @@ namespace CMakeTools
             }
         }
 
+        private bool GetSubcommandParamsFlag(int state)
+        {
+            // Get the flag indicating that the current subcommand has parameter
+            // information.
+            return (state & SubcommandParmsFlag) != 0;
+        }
+
+        private void SetSubcommandParamsFlag(ref int state, bool subcommandParams)
+        {
+            // Set the flag indicating that the current subcommand has parameter
+            // information.
+            if (subcommandParams)
+            {
+                state |= SubcommandParmsFlag;
+            }
+            else
+            {
+                state &= ~SubcommandParmsFlag;
+            }
+        }
         private bool IncParenDepth(ref int state)
         {
             // Increment the number of parentheses in which we're nested.
@@ -609,7 +639,7 @@ namespace CMakeTools
         {
             // Get the identifier of the last command scanned from the state.
             int id = (state & LastCommandMask) >> LastCommandShift;
-            if (id == 0x00000FFF)
+            if (id == 0x000000FF)
             {
                 return CMakeCommandId.Unspecified;
             }

@@ -504,6 +504,14 @@ namespace CMakeTools
             return _allSubcommands.ContainsKey(id);
         }
 
+        public static bool HasSubcommandParameters(CMakeCommandId id,
+            string subcommand)
+        {
+            return _allSubcommands.ContainsKey(id) &&
+                _allSubcommands[id].ContainsKey(subcommand) &&
+                _allSubcommands[id][subcommand] != null;
+        }
+
         /// <summary>
         /// Get a methods object containing the parameters for a given CMake subcommand.
         /// </summary>

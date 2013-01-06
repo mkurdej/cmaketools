@@ -59,7 +59,8 @@ namespace CMakeTools
             { CMakeCommandId.SetSourceFilesProperties,  CreateSetXPropertyDeclarations },
             { CMakeCommandId.SetTestsProperties,        CreateSetXPropertyDeclarations },
             { CMakeCommandId.SetDirectoryProperties,    CreateSetXPropertyDeclarations },
-            { CMakeCommandId.GetProperty,               CreateGetPropertyDeclarations }
+            { CMakeCommandId.GetProperty,               CreateGetPropertyDeclarations },
+            { CMakeCommandId.SetProperty,               CreateSetPropertyDeclarations }
         };
 
         // Map from SET_*_PROPERTIES commands to factory methods to create declarations
@@ -74,6 +75,7 @@ namespace CMakeTools
             { CMakePropertyType.Test,       CreateTestDeclarations }
         };
 
+        // Keywords that can be used with the ADD_EXECUTABLE command.
         private static readonly string[] _addExecutableKeywords = new string[]
         {
             "EXCLUDE_FROM_ALL",
@@ -81,12 +83,21 @@ namespace CMakeTools
             "WIN32"
         };
 
+        // Keywords that can be used with the ADD_LIBRARY command.
         private static readonly string[] _addLibraryKeywords = new string[]
         {
             "EXCLUDE_FROM_ALL",
             "MODULE",
             "SHARED",
             "STATIC"
+        };
+
+        // Keywords that can be used with the SET_PROPERTY command.
+        private static readonly string[] _setPropertyKeywords = new string[]
+        {
+            "APPEND",
+            "APPEND_STRING",
+            "PROPERTY"
         };
 
         private static readonly Dictionary<CMakeCommandId, string[]> _commandKeywords =
@@ -348,6 +359,44 @@ namespace CMakeTools
                     decls = new CMakeItemDeclarations();
                     decls.AddItem("PROPERTY", CMakeItemDeclarations.ItemType.Command);
                 }
+            }
+            return decls;
+        }
+
+        private static CMakeItemDeclarations CreateSetPropertyDeclarations(
+            CMakeCommandId id, ParseRequest req, Source source,
+            List<string> priorParameters)
+        {
+            CMakeItemDeclarations decls = null;
+            int propertyIndex = priorParameters.IndexOf("PROPERTY");
+            if (propertyIndex < 0)
+            {
+                CMakePropertyType type = CMakeProperties.GetPropertyTypeFromKeyword(
+                    priorParameters[0]);
+                if (_propObjMethods.ContainsKey(type) &&
+                    !priorParameters.Any(x => _setPropertyKeywords.Contains(x)))
+                {
+                    decls = _propObjMethods[type](id, req, source, priorParameters);
+                }
+                else
+                {
+                    decls = new CMakeItemDeclarations();
+                }
+                if (priorParameters.Count > 1 || type == CMakePropertyType.Global)
+                {
+                    decls.AddItems(_setPropertyKeywords,
+                        CMakeItemDeclarations.ItemType.Command);
+                }
+                decls.ExcludeItems(priorParameters.Skip(1));
+            }
+            else if (propertyIndex == priorParameters.Count - 1)
+            {
+                CMakePropertyType type = CMakeProperties.GetPropertyTypeFromKeyword(
+                    priorParameters[0]);
+                IEnumerable<string> properties = CMakeProperties.GetPropertiesOfType(
+                    type);
+                decls = new CMakeItemDeclarations();
+                decls.AddItems(properties, CMakeItemDeclarations.ItemType.Property);
             }
             return decls;
         }
