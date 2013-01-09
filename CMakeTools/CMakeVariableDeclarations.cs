@@ -45,21 +45,13 @@ namespace CMakeTools
             "CMAKE_AUTOMOC",
             "CMAKE_AUTOMOC_MOC_OPTIONS",
             "CMAKE_AUTOMOC_RELAXED_MODE",
-            "CMAKE_BACKWARDS_COMPATIBILITY",
-            "CMAKE_BINARY_DIR",
-            "CMAKE_BUILD_TOOL",
             "CMAKE_BUILD_TYPE",
             "CMAKE_BUILD_WITH_INSTALL_RPATH",
-            "CMAKE_CACHE_MAJOR_VERSION",
-            "CMAKE_CACHE_MINOR_VERSION",
-            "CMAKE_CACHE_PATCH_VERSION",
             "CMAKE_CACHEFILE_DIR",
             "CMAKE_CFG_INTDIR",
             "CMAKE_CL_64",
             "CMAKE_COLOR_MAKEFILE",
-            "CMAKE_COMMAND",
             "CMAKE_COMPILER_2005",
-            "CMAKE_CONFIGURATION_TYPES",
             "CMAKE_CROSSCOMPILING",
             "CMAKE_CTEST_COMMAND",
             "CMAKE_CURRENT_BINARY_DIR",
@@ -69,16 +61,12 @@ namespace CMakeTools
             "CMAKE_CURRENT_SOURCE_DIR",
             "CMAKE_DL_LIBS",
             "CMAKE_DEBUG_POSTFIX",
-            "CMAKE_EDIT_COMMAND",
-            "CMAKE_EXE_LINKER_FLAGS",
             "CMAKE_EXECUTABLE_SUFFIX",
             "CMAKE_EXTRA_GENERATOR",
             "CMAKE_EXTRA_SHARED_LIBRARY_SUFFIXES",
             "CMAKE_FIND_LIBRARY_PREFIXES",
             "CMAKE_FIND_LIBRARY_SUFFIXES",
             "CMAKE_FIND_PACKAGE_WARN_NO_MODULE",
-            "CMAKE_GENERATOR",
-            "CMAKE_HOME_DIRECTORY",
             "CMAKE_HOST_APPLE",
             "CMAKE_HOST_SYSTEM",
             "CMAKE_HOST_SYSTEM_NAME",
@@ -93,7 +81,6 @@ namespace CMakeTools
             "CMAKE_INCLUDE_PATH",
             "CMAKE_INSTALL_DEFAULT_COMPONENT_NAME",
             "CMAKE_INSTALL_NAME_DIR",
-            "CMAKE_INSTALL_PREFIX",
             "CMAKE_INSTALL_RPATH",
             "CMAKE_INSTALL_RPATH_USE_LINK_PATH",
             "CMAKE_INTERNAL_PLATFORM_ABI",
@@ -109,7 +96,6 @@ namespace CMakeTools
             "CMAKE_LINK_LIBRARY_SUFFIX",
             "CMAKE_MACOSX_BUNDLE",
             "CMAKE_MAJOR_VERSION",
-            "CMAKE_MAKE_PROGRAM",
             "CMAKE_MFC_FLAG",
             "CMAKE_MINOR_VERSION",
             "CMAKE_MODULE_PATH",
@@ -122,9 +108,7 @@ namespace CMakeTools
             "CMAKE_POSITION_INDEPENDENT_CODE",
             "CMAKE_PREFIX_PATH",
             "CMAKE_PROGRAM_PATH",
-            "CMAKE_PROJECT_NAME",
             "CMAKE_RANLIB",
-            "CMAKE_ROOT",
             "CMAKE_RUNTIME_OUTPUT_DIRECTORY",
             "CMAKE_SCRIPT_MODE_FILE",
             "CMAKE_SHARED_LIBRARY_PREFIX",
@@ -134,7 +118,6 @@ namespace CMakeTools
             "CMAKE_SIZEOF_VOID_P",
             "CMAKE_SKIP_BUILD_RPATH",
             "CMAKE_SKIP_INSTALL_ALL_DEPENDENCY",
-            "CMAKE_SKIP_RPATH",
             "CMAKE_SOURCE_DIR",
             "CMAKE_STANDARD_LIBRARIES",
             "CMAKE_STATIC_LIBRARY_PREFIX",
@@ -150,16 +133,12 @@ namespace CMakeTools
             "CMAKE_SYSTEM_VERSION",
             "CMAKE_TRY_COMPILE_CONFIGURATION",
             "CMAKE_TWEAK_VERSION",
-            "CMAKE_USE_RELATIVE_PATHS",
             "CMAKE_USER_MAKE_RULES_OVERRIDE",
             "CMAKE_USING_VC_FREE_TOOLS",
-            "CMAKE_VERBOSE_MAKEFILE",
             "CMAKE_VERSION",
             "CMAKE_VS_PLATFORM_TOOLSET",
             "CMAKE_WIN32_EXECUTABLE",
             "CYGWIN",
-            "EXECUTABLE_OUTPUT_PATH",
-            "LIBRARY_OUTPUT_PATH",
             "MSVC",
             "MSVC10",
             "MSVC11",
@@ -170,9 +149,7 @@ namespace CMakeTools
             "MSVC90",
             "MSVC_IDE",
             "MSVC_VERSION",
-            "PROJECT_BINARY_DIR",
             "PROJECT_NAME",
-            "PROJECT_SOURCE_DIR",
             "UNIX",
             "WIN32",
             "XCODE_VERSION"
@@ -210,6 +187,33 @@ namespace CMakeTools
             "CMAKE_{0}_SIZEOF_DATA_PTR",
             "CMAKE_{0}_SOURCE_FILE_EXTENSIONS",
             "CMAKE_USER_MAKE_RULES_OVERRIDE_{0}"
+        };
+
+        // Array of standard cache variables.
+        private static readonly string[] _standardCacheVariables = new string[]
+        {
+            "CMAKE_BACKWARDS_COMPATIBILITY",
+            "CMAKE_BUILD_TOOL",
+            "CMAKE_CACHE_MAJOR_VERSION",
+            "CMAKE_CACHE_MINOR_VERSION",
+            "CMAKE_CACHE_PATCH_VERSION",
+            "CMAKE_COMMAND",
+            "CMAKE_CONFIGURATION_TYPES",
+            "CMAKE_EDIT_COMMAND",
+            "CMAKE_EXE_LINKER_FLAGS",
+            "CMAKE_GENERATOR",
+            "CMAKE_HOME_DIRECTORY",
+            "CMAKE_INSTALL_PREFIX",
+            "CMAKE_MAKE_PROGRAM",
+            "CMAKE_PROJECT_NAME",
+            "CMAKE_ROOT",
+            "CMAKE_SKIP_RPATH",
+            "CMAKE_USE_RELATIVE_PATHS",
+            "CMAKE_VERBOSE_MAKEFILE",
+            "EXECUTABLE_OUTPUT_PATH",
+            "LIBRARY_OUTPUT_PATH",
+            "PROJECT_BINARY_DIR",
+            "PROJECT_SOURCE_DIR",
         };
 
         // Array of standard environment variables.  This list was taken from
@@ -284,6 +288,7 @@ namespace CMakeTools
             {
             case CMakeVariableType.Variable:
                 vars.AddRange(_standardVariables);
+                vars.AddRange(_standardCacheVariables);
                 string path = CMakePath.FindCMakeModules();
                 if (path != null)
                 {
@@ -300,6 +305,7 @@ namespace CMakeTools
                 vars.AddRange(_standardEnvVariables);
                 break;
             case CMakeVariableType.CacheVariable:
+                vars.AddRange(_standardCacheVariables);
                 break;
             }
             return vars;
