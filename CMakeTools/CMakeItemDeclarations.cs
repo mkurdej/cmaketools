@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.Package;
+using Microsoft.VisualStudio.TextManager.Interop;
 
 namespace CMakeTools
 {
@@ -168,6 +169,20 @@ namespace CMakeTools
             }
             EnsureSorted();
             return _items[index].Name;
+        }
+
+        public override string OnCommit(IVsTextView textView, string textSoFar,
+            char commitCharacter, int index, ref TextSpan initialExtent)
+        {
+            if (string.IsNullOrEmpty(textSoFar) && commitCharacter == ' ')
+            {
+                // If the user types a space when the list box first appears, insert the
+                // space.  The space will generally trigger the exact same member
+                // selection list box to appear again.
+                return " ";
+            }
+            return base.OnCommit(textView, textSoFar, commitCharacter, index,
+                ref initialExtent);
         }
 
         private void EnsureSorted()
