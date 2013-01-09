@@ -170,10 +170,6 @@ namespace CMakeTools
             "CMAKE_{0}_CREATE_SHARED_LIBRARY",
             "CMAKE_{0}_CREATE_SHARED_MODULE",
             "CMAKE_{0}_CREATE_STATIC_LIBRARY",
-            "CMAKE_{0}_FLAGS_DEBUG",
-            "CMAKE_{0}_FLAGS_MINSIZEREL",
-            "CMAKE_{0}_FLAGS_RELEASE",
-            "CMAKE_{0}_FLAGS_RELWITHDEBINFO",
             "CMAKE_{0}_IGNORE_EXTENSIONS",
             "CMAKE_{0}_IMPLICIT_INCLUDE_DIRECTORIES",
             "CMAKE_{0}_IMPLICIT_LINK_DIRECTORIES",
@@ -213,7 +209,16 @@ namespace CMakeTools
             "EXECUTABLE_OUTPUT_PATH",
             "LIBRARY_OUTPUT_PATH",
             "PROJECT_BINARY_DIR",
-            "PROJECT_SOURCE_DIR",
+            "PROJECT_SOURCE_DIR"
+        };
+
+        // Array of standard cache variables defined for each language.
+        private static readonly string[] _standardLangCacheVariables = new string[]
+        {
+            "CMAKE_{0}_FLAGS_DEBUG",
+            "CMAKE_{0}_FLAGS_MINSIZEREL",
+            "CMAKE_{0}_FLAGS_RELEASE",
+            "CMAKE_{0}_FLAGS_RELWITHDEBINFO"
         };
 
         // Array of standard environment variables.  This list was taken from
@@ -287,7 +292,13 @@ namespace CMakeTools
             switch (type)
             {
             case CMakeVariableType.Variable:
-                vars.AddRange(_standardVariables);
+            case CMakeVariableType.CacheVariable:
+                // All cache variables also serve as ordinary CMake variables, but not
+                // the other way around.
+                if (type == CMakeVariableType.Variable)
+                {
+                    vars.AddRange(_standardVariables);
+                }
                 vars.AddRange(_standardCacheVariables);
                 string path = CMakePath.FindCMakeModules();
                 if (path != null)
@@ -296,16 +307,18 @@ namespace CMakeTools
                         CMakeLanguageDeclarations.GetLanguagesFromDir(path);
                     foreach (string language in languages)
                     {
-                        vars.AddRange(_standardLangVariables.Select(
+                        if (type == CMakeVariableType.Variable)
+                        {
+                            vars.AddRange(_standardLangVariables.Select(
+                                x => string.Format(x, language)));
+                        }
+                        vars.AddRange(_standardLangCacheVariables.Select(
                             x => string.Format(x, language)));
                     }
                 }
                 break;
             case CMakeVariableType.EnvVariable:
                 vars.AddRange(_standardEnvVariables);
-                break;
-            case CMakeVariableType.CacheVariable:
-                vars.AddRange(_standardCacheVariables);
                 break;
             }
             return vars;
