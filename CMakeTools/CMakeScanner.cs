@@ -458,9 +458,23 @@ namespace CMakeTools
             // If the user has begun to type a reference to a variable inside the string,
             // trigger member selection to show a list of variables.
             string tokenText = _source.ExtractToken(tokenInfo);
-            if (_varTokenMap.Any(x => tokenText.EndsWith(x.Value)))
+            CMakeToken varToken = _varTokenMap.FirstOrDefault(
+                x => tokenText.EndsWith(x.Value)).Key;
+            if (varToken != CMakeToken.Unspecified)
             {
-                tokenInfo.Trigger = TokenTriggers.MemberSelect;
+                // Don't trigger member selection if the dollar sign is preceded by an
+                // escape character, unless the escape character is itself escaped.
+                int pos = tokenText.Length - _varTokenMap[varToken].Length - 1;
+                int escapeCount = 0;
+                while (pos > 0 && tokenText[pos] == '\\')
+                {
+                    escapeCount++;
+                    pos--;
+                }
+                if (escapeCount % 2 == 0)
+                {
+                    tokenInfo.Trigger = TokenTriggers.MemberSelect;
+                }
             }
         }
 
