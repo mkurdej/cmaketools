@@ -68,28 +68,50 @@ namespace CMakeTools
             {
                 // Set an appropriate declarations object depending on the token that
                 // triggered member selection.
-                if (req.TokenInfo.Token == (int)CMakeToken.VariableStart)
+                CMakeToken token = (CMakeToken)req.TokenInfo.Token;
+                if (token == CMakeToken.String)
+                {
+                    // If the token is a string and the user has began to reference a
+                    // variable inside the string, treat the string as if it was the
+                    // appropriate type of variable start token and display member
+                    // selection for variables.
+                    string line = source.GetLine(req.Line);
+                    string tokenText = line.ExtractToken(req.TokenInfo);
+                    if (tokenText.EndsWith("${"))
+                    {
+                        token = CMakeToken.VariableStart;
+                    }
+                    else if (tokenText.EndsWith("$ENV{"))
+                    {
+                        token = CMakeToken.VariableStartEnv;
+                    }
+                    else if (tokenText.EndsWith("$CACHE{"))
+                    {
+                        token = CMakeToken.VariableStartCache;
+                    }
+                }
+                if (token == CMakeToken.VariableStart)
                 {
                     List<string> vars = CMakeParsing.ParseForVariables(
                         source.GetLines());
                     scope.SetDeclarations(new CMakeVariableDeclarations(vars,
                         CMakeVariableType.Variable));
                 }
-                else if (req.TokenInfo.Token == (int)CMakeToken.VariableStartEnv)
+                else if (token == CMakeToken.VariableStartEnv)
                 {
                     List<string> vars = CMakeParsing.ParseForEnvVariables(
                         source.GetLines());
                     scope.SetDeclarations(new CMakeVariableDeclarations(vars,
                         CMakeVariableType.EnvVariable));
                 }
-                else if (req.TokenInfo.Token == (int)CMakeToken.VariableStartCache)
+                else if (token == CMakeToken.VariableStartCache)
                 {
                     List<string> vars = CMakeParsing.ParseForCacheVariables(
                         source.GetLines());
                     scope.SetDeclarations(new CMakeVariableDeclarations(vars,
                         CMakeVariableType.CacheVariable));
                 }
-                else if (req.TokenInfo.Token == (int)CMakeToken.Identifier)
+                else if (token == CMakeToken.Identifier)
                 {
                     CMakeParsing.TokenData tokenData;
                     CMakeParsing.ParseForToken(source.GetLines(), req.Line,
@@ -119,7 +141,7 @@ namespace CMakeTools
                         scope.SetDeclarations(decls);
                     }
                 }
-                else if (req.TokenInfo.Token == (int)CMakeToken.OpenParen)
+                else if (token == CMakeToken.OpenParen)
                 {
                     CMakeCommandId id = CMakeParsing.ParseForTriggerCommandId(
                         source.GetLines(), req.Line, req.TokenInfo.StartIndex);
@@ -127,7 +149,7 @@ namespace CMakeTools
                         id, req, source);
                     scope.SetDeclarations(decls);
                 }
-                else if (req.TokenInfo.Token == (int)CMakeToken.WhiteSpace)
+                else if (token == CMakeToken.WhiteSpace)
                 {
                     CMakeParsing.TokenData tokenData;
                     CMakeParsing.ParseForToken(source.GetLines(), req.Line,

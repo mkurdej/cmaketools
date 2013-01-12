@@ -456,6 +456,15 @@ namespace CMakeTools
             _offset = _source.Length;
             tokenInfo.EndIndex = _source.Length - 1;
             SetStringFlag(ref state, true);
+
+            // If the user has begun to type a reference to a variable inside the string,
+            // trigger member selection to show a list of variables.
+            string tokenText = _source.ExtractToken(tokenInfo);
+            if (tokenText.EndsWith("${") || tokenText.EndsWith("$ENV{") ||
+                tokenText.EndsWith("$CACHE{"))
+            {
+                tokenInfo.Trigger = TokenTriggers.MemberSelect;
+            }
         }
 
         private bool ScanFileNameChar()
