@@ -10,6 +10,8 @@
  * 
  * **************************************************************************/
 
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.VisualStudio.Package;
 
 namespace CMakeTools
@@ -19,6 +21,7 @@ namespace CMakeTools
     /// </summary>
     public enum CMakeToken
     {
+        Unspecified,
         WhiteSpace,
         String,
         Comment,
@@ -54,6 +57,15 @@ namespace CMakeTools
         // This flag indicates whether the last token scanned on the current line was a
         // whitespace token.
         private bool _lastWhitespace;
+
+        // Map from variable start tokens to their string representations.
+        private static readonly Dictionary<CMakeToken, string> _varTokenMap =
+            new Dictionary<CMakeToken, string>()
+        {
+            { CMakeToken.VariableStart,         "${" },
+            { CMakeToken.VariableStartEnv,      "$ENV{" },
+            { CMakeToken.VariableStartCache,    "$CACHE{" }
+        };
 
         public CMakeScanner(bool textFile = false)
         {
@@ -377,30 +389,16 @@ namespace CMakeTools
                 else if (_source[_offset] == '$')
                 {
                     // Scan a variable start token.
+                    CMakeToken varToken = _varTokenMap.FirstOrDefault(
+                        x => _source.Substring(_offset).StartsWith(x.Value)).Key;
                     tokenInfo.StartIndex = _offset;
                     _offset++;
-                    if (_offset < _source.Length && _source[_offset] == '{')
+                    if (varToken != CMakeToken.Unspecified)
                     {
                         SetVariableFlag(ref state, true);
-                        tokenInfo.Token = (int)CMakeToken.VariableStart;
+                        tokenInfo.Token = (int)varToken;
                         tokenInfo.Trigger = TokenTriggers.MemberSelect;
-                        _offset++;
-                    }
-                    else if (_offset + 3 < _source.Length &&
-                        _source.Substring(_offset, 4).Equals("ENV{"))
-                    {
-                        SetVariableFlag(ref state, true);
-                        tokenInfo.Token = (int)CMakeToken.VariableStartEnv;
-                        tokenInfo.Trigger = TokenTriggers.MemberSelect;
-                        _offset += 4;
-                    }
-                    else if (_offset + 5 < _source.Length &&
-                        _source.Substring(_offset, 6).Equals("CACHE{"))
-                    {
-                        SetVariableFlag(ref state, true);
-                        tokenInfo.Token = (int)CMakeToken.VariableStartCache;
-                        tokenInfo.Trigger = TokenTriggers.MemberSelect;
-                        _offset += 6;
+                        _offset += _varTokenMap[varToken].Length - 1;
                     }
                     tokenInfo.EndIndex = _offset - 1;
                     tokenInfo.Color = TokenColor.Identifier;
@@ -460,8 +458,7 @@ namespace CMakeTools
             // If the user has begun to type a reference to a variable inside the string,
             // trigger member selection to show a list of variables.
             string tokenText = _source.ExtractToken(tokenInfo);
-            if (tokenText.EndsWith("${") || tokenText.EndsWith("$ENV{") ||
-                tokenText.EndsWith("$CACHE{"))
+            if (_varTokenMap.Any(x => tokenText.EndsWith(x.Value)))
             {
                 tokenInfo.Trigger = TokenTriggers.MemberSelect;
             }
