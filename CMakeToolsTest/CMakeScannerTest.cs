@@ -714,5 +714,79 @@ namespace CMakeTools
             Assert.AreEqual(TokenTriggers.MemberSelect, tokenInfo.Trigger);
             Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
         }
+
+        /// <summary>
+        /// Test scanning strings that contain variable references.
+        /// </summary>
+        [TestMethod]
+        public void TestVariablesInStrings()
+        {
+            CMakeScanner scanner = new CMakeScanner();
+            TokenInfo tokenInfo = new TokenInfo();
+            int state;
+
+            scanner.SetSource("\"FOO${", 0);
+            state = 0;
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(0, tokenInfo.StartIndex);
+            Assert.AreEqual(5, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.String, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.MemberSelect, tokenInfo.Trigger);
+            Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+
+            scanner.SetSource("\"FOO$ENV{", 0);
+            state = 0;
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(0, tokenInfo.StartIndex);
+            Assert.AreEqual(8, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.String, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.MemberSelect, tokenInfo.Trigger);
+            Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+
+            scanner.SetSource("\"FOO$CACHE{", 0);
+            state = 0;
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(0, tokenInfo.StartIndex);
+            Assert.AreEqual(10, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.String, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.MemberSelect, tokenInfo.Trigger);
+            Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+
+            scanner.SetSource("\"FOO${BAR", 0);
+            state = 0;
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(0, tokenInfo.StartIndex);
+            Assert.AreEqual(8, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.String, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+            Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+
+            scanner.SetSource("\"FOO${\"", 0);
+            state = 0;
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(0, tokenInfo.StartIndex);
+            Assert.AreEqual(6, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.String, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+            Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+
+            scanner.SetSource("\"FOO\\${", 0);
+            state = 0;
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(0, tokenInfo.StartIndex);
+            Assert.AreEqual(6, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.String, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+            Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+
+            scanner.SetSource("\"FOO\\\\${", 0);
+            state = 0;
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(0, tokenInfo.StartIndex);
+            Assert.AreEqual(7, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.String, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.MemberSelect, tokenInfo.Trigger);
+            Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+        }
     }
 }
