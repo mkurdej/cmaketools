@@ -56,11 +56,28 @@ namespace CMakeTools
             }
             if (req.Sink.BraceMatching)
             {
-                List<CMakeParsing.SpanPair> pairs = CMakeParsing.ParseForParens(
-                    source.GetLines());
-                foreach (CMakeParsing.SpanPair pair in pairs)
+                List<CMakeParsing.SpanPair> pairs = null;
+                switch ((CMakeToken)req.TokenInfo.Token)
                 {
-                    req.Sink.MatchPair(pair.First, pair.Second, 0);
+                case CMakeToken.OpenParen:
+                case CMakeToken.CloseParen:
+                    pairs = CMakeParsing.ParseForParens(source.GetLines());
+                    break;
+                case CMakeToken.VariableStart:
+                case CMakeToken.VariableStartEnv:
+                case CMakeToken.VariableStartCache:
+                case CMakeToken.VariableStartSetEnv:
+                case CMakeToken.VariableEnd:
+                    pairs = CMakeParsing.ParseForVariableBraces(source.GetLines(),
+                        req.Line);
+                    break;
+                }
+                if (pairs != null)
+                {
+                    foreach (CMakeParsing.SpanPair pair in pairs)
+                    {
+                        req.Sink.MatchPair(pair.First, pair.Second, 0);
+                    }
                 }
             }
             if (req.Reason == ParseReason.MemberSelect ||

@@ -397,7 +397,8 @@ namespace CMakeTools
                     {
                         SetVariableFlag(ref state, true);
                         tokenInfo.Token = (int)varToken;
-                        tokenInfo.Trigger = TokenTriggers.MemberSelect;
+                        tokenInfo.Trigger =
+                            TokenTriggers.MemberSelect | TokenTriggers.MatchBraces;
                         _offset += _varTokenMap[varToken].Length - 1;
                     }
                     tokenInfo.EndIndex = _offset - 1;
@@ -411,6 +412,7 @@ namespace CMakeTools
                     tokenInfo.EndIndex = _offset;
                     tokenInfo.Color = TokenColor.Identifier;
                     tokenInfo.Token = (int)CMakeToken.VariableEnd;
+                    tokenInfo.Trigger = TokenTriggers.MatchBraces;
                     _offset++;
                     return true;
                 }

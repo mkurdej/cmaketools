@@ -1469,6 +1469,63 @@ namespace CMakeTools
         }
 
         /// <summary>
+        /// Parse for pairs of matching braces denoting references to variables.
+        /// </summary>
+        /// <param name="lines">A collection of lines to parse.</param>
+        /// <param name="lineNum">The number of the line on which to find braces.</param>
+        /// <returns>A list of pairs of matching braces.</returns>
+        public static List<SpanPair> ParseForVariableBraces(IEnumerable<string> lines,
+            int lineNum)
+        {
+            List<SpanPair> pairs = new List<SpanPair>();
+            Stack<TextSpan> stack = new Stack<TextSpan>();
+            CMakeScanner scanner = new CMakeScanner();
+            TokenInfo tokenInfo = new TokenInfo();
+            int state = 0;
+            int i = 0;
+            foreach (string line in lines)
+            {
+                scanner.SetSource(line, 0);
+                if (i < lineNum)
+                {
+                    while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+                }
+                else
+                {
+                    while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state))
+                    {
+                        switch ((CMakeToken)tokenInfo.Token)
+                        {
+                        case CMakeToken.VariableStart:
+                        case CMakeToken.VariableStartEnv:
+                        case CMakeToken.VariableStartCache:
+                        case CMakeToken.VariableStartSetEnv:
+                            stack.Push(tokenInfo.ToTextSpan(i));
+                            break;
+                        case CMakeToken.VariableEnd:
+                            if (stack.Count > 0)
+                            {
+                                pairs.Add(new SpanPair()
+                                {
+                                    First = stack.Pop(),
+                                    Second = tokenInfo.ToTextSpan(i)
+                                });
+                            }
+                            break;
+                        case CMakeToken.Variable:
+                            break;
+                        default:
+                            stack.Clear();
+                            break;
+                        }
+                    }
+                }
+                i++;
+            }
+            return pairs;
+        }
+
+        /// <summary>
         /// Check whether the line following the specified line should be indented.
         /// </summary>
         /// <param name="lines">A collection of lines to parse.</param>
