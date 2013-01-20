@@ -59,7 +59,8 @@ namespace CMakeTools
             Assert.AreEqual(8, tokenInfo.StartIndex);
             Assert.AreEqual(9, tokenInfo.EndIndex);
             Assert.AreEqual(CMakeToken.VariableStart, (CMakeToken)tokenInfo.Token);
-            Assert.AreEqual(TokenTriggers.MemberSelect, tokenInfo.Trigger);
+            Assert.AreEqual(TokenTriggers.MemberSelect | TokenTriggers.MatchBraces,
+                tokenInfo.Trigger);
             Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
             Assert.AreEqual(10, tokenInfo.StartIndex);
             Assert.AreEqual(12, tokenInfo.EndIndex);
@@ -69,7 +70,7 @@ namespace CMakeTools
             Assert.AreEqual(13, tokenInfo.StartIndex);
             Assert.AreEqual(13, tokenInfo.EndIndex);
             Assert.AreEqual(CMakeToken.VariableEnd, (CMakeToken)tokenInfo.Token);
-            Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+            Assert.AreEqual(TokenTriggers.MatchBraces, tokenInfo.Trigger);
             Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
             Assert.AreEqual(14, tokenInfo.StartIndex);
             Assert.AreEqual(14, tokenInfo.EndIndex);
@@ -145,7 +146,8 @@ namespace CMakeTools
             Assert.AreEqual(0, tokenInfo.StartIndex);
             Assert.AreEqual(4, tokenInfo.EndIndex);
             Assert.AreEqual(CMakeToken.VariableStartEnv, (CMakeToken)tokenInfo.Token);
-            Assert.AreEqual(TokenTriggers.MemberSelect, tokenInfo.Trigger);
+            Assert.AreEqual(TokenTriggers.MemberSelect | TokenTriggers.MatchBraces,
+                tokenInfo.Trigger);
             Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
             Assert.AreEqual(5, tokenInfo.StartIndex);
             Assert.AreEqual(7, tokenInfo.EndIndex);
@@ -155,7 +157,7 @@ namespace CMakeTools
             Assert.AreEqual(8, tokenInfo.StartIndex);
             Assert.AreEqual(8, tokenInfo.EndIndex);
             Assert.AreEqual(CMakeToken.VariableEnd, (CMakeToken)tokenInfo.Token);
-            Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+            Assert.AreEqual(TokenTriggers.MatchBraces, tokenInfo.Trigger);
             Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
         }
 
@@ -286,7 +288,7 @@ namespace CMakeTools
             Assert.AreEqual(11, tokenInfo.StartIndex);
             Assert.AreEqual(11, tokenInfo.EndIndex);
             Assert.AreEqual(CMakeToken.VariableEnd, (CMakeToken)tokenInfo.Token);
-            Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+            Assert.AreEqual(TokenTriggers.MatchBraces, tokenInfo.Trigger);
             Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
             Assert.AreEqual(12, tokenInfo.StartIndex);
             Assert.AreEqual(12, tokenInfo.EndIndex);
@@ -338,7 +340,7 @@ namespace CMakeTools
             Assert.AreEqual(12, tokenInfo.StartIndex);
             Assert.AreEqual(12, tokenInfo.EndIndex);
             Assert.AreEqual(CMakeToken.VariableEnd, (CMakeToken)tokenInfo.Token);
-            Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+            Assert.AreEqual(TokenTriggers.MatchBraces, tokenInfo.Trigger);
             Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
             Assert.AreEqual(13, tokenInfo.StartIndex);
             Assert.AreEqual(13, tokenInfo.EndIndex);
@@ -491,7 +493,8 @@ namespace CMakeTools
             Assert.AreEqual(0, tokenInfo.StartIndex);
             Assert.AreEqual(1, tokenInfo.EndIndex);
             Assert.AreEqual(CMakeToken.VariableStart, (CMakeToken)tokenInfo.Token);
-            Assert.AreEqual(TokenTriggers.MemberSelect, tokenInfo.Trigger);
+            Assert.AreEqual(TokenTriggers.MemberSelect | TokenTriggers.MatchBraces,
+                tokenInfo.Trigger);
             Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
             Assert.AreEqual(2, tokenInfo.StartIndex);
             Assert.AreEqual(2, tokenInfo.EndIndex);
@@ -501,7 +504,7 @@ namespace CMakeTools
             Assert.AreEqual(3, tokenInfo.StartIndex);
             Assert.AreEqual(3, tokenInfo.EndIndex);
             Assert.AreEqual(CMakeToken.VariableEnd, (CMakeToken)tokenInfo.Token);
-            Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+            Assert.AreEqual(TokenTriggers.MatchBraces, tokenInfo.Trigger);
             Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
 
             // Test getting a variable whose name starts with a number.
@@ -511,7 +514,8 @@ namespace CMakeTools
             Assert.AreEqual(0, tokenInfo.StartIndex);
             Assert.AreEqual(1, tokenInfo.EndIndex);
             Assert.AreEqual(CMakeToken.VariableStart, (CMakeToken)tokenInfo.Token);
-            Assert.AreEqual(TokenTriggers.MemberSelect, tokenInfo.Trigger);
+            Assert.AreEqual(TokenTriggers.MemberSelect | TokenTriggers.MatchBraces,
+                tokenInfo.Trigger);
             Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
             Assert.AreEqual(2, tokenInfo.StartIndex);
             Assert.AreEqual(4, tokenInfo.EndIndex);
@@ -521,7 +525,7 @@ namespace CMakeTools
             Assert.AreEqual(5, tokenInfo.StartIndex);
             Assert.AreEqual(5, tokenInfo.EndIndex);
             Assert.AreEqual(CMakeToken.VariableEnd, (CMakeToken)tokenInfo.Token);
-            Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+            Assert.AreEqual(TokenTriggers.MatchBraces, tokenInfo.Trigger);
             Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
 
             // Test setting a variable whose name contains a hyphen.

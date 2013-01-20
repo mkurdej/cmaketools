@@ -1114,6 +1114,92 @@ namespace CMakeTools
         }
 
         /// <summary>
+        /// Test for matching pair of curly braces denoting variable references.
+        /// </summary>
+        [TestMethod]
+        public void TestParseForVariableBraces()
+        {
+            // Test a single pair.
+            List<string> lines = new List<string>();
+            lines.Add("${FOO}");
+            List<CMakeParsing.SpanPair> pairs = CMakeParsing.ParseForVariableBraces(
+                lines, 0);
+            Assert.IsNotNull(pairs);
+            Assert.AreEqual(1, pairs.Count);
+            Assert.AreEqual(0, pairs[0].First.iStartLine);
+            Assert.AreEqual(0, pairs[0].First.iStartIndex);
+            Assert.AreEqual(0, pairs[0].First.iEndLine);
+            Assert.AreEqual(2, pairs[0].First.iEndIndex);
+            Assert.AreEqual(0, pairs[0].Second.iStartLine);
+            Assert.AreEqual(5, pairs[0].Second.iStartIndex);
+            Assert.AreEqual(0, pairs[0].Second.iEndLine);
+            Assert.AreEqual(6, pairs[0].Second.iEndIndex);
+            lines.Clear();
+            lines.Add("$ENV{FOO}");
+            pairs = CMakeParsing.ParseForVariableBraces(lines, 0);
+            Assert.IsNotNull(pairs);
+            Assert.AreEqual(1, pairs.Count);
+            Assert.AreEqual(0, pairs[0].First.iStartLine);
+            Assert.AreEqual(0, pairs[0].First.iStartIndex);
+            Assert.AreEqual(0, pairs[0].First.iEndLine);
+            Assert.AreEqual(5, pairs[0].First.iEndIndex);
+            Assert.AreEqual(0, pairs[0].Second.iStartLine);
+            Assert.AreEqual(8, pairs[0].Second.iStartIndex);
+            Assert.AreEqual(0, pairs[0].Second.iEndLine);
+            Assert.AreEqual(9, pairs[0].Second.iEndIndex);
+            lines.Clear();
+            lines.Add("$CACHE{FOO}");
+            pairs = CMakeParsing.ParseForVariableBraces(lines, 0);
+            Assert.IsNotNull(pairs);
+            Assert.AreEqual(1, pairs.Count);
+            Assert.AreEqual(0, pairs[0].First.iStartLine);
+            Assert.AreEqual(0, pairs[0].First.iStartIndex);
+            Assert.AreEqual(0, pairs[0].First.iEndLine);
+            Assert.AreEqual(7, pairs[0].First.iEndIndex);
+            Assert.AreEqual(0, pairs[0].Second.iStartLine);
+            Assert.AreEqual(10, pairs[0].Second.iStartIndex);
+            Assert.AreEqual(0, pairs[0].Second.iEndLine);
+            Assert.AreEqual(11, pairs[0].Second.iEndIndex);
+
+            // Test two nested pairs.
+            lines.Clear();
+            lines.Add("${${FOO}}");
+            pairs = CMakeParsing.ParseForVariableBraces(lines, 0);
+            Assert.IsNotNull(pairs);
+            Assert.AreEqual(2, pairs.Count);
+            Assert.AreEqual(0, pairs[0].First.iStartLine);
+            Assert.AreEqual(2, pairs[0].First.iStartIndex);
+            Assert.AreEqual(0, pairs[0].First.iEndLine);
+            Assert.AreEqual(4, pairs[0].First.iEndIndex);
+            Assert.AreEqual(0, pairs[0].Second.iStartLine);
+            Assert.AreEqual(7, pairs[0].Second.iStartIndex);
+            Assert.AreEqual(0, pairs[0].Second.iEndLine);
+            Assert.AreEqual(8, pairs[0].Second.iEndIndex);
+            Assert.AreEqual(0, pairs[1].First.iStartLine);
+            Assert.AreEqual(0, pairs[1].First.iStartIndex);
+            Assert.AreEqual(0, pairs[1].First.iEndLine);
+            Assert.AreEqual(2, pairs[1].First.iEndIndex);
+            Assert.AreEqual(0, pairs[1].Second.iStartLine);
+            Assert.AreEqual(8, pairs[1].Second.iStartIndex);
+            Assert.AreEqual(0, pairs[1].Second.iEndLine);
+            Assert.AreEqual(9, pairs[1].Second.iEndIndex);
+
+            // Test an unmatched pair.
+            lines.Clear();
+            lines.Add("${FOO");
+            pairs = CMakeParsing.ParseForVariableBraces(lines, 0);
+            Assert.IsNotNull(pairs);
+            Assert.AreEqual(0, pairs.Count);
+
+            // Test a matched pair with an illegal character in the middle.
+            lines.Clear();
+            lines.Add("${FOO BAR}");
+            pairs = CMakeParsing.ParseForVariableBraces(lines, 0);
+            Assert.IsNotNull(pairs);
+            Assert.AreEqual(0, pairs.Count);
+        }
+
+        /// <summary>
         /// Test parsing to determine whether a line should be indented.
         /// </summary>
         [TestMethod]
