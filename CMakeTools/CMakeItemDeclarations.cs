@@ -174,6 +174,18 @@ namespace CMakeTools
         public override string OnCommit(IVsTextView textView, string textSoFar,
             char commitCharacter, int index, ref TextSpan initialExtent)
         {
+            if (commitCharacter == '$')
+            {
+                // If the user starts typing a reference to a variable, dismiss member
+                // selection and continue after any text already typed.
+                return textSoFar;
+            }
+            if (commitCharacter == '}' && index < 0)
+            {
+                // If the user completes a variable reference that doesn't match anything
+                // in the member selection list, still insert the closing curly brace.
+                return textSoFar + commitCharacter;
+            }
             if (string.IsNullOrEmpty(textSoFar) && commitCharacter == ' ')
             {
                 // If the user types a space when the list box first appears, insert the
