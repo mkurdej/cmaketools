@@ -115,6 +115,15 @@ namespace CMakeTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid variable reference..
+        /// </summary>
+        internal static string InvalidVariableRef {
+            get {
+                return ResourceManager.GetString("InvalidVariableRef", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CMake Tools for Visual Studio.
         /// </summary>
         internal static string MessageBoxTitle {

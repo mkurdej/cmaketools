@@ -1668,5 +1668,85 @@ namespace CMakeTools
             }
             return 0;
         }
+
+        // Internal states of the bad variable reference parsing mechanism
+        private enum BadVariableRefParseState
+        {
+            NeedStart,
+            NeedName,
+            NeedEnd
+        }
+
+        /// <summary>
+        /// Parse for syntax errors in variable references.
+        /// </summary>
+        /// <param name="lines">A collection of lines to parse.</param>
+        /// <returns>
+        /// A list of text spans identifying syntactically invalid variable references.
+        /// </returns>
+        public static List<TextSpan> ParseForBadVariableRefs(IEnumerable<string> lines)
+        {
+            List<TextSpan> results = new List<TextSpan>();
+            CMakeScanner scanner = new CMakeScanner();
+            TokenInfo tokenInfo = new TokenInfo();
+            BadVariableRefParseState state = BadVariableRefParseState.NeedStart;
+            Stack<TextSpan> stack = new Stack<TextSpan>();
+            int scannerState = 0;
+            int lineNum = 0;
+            foreach (string line in lines)
+            {
+                scanner.SetSource(line, 0);
+                while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo,
+                    ref scannerState))
+                {
+                    switch ((CMakeToken)tokenInfo.Token)
+                    {
+                    case CMakeToken.VariableStart:
+                    case CMakeToken.VariableStartEnv:
+                    case CMakeToken.VariableStartCache:
+                        stack.Push(tokenInfo.ToTextSpan(lineNum));
+                        state = BadVariableRefParseState.NeedName;
+                        break;
+                    case CMakeToken.Variable:
+                        if (state == BadVariableRefParseState.NeedName)
+                        {
+                            state = BadVariableRefParseState.NeedEnd;
+                        }
+                        break;
+                    case CMakeToken.VariableEnd:
+                        if (state == BadVariableRefParseState.NeedEnd)
+                        {
+                            stack.Pop();
+                            state = stack.Count > 0 ? BadVariableRefParseState.NeedEnd :
+                                BadVariableRefParseState.NeedStart;
+                        }
+                        break;
+                    default:
+                        HandlePossibleBadVariableRef(ref state, tokenInfo.StartIndex,
+                            stack, results);
+                        break;
+                    }
+                }
+                HandlePossibleBadVariableRef(ref state, line.Length, stack, results);
+                lineNum++;
+            }
+            return results;
+        }
+
+        private static void HandlePossibleBadVariableRef(
+            ref BadVariableRefParseState state, int curIndex,
+            Stack<TextSpan> stack, List<TextSpan> results)
+        {
+            if (state != BadVariableRefParseState.NeedStart)
+            {
+                while (stack.Count > 0)
+                {
+                    TextSpan span = stack.Pop();
+                    span.iEndIndex = curIndex;
+                    results.Add(span);
+                }
+                state = BadVariableRefParseState.NeedStart;
+            }
+        }
     }
 }

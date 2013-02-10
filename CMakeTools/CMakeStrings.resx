@@ -135,6 +135,9 @@
   <data name="FileNotFound" xml:space="preserve">
     <value>The file '{0}' could not be found.</value>
   </data>
+  <data name="InvalidVariableRef" xml:space="preserve">
+    <value>Invalid variable reference.</value>
+  </data>
   <data name="MessageBoxTitle" xml:space="preserve">
     <value>CMake Tools for Visual Studio</value>
   </data>

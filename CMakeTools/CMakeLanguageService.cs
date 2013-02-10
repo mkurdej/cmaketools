@@ -234,6 +234,16 @@ namespace CMakeTools
             {
                 scope.SetLines(source.GetLines());
             }
+            else if (req.Reason == ParseReason.Check)
+            {
+                List<TextSpan> spans = CMakeParsing.ParseForBadVariableRefs(
+                    source.GetLines());
+                foreach (TextSpan span in spans)
+                {
+                    req.Sink.AddError(req.FileName, CMakeStrings.InvalidVariableRef,
+                        span, Severity.Error);
+                }
+            }
             return scope;
         }
 
