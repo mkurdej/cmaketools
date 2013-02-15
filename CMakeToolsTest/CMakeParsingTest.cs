@@ -1283,5 +1283,50 @@ namespace CMakeTools
             Assert.AreEqual(0, CMakeParsing.GetLastNonEmptyLine(lines, 2));
             Assert.AreEqual(3, CMakeParsing.GetLastNonEmptyLine(lines, 3));
         }
+
+        /// <summary>
+        /// Test parsing for bad variable references.
+        /// </summary>
+        [TestMethod]
+        public void TestParseForBadVariableRefs()
+        {
+            // Check that there are no false positives.
+            List<string> lines = new List<string>();
+            lines.Add("${FOO}");
+            lines.Add("$ENV{FOO}");
+            lines.Add("$CACHE{FOO}");
+            lines.Add("${${FOO}}");
+            lines.Add("${FOO${FOO}}");
+            lines.Add("${${FOO}FOO}");
+            lines.Add("${FOO${FOO}FOO}");
+            lines.Add("$ENV{${FOO}}");
+            lines.Add("${FOO-BAR${FOO-BAR}FOO-BAR}");
+            lines.Add("${8${8}8}");
+            lines.Add("SET(ENV{${FOO}})");
+            List<TextSpan> spans = CMakeParsing.ParseForBadVariableRefs(lines);
+            Assert.AreEqual(0, spans.Count);
+
+            // Check that errors are found.
+            lines.Clear();
+            lines.Add("${FOO }");
+            spans = CMakeParsing.ParseForBadVariableRefs(lines);
+            Assert.AreEqual(2, spans.Count);
+            Assert.AreEqual(0, spans[0].iStartLine);
+            Assert.AreEqual(0, spans[0].iStartIndex);
+            Assert.AreEqual(0, spans[0].iEndLine);
+            Assert.AreEqual(5, spans[0].iEndIndex);
+            Assert.AreEqual(0, spans[1].iStartLine);
+            Assert.AreEqual(6, spans[1].iStartIndex);
+            Assert.AreEqual(0, spans[1].iEndLine);
+            Assert.AreEqual(7, spans[1].iEndIndex);
+            lines.Clear();
+            lines.Add("${}");
+            spans = CMakeParsing.ParseForBadVariableRefs(lines);
+            Assert.AreEqual(1, spans.Count);
+            Assert.AreEqual(0, spans[0].iStartLine);
+            Assert.AreEqual(0, spans[0].iStartIndex);
+            Assert.AreEqual(0, spans[0].iEndLine);
+            Assert.AreEqual(3, spans[0].iEndIndex);
+        }
     }
 }

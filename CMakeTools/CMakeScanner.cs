@@ -74,7 +74,7 @@ namespace CMakeTools
             public bool noSeparatorFlag;
             public bool needSubcommandFlag;
             public bool subcommandParmsFlag;
-            public bool variableFlag;
+            public int variableDepth;
             public int parenDepth;
             public int separatorCount;
             public CMakeCommandId lastCommand;
@@ -120,8 +120,8 @@ namespace CMakeTools
 
             bool originalScannedNonWhitespace = _scannedNonWhitespace;
             bool originalLastWhitespace = _lastWhitespace;
-            bool expectVariable = scanInfo.variableFlag;
-            scanInfo.variableFlag = false;
+            int originalVariableDepth = scanInfo.variableDepth;
+            scanInfo.variableDepth = 0;
             bool noSeparator = scanInfo.noSeparatorFlag;
             scanInfo.noSeparatorFlag = false;
             tokenInfo.Trigger = TokenTriggers.None;
@@ -283,7 +283,7 @@ namespace CMakeTools
                             // as a numeric identifier.
                             isNumeric = true;
                         }
-                        else if (!expectVariable && ScanFileNameChar())
+                        else if (originalVariableDepth == 0 && ScanFileNameChar())
                         {
                             isFileName = true;
                         }
@@ -298,19 +298,20 @@ namespace CMakeTools
 
                     CMakeCommandId id = scanInfo.lastCommand;
                     string substr = _source.ExtractToken(tokenInfo);
-                    if (expectVariable)
+                    if (originalVariableDepth != 0)
                     {
                         // If we're inside curly braces following a dollar sign, treat
                         // the identifier as a variable.
                         tokenInfo.Color = TokenColor.Identifier;
                         tokenInfo.Token = (int)CMakeToken.Variable;
+                        scanInfo.variableDepth = originalVariableDepth;
                     }
                     else if ((id == CMakeCommandId.Set || id == CMakeCommandId.Unset) &&
                         substr.StartsWith("ENV{"))
                     {
                         // Inside a SET or UNSET command, ENV{ indicates an environment
                         // variable.  This token is case-sensitive.
-                        scanInfo.variableFlag = true;
+                        scanInfo.variableDepth = originalVariableDepth + 1;
                         tokenInfo.EndIndex = tokenInfo.StartIndex + 3;
                         tokenInfo.Color = TokenColor.Identifier;
                         tokenInfo.Token = (int)CMakeToken.VariableStartSetEnv;
@@ -391,7 +392,7 @@ namespace CMakeTools
                     while (_offset < _source.Length - 1)
                     {
                         char ch = _source[_offset + 1];
-                        if (!expectVariable && ScanFileNameChar())
+                        if (originalVariableDepth == 0 && ScanFileNameChar())
                         {
                             isFileName = true;
                         }
@@ -404,9 +405,10 @@ namespace CMakeTools
                     tokenInfo.EndIndex = _offset;
                     _offset++;
                     tokenInfo.Color = TokenColor.Identifier;
-                    if (expectVariable)
+                    if (originalVariableDepth != 0)
                     {
                         tokenInfo.Token = (int)CMakeToken.Variable;
+                        scanInfo.variableDepth = originalVariableDepth;
                     }
                     else if (isFileName)
                     {
@@ -427,7 +429,7 @@ namespace CMakeTools
                     _offset++;
                     if (varToken != CMakeToken.Unspecified)
                     {
-                        scanInfo.variableFlag = true;
+                        scanInfo.variableDepth = originalVariableDepth + 1;
                         tokenInfo.Token = (int)varToken;
                         tokenInfo.Trigger =
                             TokenTriggers.MemberSelect | TokenTriggers.MatchBraces;
@@ -445,6 +447,8 @@ namespace CMakeTools
                     tokenInfo.Color = TokenColor.Identifier;
                     tokenInfo.Token = (int)CMakeToken.VariableEnd;
                     tokenInfo.Trigger = TokenTriggers.MatchBraces;
+                    scanInfo.variableDepth = originalVariableDepth > 0 ?
+                        originalVariableDepth - 1 : 0;
                     _offset++;
                     return true;
                 }

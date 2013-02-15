@@ -1703,6 +1703,7 @@ namespace CMakeTools
                     case CMakeToken.VariableStart:
                     case CMakeToken.VariableStartEnv:
                     case CMakeToken.VariableStartCache:
+                    case CMakeToken.VariableStartSetEnv:
                         stack.Push(tokenInfo.ToTextSpan(lineNum));
                         state = BadVariableRefParseState.NeedName;
                         break;
@@ -1719,6 +1720,16 @@ namespace CMakeTools
                             stack.Pop();
                             state = stack.Count > 0 ? BadVariableRefParseState.NeedEnd :
                                 BadVariableRefParseState.NeedStart;
+                        }
+                        else if (state == BadVariableRefParseState.NeedStart)
+                        {
+                            results.Add(tokenInfo.ToTextSpan(lineNum));
+                        }
+                        else if (state == BadVariableRefParseState.NeedName)
+                        {
+                            TextSpan span = stack.Pop();
+                            span.iEndIndex = tokenInfo.EndIndex + 1;
+                            results.Add(span);
                         }
                         break;
                     default:
