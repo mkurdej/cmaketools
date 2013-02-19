@@ -358,6 +358,12 @@ namespace CMakeTools
             identifier = CMakeParsing.ParseForIdentifier(lines, 0, 1, out isVariable);
             Assert.AreEqual("foo", identifier);
             Assert.IsFalse(isVariable);
+
+            // Test that fragments of variable names aren't treated as identifiers.
+            lines.Clear();
+            lines.Add("${foo${bar}foo}");
+            Assert.IsNull(CMakeParsing.ParseForIdentifier(lines, 0, 3, out isVariable));
+            Assert.IsNull(CMakeParsing.ParseForIdentifier(lines, 0, 12, out isVariable));
         }
 
         /// <summary>

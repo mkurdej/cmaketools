@@ -1281,6 +1281,14 @@ namespace CMakeTools
                         string tokenText = line.ExtractToken(tokenInfo);
                         if (tokenInfo.Token == (int)CMakeToken.Variable)
                         {
+                            if (tokenInfo.StartIndex <= 0 ||
+                                tokenInfo.EndIndex >= line.Length - 1 ||
+                                line[tokenInfo.StartIndex - 1] != '{' ||
+                                line[tokenInfo.EndIndex + 1] != '}')
+                            {
+                                isVariable = false;
+                                return null;
+                            }
                             isVariable = true;
                             return tokenText;
                         }
