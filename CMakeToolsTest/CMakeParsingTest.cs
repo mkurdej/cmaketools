@@ -1320,6 +1320,14 @@ namespace CMakeTools
             Assert.AreEqual(0, spans[1].iEndLine);
             Assert.AreEqual(7, spans[1].iEndIndex);
             lines.Clear();
+            lines.Add("${");
+            spans = CMakeParsing.ParseForBadVariableRefs(lines);
+            Assert.AreEqual(1, spans.Count);
+            Assert.AreEqual(0, spans[0].iStartLine);
+            Assert.AreEqual(0, spans[0].iStartIndex);
+            Assert.AreEqual(0, spans[0].iEndLine);
+            Assert.AreEqual(2, spans[0].iEndIndex);
+            lines.Clear();
             lines.Add("${}");
             spans = CMakeParsing.ParseForBadVariableRefs(lines);
             Assert.AreEqual(1, spans.Count);
@@ -1327,6 +1335,42 @@ namespace CMakeTools
             Assert.AreEqual(0, spans[0].iStartIndex);
             Assert.AreEqual(0, spans[0].iEndLine);
             Assert.AreEqual(3, spans[0].iEndIndex);
+            lines.Clear();
+            lines.Add("$ENV{");
+            spans = CMakeParsing.ParseForBadVariableRefs(lines);
+            Assert.AreEqual(1, spans.Count);
+            Assert.AreEqual(0, spans[0].iStartLine);
+            Assert.AreEqual(0, spans[0].iStartIndex);
+            Assert.AreEqual(0, spans[0].iEndLine);
+            Assert.AreEqual(5, spans[0].iEndIndex);
+            lines.Clear();
+            lines.Add("$CACHE{");
+            spans = CMakeParsing.ParseForBadVariableRefs(lines);
+            Assert.AreEqual(1, spans.Count);
+            Assert.AreEqual(0, spans[0].iStartLine);
+            Assert.AreEqual(0, spans[0].iStartIndex);
+            Assert.AreEqual(0, spans[0].iEndLine);
+            Assert.AreEqual(7, spans[0].iEndIndex);
+            lines.Clear();
+            lines.Add("SET(ENV{");
+            spans = CMakeParsing.ParseForBadVariableRefs(lines);
+            Assert.AreEqual(1, spans.Count);
+            Assert.AreEqual(0, spans[0].iStartLine);
+            Assert.AreEqual(4, spans[0].iStartIndex);
+            Assert.AreEqual(0, spans[0].iEndLine);
+            Assert.AreEqual(8, spans[0].iEndIndex);
+            lines.Clear();
+            lines.Add("${${FOO");
+            spans = CMakeParsing.ParseForBadVariableRefs(lines);
+            Assert.AreEqual(2, spans.Count);
+            Assert.AreEqual(0, spans[0].iStartLine);
+            Assert.AreEqual(2, spans[0].iStartIndex);
+            Assert.AreEqual(0, spans[0].iEndLine);
+            Assert.AreEqual(7, spans[0].iEndIndex);
+            Assert.AreEqual(0, spans[1].iStartLine);
+            Assert.AreEqual(0, spans[1].iStartIndex);
+            Assert.AreEqual(0, spans[1].iEndLine);
+            Assert.AreEqual(7, spans[1].iEndIndex);
         }
     }
 }
