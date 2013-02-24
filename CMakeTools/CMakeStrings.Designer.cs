@@ -142,6 +142,15 @@ namespace CMakeTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unmatched parenthesis..
+        /// </summary>
+        internal static string UnmatchedParen {
+            get {
+                return ResourceManager.GetString("UnmatchedParen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Yes.
         /// </summary>
         internal static string Yes {

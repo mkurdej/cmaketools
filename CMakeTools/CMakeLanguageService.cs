@@ -243,6 +243,12 @@ namespace CMakeTools
                     req.Sink.AddError(req.FileName, CMakeStrings.InvalidVariableRef,
                         span, Severity.Error);
                 }
+                spans = CMakeParsing.ParseForUnmatchedParens(source.GetLines());
+                foreach (TextSpan span in spans)
+                {
+                    req.Sink.AddError(req.FileName, CMakeStrings.UnmatchedParen,
+                        span, Severity.Error);
+                }
             }
             return scope;
         }

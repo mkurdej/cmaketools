@@ -1767,5 +1767,51 @@ namespace CMakeTools
                 state = BadVariableRefParseState.NeedStart;
             }
         }
+
+        /// <summary>
+        /// Parse for unmatched parentheses.
+        /// </summary>
+        /// <param name="lines">A collection of lines to parse.</param>
+        /// <returns>
+        /// A list of text spans identifying unmatched parentheses.
+        /// </returns>
+        public static List<TextSpan> ParseForUnmatchedParens(IEnumerable<string> lines)
+        {
+            List<TextSpan> results = new List<TextSpan>();
+            Stack<TextSpan> stack = new Stack<TextSpan>();
+            CMakeScanner scanner = new CMakeScanner();
+            TokenInfo tokenInfo = new TokenInfo();
+            int state = 0;
+            int lineNum = 0;
+            foreach (string line in lines)
+            {
+                scanner.SetSource(line, 0);
+                while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state))
+                {
+                    switch ((CMakeToken)tokenInfo.Token)
+                    {
+                    case CMakeToken.OpenParen:
+                        stack.Push(tokenInfo.ToTextSpan(lineNum));
+                        break;
+                    case CMakeToken.CloseParen:
+                        if (stack.Count > 0)
+                        {
+                            stack.Pop();
+                        }
+                        else
+                        {
+                            results.Add(tokenInfo.ToTextSpan(lineNum));
+                        }
+                        break;
+                    }
+                }
+                ++lineNum;
+            }
+            while (stack.Count > 0)
+            {
+                results.Add(stack.Pop());
+            }
+            return results;
+        }
     }
 }
