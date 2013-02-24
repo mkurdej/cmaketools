@@ -1805,7 +1805,7 @@ namespace CMakeTools
                         break;
                     }
                 }
-                ++lineNum;
+                lineNum++;
             }
             while (stack.Count > 0)
             {

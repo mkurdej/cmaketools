@@ -1378,5 +1378,89 @@ namespace CMakeTools
             Assert.AreEqual(0, spans[1].iEndLine);
             Assert.AreEqual(7, spans[1].iEndIndex);
         }
+
+        /// <summary>
+        /// Test parsing for unmatched parentheses.
+        /// </summary>
+        [TestMethod]
+        public void TestParseForUnmatchedParens()
+        {
+            // Test that there are no false positives.
+            List<string> lines = new List<string>();
+            lines.Add("()");
+            lines.Add("(())");
+            lines.Add("((");
+            lines.Add(")");
+            lines.Add(")");
+            List<TextSpan> spans = CMakeParsing.ParseForUnmatchedParens(lines);
+            Assert.AreEqual(0, spans.Count);
+
+            // Test that unmatched parentheses are properly detected.
+            lines.Clear();
+            lines.Add("(");
+            spans = CMakeParsing.ParseForUnmatchedParens(lines);
+            Assert.AreEqual(1, spans.Count);
+            Assert.AreEqual(0, spans[0].iStartLine);
+            Assert.AreEqual(0, spans[0].iStartIndex);
+            Assert.AreEqual(0, spans[0].iEndLine);
+            Assert.AreEqual(1, spans[0].iEndIndex);
+            lines.Clear();
+            lines.Add(")");
+            spans = CMakeParsing.ParseForUnmatchedParens(lines);
+            Assert.AreEqual(1, spans.Count);
+            Assert.AreEqual(0, spans[0].iStartLine);
+            Assert.AreEqual(0, spans[0].iStartIndex);
+            Assert.AreEqual(0, spans[0].iEndLine);
+            Assert.AreEqual(1, spans[0].iEndIndex);
+            lines.Clear();
+            lines.Add("(()");
+            spans = CMakeParsing.ParseForUnmatchedParens(lines);
+            Assert.AreEqual(1, spans.Count);
+            Assert.AreEqual(0, spans[0].iStartLine);
+            Assert.AreEqual(0, spans[0].iStartIndex);
+            Assert.AreEqual(0, spans[0].iEndLine);
+            Assert.AreEqual(1, spans[0].iEndIndex);
+            lines.Clear();
+            lines.Add("())");
+            spans = CMakeParsing.ParseForUnmatchedParens(lines);
+            Assert.AreEqual(1, spans.Count);
+            Assert.AreEqual(0, spans[0].iStartLine);
+            Assert.AreEqual(2, spans[0].iStartIndex);
+            Assert.AreEqual(0, spans[0].iEndLine);
+            Assert.AreEqual(3, spans[0].iEndIndex);
+            lines.Clear();
+            lines.Add("((");
+            spans = CMakeParsing.ParseForUnmatchedParens(lines);
+            Assert.AreEqual(2, spans.Count);
+            Assert.AreEqual(0, spans[0].iStartLine);
+            Assert.AreEqual(1, spans[0].iStartIndex);
+            Assert.AreEqual(0, spans[0].iEndLine);
+            Assert.AreEqual(2, spans[0].iEndIndex);
+            Assert.AreEqual(0, spans[1].iStartLine);
+            Assert.AreEqual(0, spans[1].iStartIndex);
+            Assert.AreEqual(0, spans[1].iEndLine);
+            Assert.AreEqual(1, spans[1].iEndIndex);
+            lines.Clear();
+            lines.Add("))");
+            spans = CMakeParsing.ParseForUnmatchedParens(lines);
+            Assert.AreEqual(2, spans.Count);
+            Assert.AreEqual(0, spans[0].iStartLine);
+            Assert.AreEqual(0, spans[0].iStartIndex);
+            Assert.AreEqual(0, spans[0].iEndLine);
+            Assert.AreEqual(1, spans[0].iEndIndex);
+            Assert.AreEqual(0, spans[1].iStartLine);
+            Assert.AreEqual(1, spans[1].iStartIndex);
+            Assert.AreEqual(0, spans[1].iEndLine);
+            Assert.AreEqual(2, spans[1].iEndIndex);
+            lines.Clear();
+            lines.Add("(");
+            lines.Add("()");
+            spans = CMakeParsing.ParseForUnmatchedParens(lines);
+            Assert.AreEqual(1, spans.Count);
+            Assert.AreEqual(0, spans[0].iStartLine);
+            Assert.AreEqual(0, spans[0].iStartIndex);
+            Assert.AreEqual(0, spans[0].iEndLine);
+            Assert.AreEqual(1, spans[0].iEndIndex);
+        }
     }
 }
