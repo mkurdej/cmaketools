@@ -27,6 +27,31 @@ namespace CMakeTools
     {
         private LanguagePreferences _preferences;
 
+        // Delegate to parse for a particular type of error.
+        private delegate List<TextSpan> ParseForErrorMethod(IEnumerable<string> lines);
+
+        // Information on a type of error to be tagged for IntelliSense.
+        private struct ErrorInfo
+        {
+            public ParseForErrorMethod Method { get; set; }
+            public string ErrorText { get; set; }
+        }
+
+        // Array of error information items.
+        private readonly ErrorInfo[] _errorInfo = new ErrorInfo[]
+        {
+            new ErrorInfo()
+            {
+                Method = CMakeParsing.ParseForBadVariableRefs,
+                ErrorText = CMakeStrings.InvalidVariableRef
+            },
+            new ErrorInfo()
+            {
+                Method = CMakeParsing.ParseForUnmatchedParens,
+                ErrorText = CMakeStrings.UnmatchedParen
+            }
+        };
+
         public override string GetFormatFilterList()
         {
             return "CMake Files (*.cmake)\n*.cmake";
@@ -236,18 +261,14 @@ namespace CMakeTools
             }
             else if (req.Reason == ParseReason.Check)
             {
-                List<TextSpan> spans = CMakeParsing.ParseForBadVariableRefs(
-                    source.GetLines());
-                foreach (TextSpan span in spans)
+                foreach (ErrorInfo info in _errorInfo)
                 {
-                    req.Sink.AddError(req.FileName, CMakeStrings.InvalidVariableRef,
-                        span, Severity.Error);
-                }
-                spans = CMakeParsing.ParseForUnmatchedParens(source.GetLines());
-                foreach (TextSpan span in spans)
-                {
-                    req.Sink.AddError(req.FileName, CMakeStrings.UnmatchedParen,
-                        span, Severity.Error);
+                    List<TextSpan> spans = info.Method(source.GetLines());
+                    foreach (TextSpan span in spans)
+                    {
+                        req.Sink.AddError(req.FileName, info.ErrorText, span,
+                            Severity.Error);
+                    }
                 }
             }
             return scope;
