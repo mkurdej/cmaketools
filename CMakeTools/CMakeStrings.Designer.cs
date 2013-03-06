@@ -97,6 +97,15 @@ namespace CMakeTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Expected: command or function call..
+        /// </summary>
+        internal static string ExpectedCommand {
+            get {
+                return ResourceManager.GetString("ExpectedCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error occurred while launching CMake..
         /// </summary>
         internal static string FailedToLaunchCMake {

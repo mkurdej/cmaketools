@@ -1813,5 +1813,50 @@ namespace CMakeTools
             }
             return results;
         }
+
+        /// <summary>
+        /// Parse for bad commands.
+        /// </summary>
+        /// <param name="lines">A collection of lines to parse.</param>
+        /// <returns>A list of text spans identifying bad commands.</returns>
+        public static List<TextSpan> ParseForBadCommands(IEnumerable<string> lines)
+        {
+            List<TextSpan> results = new List<TextSpan>();
+            CMakeScanner scanner = new CMakeScanner();
+            TokenInfo tokenInfo = new TokenInfo();
+            int state = 0;
+            int lineNum = 0;
+            foreach (string line in lines)
+            {
+                bool lineHasError = false;
+                scanner.SetSource(line, 0);
+                while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state))
+                {
+                    switch ((CMakeToken)tokenInfo.Token)
+                    {
+                    case CMakeToken.WhiteSpace:
+                    case CMakeToken.Comment:
+                    case CMakeToken.CloseParen:
+                        // Ignore whitespace and comments.  Also ignore closing
+                        // parentheses, which will get get flagged for being mismatched
+                        // if they're improper.
+                        break;
+                    case CMakeToken.Identifier:
+                    case CMakeToken.Keyword:
+                        // Identifiers and keywords are valid commands.
+                        break;
+                    default:
+                        if (!scanner.InsideParens(state) && !lineHasError)
+                        {
+                            results.Add(tokenInfo.ToTextSpan(lineNum));
+                            lineHasError = true;
+                        }
+                        break;
+                    }
+                }
+                lineNum++;
+            }
+            return results;
+        }
     }
 }

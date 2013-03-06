@@ -49,6 +49,11 @@ namespace CMakeTools
             {
                 Method = CMakeParsing.ParseForUnmatchedParens,
                 ErrorText = CMakeStrings.UnmatchedParen
+            },
+            new ErrorInfo()
+            {
+                Method = CMakeParsing.ParseForBadCommands,
+                ErrorText = CMakeStrings.ExpectedCommand
             }
         };
 
