@@ -1689,11 +1689,11 @@ namespace CMakeTools
         /// </summary>
         /// <param name="lines">A collection of lines to parse.</param>
         /// <returns>
-        /// A list of text spans identifying syntactically invalid variable references.
+        /// A list of error information.
         /// </returns>
-        public static List<TextSpan> ParseForBadVariableRefs(IEnumerable<string> lines)
+        public static List<CMakeErrorInfo> ParseForBadVariableRefs(IEnumerable<string> lines)
         {
-            List<TextSpan> results = new List<TextSpan>();
+            List<CMakeErrorInfo> results = new List<CMakeErrorInfo>();
             CMakeScanner scanner = new CMakeScanner();
             TokenInfo tokenInfo = new TokenInfo();
             BadVariableRefParseState state = BadVariableRefParseState.NeedStart;
@@ -1731,13 +1731,21 @@ namespace CMakeTools
                         }
                         else if (state == BadVariableRefParseState.NeedStart)
                         {
-                            results.Add(tokenInfo.ToTextSpan(lineNum));
+                            results.Add(new CMakeErrorInfo()
+                            {
+                                ErrorCode = CMakeError.InvalidVariableRef,
+                                Span = tokenInfo.ToTextSpan(lineNum)
+                            });
                         }
                         else if (state == BadVariableRefParseState.NeedName)
                         {
                             TextSpan span = stack.Pop();
                             span.iEndIndex = tokenInfo.EndIndex + 1;
-                            results.Add(span);
+                            results.Add(new CMakeErrorInfo()
+                            {
+                                ErrorCode = CMakeError.InvalidVariableRef,
+                                Span = span
+                            });
                         }
                         break;
                     default:
@@ -1754,7 +1762,7 @@ namespace CMakeTools
 
         private static void HandlePossibleBadVariableRef(
             ref BadVariableRefParseState state, int curIndex,
-            Stack<TextSpan> stack, List<TextSpan> results)
+            Stack<TextSpan> stack, List<CMakeErrorInfo> results)
         {
             if (state != BadVariableRefParseState.NeedStart)
             {
@@ -1762,7 +1770,11 @@ namespace CMakeTools
                 {
                     TextSpan span = stack.Pop();
                     span.iEndIndex = curIndex;
-                    results.Add(span);
+                    results.Add(new CMakeErrorInfo()
+                    {
+                        ErrorCode = CMakeError.InvalidVariableRef,
+                        Span = span
+                    });
                 }
                 state = BadVariableRefParseState.NeedStart;
             }
@@ -1773,11 +1785,12 @@ namespace CMakeTools
         /// </summary>
         /// <param name="lines">A collection of lines to parse.</param>
         /// <returns>
-        /// A list of text spans identifying unmatched parentheses.
+        /// A list of error information.
         /// </returns>
-        public static List<TextSpan> ParseForUnmatchedParens(IEnumerable<string> lines)
+        public static List<CMakeErrorInfo> ParseForUnmatchedParens(
+            IEnumerable<string> lines)
         {
-            List<TextSpan> results = new List<TextSpan>();
+            List<CMakeErrorInfo> results = new List<CMakeErrorInfo>();
             Stack<TextSpan> stack = new Stack<TextSpan>();
             CMakeScanner scanner = new CMakeScanner();
             TokenInfo tokenInfo = new TokenInfo();
@@ -1800,7 +1813,11 @@ namespace CMakeTools
                         }
                         else
                         {
-                            results.Add(tokenInfo.ToTextSpan(lineNum));
+                            results.Add(new CMakeErrorInfo()
+                            {
+                                ErrorCode = CMakeError.UnmatchedParen,
+                                Span = tokenInfo.ToTextSpan(lineNum)
+                            });
                         }
                         break;
                     }
@@ -1809,7 +1826,11 @@ namespace CMakeTools
             }
             while (stack.Count > 0)
             {
-                results.Add(stack.Pop());
+                results.Add(new CMakeErrorInfo()
+                {
+                    ErrorCode = CMakeError.UnmatchedParen,
+                    Span = stack.Pop()
+                });
             }
             return results;
         }
@@ -1818,10 +1839,10 @@ namespace CMakeTools
         /// Parse for bad commands.
         /// </summary>
         /// <param name="lines">A collection of lines to parse.</param>
-        /// <returns>A list of text spans identifying bad commands.</returns>
-        public static List<TextSpan> ParseForBadCommands(IEnumerable<string> lines)
+        /// <returns>A list of error information.</returns>
+        public static List<CMakeErrorInfo> ParseForBadCommands(IEnumerable<string> lines)
         {
-            List<TextSpan> results = new List<TextSpan>();
+            List<CMakeErrorInfo> results = new List<CMakeErrorInfo>();
             CMakeScanner scanner = new CMakeScanner();
             TokenInfo tokenInfo = new TokenInfo();
             int state = 0;
@@ -1848,7 +1869,11 @@ namespace CMakeTools
                     default:
                         if (!scanner.InsideParens(state) && !lineHasError)
                         {
-                            results.Add(tokenInfo.ToTextSpan(lineNum));
+                            results.Add(new CMakeErrorInfo()
+                            {
+                                ErrorCode = CMakeError.ExpectedCommand,
+                                Span = tokenInfo.ToTextSpan(lineNum)
+                            });
                             lineHasError = true;
                         }
                         break;

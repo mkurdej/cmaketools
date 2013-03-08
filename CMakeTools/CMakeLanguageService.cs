@@ -28,33 +28,25 @@ namespace CMakeTools
         private LanguagePreferences _preferences;
 
         // Delegate to parse for a particular type of error.
-        private delegate List<TextSpan> ParseForErrorMethod(IEnumerable<string> lines);
+        private delegate List<CMakeErrorInfo> ParseForErrorMethod(
+            IEnumerable<string> lines);
 
-        // Information on a type of error to be tagged for IntelliSense.
-        private struct ErrorInfo
+        // Array of error parsing methods.
+        private readonly ParseForErrorMethod[] _parseForErrorMethods =
+            new ParseForErrorMethod[]
         {
-            public ParseForErrorMethod Method { get; set; }
-            public string ErrorText { get; set; }
-        }
+            CMakeParsing.ParseForBadVariableRefs,
+            CMakeParsing.ParseForUnmatchedParens,
+            CMakeParsing.ParseForBadCommands
+        };
 
-        // Array of error information items.
-        private readonly ErrorInfo[] _errorInfo = new ErrorInfo[]
+        // Map from error codes to text strings.
+        private Dictionary<CMakeError, string> _errorStrings =
+            new Dictionary<CMakeError, string>()
         {
-            new ErrorInfo()
-            {
-                Method = CMakeParsing.ParseForBadVariableRefs,
-                ErrorText = CMakeStrings.InvalidVariableRef
-            },
-            new ErrorInfo()
-            {
-                Method = CMakeParsing.ParseForUnmatchedParens,
-                ErrorText = CMakeStrings.UnmatchedParen
-            },
-            new ErrorInfo()
-            {
-                Method = CMakeParsing.ParseForBadCommands,
-                ErrorText = CMakeStrings.ExpectedCommand
-            }
+            { CMakeError.InvalidVariableRef,    CMakeStrings.InvalidVariableRef },
+            { CMakeError.UnmatchedParen,        CMakeStrings.UnmatchedParen },
+            { CMakeError.ExpectedCommand,       CMakeStrings.ExpectedCommand }
         };
 
         public override string GetFormatFilterList()
@@ -266,13 +258,17 @@ namespace CMakeTools
             }
             else if (req.Reason == ParseReason.Check)
             {
-                foreach (ErrorInfo info in _errorInfo)
+                foreach (ParseForErrorMethod method in _parseForErrorMethods)
                 {
-                    List<TextSpan> spans = info.Method(source.GetLines());
-                    foreach (TextSpan span in spans)
+                    List<CMakeErrorInfo> info = method(source.GetLines());
+                    foreach (CMakeErrorInfo item in info)
                     {
-                        req.Sink.AddError(req.FileName, info.ErrorText, span,
-                            Severity.Error);
+                        if (_errorStrings.ContainsKey(item.ErrorCode))
+                        {
+                            req.Sink.AddError(req.FileName,
+                                _errorStrings[item.ErrorCode], item.Span,
+                                Severity.Error);
+                        }
                     }
                 }
             }

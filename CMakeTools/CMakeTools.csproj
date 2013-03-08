@@ -40,6 +40,7 @@
     <Compile Include="CMakeAuthoringScope.cs" />
     <Compile Include="CMakeCmdIds.cs" />
     <Compile Include="CMakeDeclarationsFactory.cs" />
+    <Compile Include="CMakeError.cs" />
     <Compile Include="CMakeExpansionProvider.cs" />
     <Compile Include="CMakeIncludeDeclarations.cs" />
     <Compile Include="CMakeItemDeclarations.cs" />
