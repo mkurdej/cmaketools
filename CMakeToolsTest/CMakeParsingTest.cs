@@ -1480,5 +1480,41 @@ namespace CMakeTools
             Assert.AreEqual(0, info[0].Span.iEndLine);
             Assert.AreEqual(1, info[0].Span.iEndIndex);
         }
+
+        /// <summary>
+        /// Test parsing for bad commands.
+        /// </summary>
+        [TestMethod]
+        public void TestParseForBadCommands()
+        {
+            // Test that there are no false positives
+            List<string> lines = new List<string>();
+            lines.Add("SET(FOO)");
+            lines.Add("SET(FOO BAR)");
+            lines.Add("# comment");
+            lines.Add("SET(FOO) # comment");
+            List<CMakeErrorInfo> info = CMakeParsing.ParseForBadCommands(lines);
+            Assert.AreEqual(0, info.Count);
+
+            // Test that invalid commands are properly detected.
+            lines.Clear();
+            lines.Add("${FOO}()");
+            info = CMakeParsing.ParseForBadCommands(lines);
+            Assert.AreEqual(1, info.Count);
+            Assert.AreEqual(CMakeError.ExpectedCommand, info[0].ErrorCode);
+            Assert.AreEqual(0, info[0].Span.iStartLine);
+            Assert.AreEqual(0, info[0].Span.iStartIndex);
+            Assert.AreEqual(0, info[0].Span.iEndLine);
+            Assert.AreEqual(2, info[0].Span.iEndIndex);
+            lines.Clear();
+            lines.Add("FOO.EXE()");
+            info = CMakeParsing.ParseForBadCommands(lines);
+            Assert.AreEqual(1, info.Count);
+            Assert.AreEqual(CMakeError.ExpectedCommand, info[0].ErrorCode);
+            Assert.AreEqual(0, info[0].Span.iStartLine);
+            Assert.AreEqual(0, info[0].Span.iStartIndex);
+            Assert.AreEqual(0, info[0].Span.iEndLine);
+            Assert.AreEqual(7, info[0].Span.iEndIndex);
+        }
     }
 }
