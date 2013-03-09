@@ -1835,6 +1835,14 @@ namespace CMakeTools
             return results;
         }
 
+        private enum BadCommandParseState
+        {
+            BeforeCommand,
+            BeforeParen,
+            InsideParens,
+            AfterParen
+        }
+
         /// <summary>
         /// Parse for bad commands.
         /// </summary>
@@ -1845,29 +1853,55 @@ namespace CMakeTools
             List<CMakeErrorInfo> results = new List<CMakeErrorInfo>();
             CMakeScanner scanner = new CMakeScanner();
             TokenInfo tokenInfo = new TokenInfo();
-            int state = 0;
+            int scannerState = 0;
             int lineNum = 0;
+            BadCommandParseState state = BadCommandParseState.BeforeCommand;
             foreach (string line in lines)
             {
                 bool lineHasError = false;
-                scanner.SetSource(line, 0);
-                while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state))
+                if (state != BadCommandParseState.InsideParens)
                 {
+                    state = BadCommandParseState.BeforeCommand;
+                }
+                scanner.SetSource(line, 0);
+                while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo,
+                    ref scannerState))
+                {
+                    if (state == BadCommandParseState.AfterParen &&
+                        tokenInfo.Token != (int)CMakeToken.WhiteSpace &&
+                        tokenInfo.Token != (int)CMakeToken.Comment &&
+                        !lineHasError)
+                    {
+                        results.Add(new CMakeErrorInfo()
+                        {
+                            ErrorCode = CMakeError.ExpectedEOL,
+                            Span = tokenInfo.ToTextSpan(lineNum)
+                        });
+                        lineHasError = true;
+                    }
                     switch ((CMakeToken)tokenInfo.Token)
                     {
                     case CMakeToken.WhiteSpace:
                     case CMakeToken.Comment:
+                        // Ignore whitespace and comments.
+                        break;
                     case CMakeToken.CloseParen:
-                        // Ignore whitespace and comments.  Also ignore closing
-                        // parentheses, which will get get flagged for being mismatched
-                        // if they're improper.
+                        if (state == BadCommandParseState.InsideParens &&
+                            !scanner.InsideParens(scannerState))
+                        {
+                            state = BadCommandParseState.AfterParen;
+                        }
                         break;
                     case CMakeToken.Identifier:
                     case CMakeToken.Keyword:
                         // Identifiers and keywords are valid commands.
+                        if (state == BadCommandParseState.BeforeCommand)
+                        {
+                            state = BadCommandParseState.BeforeParen;
+                        }
                         break;
                     default:
-                        if (!scanner.InsideParens(state) && !lineHasError)
+                        if (!scanner.InsideParens(scannerState) && !lineHasError)
                         {
                             results.Add(new CMakeErrorInfo()
                             {
@@ -1875,6 +1909,12 @@ namespace CMakeTools
                                 Span = tokenInfo.ToTextSpan(lineNum)
                             });
                             lineHasError = true;
+                        }
+                        else if (scanner.InsideParens(scannerState) &&
+                            tokenInfo.Token == (int)CMakeToken.OpenParen &&
+                            state == BadCommandParseState.BeforeParen)
+                        {
+                            state = BadCommandParseState.InsideParens;
                         }
                         break;
                     }

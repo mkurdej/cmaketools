@@ -106,6 +106,15 @@ namespace CMakeTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Expected: end of line..
+        /// </summary>
+        internal static string ExpectedEOL {
+            get {
+                return ResourceManager.GetString("ExpectedEOL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error occurred while launching CMake..
         /// </summary>
         internal static string FailedToLaunchCMake {

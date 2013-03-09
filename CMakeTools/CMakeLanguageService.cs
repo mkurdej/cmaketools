@@ -46,7 +46,8 @@ namespace CMakeTools
         {
             { CMakeError.InvalidVariableRef,    CMakeStrings.InvalidVariableRef },
             { CMakeError.UnmatchedParen,        CMakeStrings.UnmatchedParen },
-            { CMakeError.ExpectedCommand,       CMakeStrings.ExpectedCommand }
+            { CMakeError.ExpectedCommand,       CMakeStrings.ExpectedCommand },
+            { CMakeError.ExpectedEOL,           CMakeStrings.ExpectedEOL }
         };
 
         public override string GetFormatFilterList()

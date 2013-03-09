@@ -21,7 +21,8 @@ namespace CMakeTools
     {
         InvalidVariableRef,
         UnmatchedParen,
-        ExpectedCommand
+        ExpectedCommand,
+        ExpectedEOL
     }
 
     /// <summary>

@@ -132,6 +132,9 @@
   <data name="ExpectedCommand" xml:space="preserve">
     <value>Expected: command or function call.</value>
   </data>
+  <data name="ExpectedEOL" xml:space="preserve">
+    <value>Expected: end of line.</value>
+  </data>
   <data name="FailedToLaunchCMake" xml:space="preserve">
     <value>An error occurred while launching CMake.</value>
   </data>
