@@ -1867,41 +1867,17 @@ namespace CMakeTools
                 while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo,
                     ref scannerState))
                 {
-                    if (state == BadCommandParseState.AfterParen &&
-                        tokenInfo.Token != (int)CMakeToken.WhiteSpace &&
-                        tokenInfo.Token != (int)CMakeToken.Comment &&
-                        !lineHasError)
+                    switch (state)
                     {
-                        results.Add(new CMakeErrorInfo()
-                        {
-                            ErrorCode = CMakeError.ExpectedEOL,
-                            Span = tokenInfo.ToTextSpan(lineNum)
-                        });
-                        lineHasError = true;
-                    }
-                    switch ((CMakeToken)tokenInfo.Token)
-                    {
-                    case CMakeToken.WhiteSpace:
-                    case CMakeToken.Comment:
-                        // Ignore whitespace and comments.
-                        break;
-                    case CMakeToken.CloseParen:
-                        if (state == BadCommandParseState.InsideParens &&
-                            !scanner.InsideParens(scannerState))
-                        {
-                            state = BadCommandParseState.AfterParen;
-                        }
-                        break;
-                    case CMakeToken.Identifier:
-                    case CMakeToken.Keyword:
-                        // Identifiers and keywords are valid commands.
-                        if (state == BadCommandParseState.BeforeCommand)
+                    case BadCommandParseState.BeforeCommand:
+                        if (tokenInfo.Token == (int)CMakeToken.Identifier ||
+                            tokenInfo.Token == (int)CMakeToken.Keyword)
                         {
                             state = BadCommandParseState.BeforeParen;
                         }
-                        break;
-                    default:
-                        if (!scanner.InsideParens(scannerState) && !lineHasError)
+                        else if (tokenInfo.Token != (int)CMakeToken.WhiteSpace &&
+                            tokenInfo.Token != (int)CMakeToken.Comment &&
+                            !lineHasError)
                         {
                             results.Add(new CMakeErrorInfo()
                             {
@@ -1910,11 +1886,39 @@ namespace CMakeTools
                             });
                             lineHasError = true;
                         }
-                        else if (scanner.InsideParens(scannerState) &&
-                            tokenInfo.Token == (int)CMakeToken.OpenParen &&
-                            state == BadCommandParseState.BeforeParen)
+                        break;
+                    case BadCommandParseState.BeforeParen:
+                        if (tokenInfo.Token == (int)CMakeToken.OpenParen)
                         {
                             state = BadCommandParseState.InsideParens;
+                        }
+                        else if (tokenInfo.Token != (int)CMakeToken.WhiteSpace)
+                        {
+                            results.Add(new CMakeErrorInfo()
+                            {
+                                ErrorCode = CMakeError.ExpectedOpenParen,
+                                Span = tokenInfo.ToTextSpan(lineNum)
+                            });
+                            lineHasError = true;
+                        }
+                        break;
+                    case BadCommandParseState.InsideParens:
+                        if (!scanner.InsideParens(scannerState))
+                        {
+                            state = BadCommandParseState.AfterParen;
+                        }
+                        break;
+                    case BadCommandParseState.AfterParen:
+                        if (tokenInfo.Token != (int)CMakeToken.WhiteSpace &&
+                            tokenInfo.Token != (int)CMakeToken.Comment &&
+                            !lineHasError)
+                        {
+                            results.Add(new CMakeErrorInfo()
+                            {
+                                ErrorCode = CMakeError.ExpectedEOL,
+                                Span = tokenInfo.ToTextSpan(lineNum)
+                            });
+                            lineHasError = true;
                         }
                         break;
                     }

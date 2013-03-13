@@ -135,6 +135,9 @@
   <data name="ExpectedEOL" xml:space="preserve">
     <value>Expected: end of line.</value>
   </data>
+  <data name="ExpectedOpenParen" xml:space="preserve">
+    <value>Expected: '('.</value>
+  </data>
   <data name="FailedToLaunchCMake" xml:space="preserve">
     <value>An error occurred while launching CMake.</value>
   </data>
