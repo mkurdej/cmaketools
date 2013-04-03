@@ -67,27 +67,9 @@ namespace CMakeTools
             { CMakeToken.VariableStartCache,    "$CACHE{" }
         };
 
-        // Scanner state data
-        private class ScanInfo
-        {
-            public bool stringFlag;
-            public bool noSeparatorFlag;
-            public bool needSubcommandFlag;
-            public bool subcommandParmsFlag;
-            public int variableDepth;
-            public int parenDepth;
-            public int separatorCount;
-            public CMakeCommandId lastCommand;
-        }
-
-        // List of scanner state data, one item for time the scanner state is
-        // set back to zero.
-        private List<ScanInfo> _scanInfoList;
-
         public CMakeScanner(bool textFile = false)
         {
             _textFile = textFile;
-            _scanInfoList = new List<ScanInfo>();
         }
 
         public void SetSource(string source, int offset)
@@ -107,12 +89,11 @@ namespace CMakeTools
                 return false;
             }
 
-            ScanInfo scanInfo = GetScanInfo(ref state);
-            if (scanInfo.stringFlag && _offset < _source.Length)
+            if (GetStringFlag(state) && _offset < _source.Length)
             {
                 // If the line begins inside a string token, begin by scanning the rest
                 // of the string.
-                ScanString(tokenInfo, scanInfo, false);
+                ScanString(tokenInfo, ref state, false);
                 _scannedNonWhitespace = true;
                 _lastWhitespace = false;
                 return true;
@@ -120,10 +101,10 @@ namespace CMakeTools
 
             bool originalScannedNonWhitespace = _scannedNonWhitespace;
             bool originalLastWhitespace = _lastWhitespace;
-            int originalVariableDepth = scanInfo.variableDepth;
-            scanInfo.variableDepth = 0;
-            bool noSeparator = scanInfo.noSeparatorFlag;
-            scanInfo.noSeparatorFlag = false;
+            int originalVariableDepth = GetVariableDepth(state);
+            SetVariableDepth(ref state, 0);
+            bool noSeparator = GetNoSeparatorFlag(state);
+            SetNoSeparatorFlag(ref state, false);
             tokenInfo.Trigger = TokenTriggers.None;
             _lastWhitespace = false;
             while (_offset < _source.Length)
@@ -140,8 +121,8 @@ namespace CMakeTools
                     tokenInfo.EndIndex = _offset - 1;
                     tokenInfo.Color = TokenColor.Text;
                     tokenInfo.Token = (int)CMakeToken.WhiteSpace;
-                    CMakeCommandId id = scanInfo.lastCommand;
-                    if (scanInfo.parenDepth > 0)
+                    CMakeCommandId id = GetLastCommand(state);
+                    if (InsideParens(state))
                     {
                         if (!noSeparator)
                         {
@@ -150,11 +131,11 @@ namespace CMakeTools
                                 // The first whitespace token after a subcommand marks
                                 // the beginning of the parameters.  The remaining
                                 // whitespace parameters separate consecutive parameters.
-                                if (scanInfo.subcommandParmsFlag)
+                                if (GetSubcommandParmsFlag(state))
                                 {
-                                    if (scanInfo.needSubcommandFlag)
+                                    if (GetNeedSubcommandFlag(state))
                                     {
-                                        scanInfo.needSubcommandFlag = false;
+                                        SetNeedSubcommandFlag(ref state, false);
                                         tokenInfo.Trigger = TokenTriggers.ParameterStart;
                                     }
                                     else
@@ -164,9 +145,9 @@ namespace CMakeTools
                                 }
                             }
                             else if (id == CMakeCommandId.Unspecified ||
-                                scanInfo.separatorCount > 0)
+                                GetSeparatorCount(state) > 0)
                             {
-                                scanInfo.separatorCount--;
+                                SetSeparatorCount(ref state, GetSeparatorCount(state) - 1);
                                 tokenInfo.Trigger = TokenTriggers.ParameterNext;
                             }
                         }
@@ -176,7 +157,7 @@ namespace CMakeTools
                             tokenInfo.Trigger |= TokenTriggers.MemberSelect;
                         }
                     }
-                    scanInfo.noSeparatorFlag = true;
+                    SetNoSeparatorFlag(ref state, true);
                     _lastWhitespace = true;
                     return true;
                 }
@@ -201,7 +182,7 @@ namespace CMakeTools
                     tokenInfo.Color = TokenColor.Comment;
                     tokenInfo.Token = (int)CMakeToken.Comment;
                     _offset = endPos + 1;
-                    scanInfo.noSeparatorFlag = noSeparator;
+                    SetNoSeparatorFlag(ref state, noSeparator);
                     return true;
                 }
 
@@ -216,28 +197,28 @@ namespace CMakeTools
                 if (_source[_offset] == '"')
                 {
                     // Scan a string token.
-                    ScanString(tokenInfo, scanInfo, true);
+                    ScanString(tokenInfo, ref state, true);
                     return true;
                 }
                 else if (_source[_offset] == '(')
                 {
                     // Scan an opening parenthesis.
-                    if (scanInfo.parenDepth == 0)
+                    if (!InsideParens(state))
                     {
-                        CMakeCommandId id = scanInfo.lastCommand;
+                        CMakeCommandId id = GetLastCommand(state);
                         if (CMakeKeywords.TriggersMemberSelection(id))
                         {
                             tokenInfo.Trigger |= TokenTriggers.MemberSelect;
-                            scanInfo.needSubcommandFlag = true;
-                            scanInfo.noSeparatorFlag = true;
+                            SetNeedSubcommandFlag(ref state, true);
+                            SetNoSeparatorFlag(ref state, true);
                         }
                         else
                         {
                             tokenInfo.Trigger |= TokenTriggers.ParameterStart;
-                            scanInfo.noSeparatorFlag = true;
+                            SetNoSeparatorFlag(ref state, true);
                         }
                     }
-                    scanInfo.parenDepth++;
+                    IncParenDepth(ref state);
                     tokenInfo.StartIndex = _offset;
                     tokenInfo.EndIndex = _offset;
                     tokenInfo.Color = TokenColor.Text;
@@ -249,14 +230,11 @@ namespace CMakeTools
                 else if (_source[_offset] == ')')
                 {
                     // Scan a closing parenthesis.
-                    if (scanInfo.parenDepth > 0)
+                    DecParenDepth(ref state);
+                    if (GetParenDepth(state) == 0)
                     {
-                        scanInfo.parenDepth--;
-                    }
-                    if (scanInfo.parenDepth == 0)
-                    {
-                        scanInfo.lastCommand = CMakeCommandId.Unspecified;
-                        scanInfo.separatorCount = 0;
+                        SetLastCommand(ref state, CMakeCommandId.Unspecified);
+                        SetSeparatorCount(ref state, 0);
                         tokenInfo.Trigger = TokenTriggers.ParameterEnd;
                     }
                     tokenInfo.StartIndex = _offset;
@@ -296,7 +274,7 @@ namespace CMakeTools
                     tokenInfo.EndIndex = _offset;
                     _offset++;
 
-                    CMakeCommandId id = scanInfo.lastCommand;
+                    CMakeCommandId id = GetLastCommand(state);
                     string substr = _source.ExtractToken(tokenInfo);
                     if (originalVariableDepth != 0)
                     {
@@ -304,14 +282,14 @@ namespace CMakeTools
                         // the identifier as a variable.
                         tokenInfo.Color = TokenColor.Identifier;
                         tokenInfo.Token = (int)CMakeToken.Variable;
-                        scanInfo.variableDepth = originalVariableDepth;
+                        SetVariableDepth(ref state, originalVariableDepth);
                     }
                     else if ((id == CMakeCommandId.Set || id == CMakeCommandId.Unset) &&
                         substr.StartsWith("ENV{"))
                     {
                         // Inside a SET or UNSET command, ENV{ indicates an environment
                         // variable.  This token is case-sensitive.
-                        scanInfo.variableDepth = originalVariableDepth + 1;
+                        SetVariableDepth(ref state, originalVariableDepth + 1);
                         tokenInfo.EndIndex = tokenInfo.StartIndex + 3;
                         tokenInfo.Color = TokenColor.Identifier;
                         tokenInfo.Token = (int)CMakeToken.VariableStartSetEnv;
@@ -334,27 +312,27 @@ namespace CMakeTools
                         // Check whether the string is a keyword or not.
                         string tokenText = _source.ExtractToken(tokenInfo);
                         bool isKeyword = false;
-                        if (scanInfo.parenDepth == 0)
+                        if (!InsideParens(state))
                         {
                             isKeyword = CMakeKeywords.IsCommand(tokenText);
-                            scanInfo.lastCommand = CMakeKeywords.GetCommandId(
-                                tokenText);
-                            scanInfo.separatorCount = CMakeMethods.GetParameterCount(
-                                scanInfo.lastCommand);
-                            if (scanInfo.separatorCount > 0)
+                            id = CMakeKeywords.GetCommandId(tokenText);
+                            SetLastCommand(ref state, id);
+                            SetSeparatorCount(ref state,
+                                CMakeMethods.GetParameterCount(id));
+                            int count = GetSeparatorCount(state);
+                            if (count > 0)
                             {
-                                scanInfo.separatorCount--;
+                                SetSeparatorCount(ref state, count - 1);
                             }
                         }
                         else
                         {
-                            isKeyword = CMakeKeywords.IsKeyword(scanInfo.lastCommand,
-                                tokenText);
+                            isKeyword = CMakeKeywords.IsKeyword(id, tokenText);
                             if (isKeyword)
                             {
-                                scanInfo.subcommandParmsFlag =
+                                SetSubcommandParmsFlag(ref state,
                                     CMakeSubcommandMethods.HasSubcommandParameters(
-                                    scanInfo.lastCommand, tokenText);
+                                    id, tokenText));
                             }
                         }
                         tokenInfo.Color = isKeyword ? TokenColor.Keyword :
@@ -364,7 +342,7 @@ namespace CMakeTools
                     }
                     if (tokenInfo.StartIndex == tokenInfo.EndIndex)
                     {
-                        if (scanInfo.parenDepth == 0 && !originalScannedNonWhitespace)
+                        if (!InsideParens(state) && !originalScannedNonWhitespace)
                         {
                             // Trigger member selection if we're not inside parentheses.
                             tokenInfo.Trigger |= TokenTriggers.MemberSelect;
@@ -408,7 +386,7 @@ namespace CMakeTools
                     if (originalVariableDepth != 0)
                     {
                         tokenInfo.Token = (int)CMakeToken.Variable;
-                        scanInfo.variableDepth = originalVariableDepth;
+                        SetVariableDepth(ref state, originalVariableDepth);
                     }
                     else if (isFileName)
                     {
@@ -429,7 +407,7 @@ namespace CMakeTools
                     _offset++;
                     if (varToken != CMakeToken.Unspecified)
                     {
-                        scanInfo.variableDepth = originalVariableDepth + 1;
+                        SetVariableDepth(ref state,  originalVariableDepth + 1);
                         tokenInfo.Token = (int)varToken;
                         tokenInfo.Trigger =
                             TokenTriggers.MemberSelect | TokenTriggers.MatchBraces;
@@ -447,8 +425,8 @@ namespace CMakeTools
                     tokenInfo.Color = TokenColor.Identifier;
                     tokenInfo.Token = (int)CMakeToken.VariableEnd;
                     tokenInfo.Trigger = TokenTriggers.MatchBraces;
-                    scanInfo.variableDepth = originalVariableDepth > 0 ?
-                        originalVariableDepth - 1 : 0;
+                    SetVariableDepth(ref state, originalVariableDepth > 0 ?
+                        originalVariableDepth - 1 : 0);
                     _offset++;
                     return true;
                 }
@@ -457,7 +435,7 @@ namespace CMakeTools
             return false;
         }
 
-        private void ScanString(TokenInfo tokenInfo, ScanInfo scanInfo,
+        private void ScanString(TokenInfo tokenInfo, ref int state,
             bool startWithQuote)
         {
             tokenInfo.StartIndex = _offset;
@@ -481,7 +459,7 @@ namespace CMakeTools
                     // An unescaped quotation mark signals the end of the string.
                     tokenInfo.EndIndex = _offset;
                     _offset++;
-                    scanInfo.stringFlag = false;
+                    SetStringFlag(ref state, false);
                     return;
                 }
                 _offset++;
@@ -492,7 +470,7 @@ namespace CMakeTools
             // and set the state to carry over onto the next line.
             _offset = _source.Length;
             tokenInfo.EndIndex = _source.Length - 1;
-            scanInfo.stringFlag = true;
+            SetStringFlag(ref state, true);
 
             // If the user has begun to type a reference to a variable inside the string,
             // trigger member selection to show a list of variables.
@@ -539,29 +517,151 @@ namespace CMakeTools
             return false;
         }
 
-        private ScanInfo GetScanInfo(ref int state)
+        private const uint StringFlag            = 0x80000000;
+        private const int NoSeparatorFlag        = 0x40000000;
+        private const int NeedSubcommandFlag     = 0x20000000;
+        private const int SubcommandParmsFlag    = 0x10000000;
+        private const int VariableDepthMask      = 0x0F000000;
+        private const int ParenDepthMask         = 0x00F00000;
+        private const int SeparatorCountMask     = 0x000F0000;
+        private const int LastCommandMask        = 0x0000FFFF;
+        private const int VariableDepthShift     = 24;
+        private const int ParenDepthShift        = 20;
+        private const int SeparatorCountShift    = 16;
+
+        public static CMakeCommandId GetLastCommand(int state)
         {
-            if (state == 0)
+            int id = state & LastCommandMask;
+            if (id == LastCommandMask)
             {
-                _scanInfoList.Add(new ScanInfo());
-                state = _scanInfoList.Count;
+                return CMakeCommandId.Unspecified;
             }
-            return _scanInfoList[state - 1];
+            return (CMakeCommandId)id;
         }
 
-        public CMakeCommandId GetLastCommand(int state)
+        private static void SetLastCommand(ref int state, CMakeCommandId id)
         {
-            return GetScanInfo(ref state).lastCommand;
+            state &= ~LastCommandMask;
+            state |= ((int)id & LastCommandMask);
         }
 
-        public bool InsideParens(int state)
+        private static int GetSeparatorCount(int state)
         {
-            return GetScanInfo(ref state).parenDepth > 0;
+            return (state & SeparatorCountMask) >> SeparatorCountShift;
+        }
+        
+        private static void SetSeparatorCount(ref int state, int count)
+        {
+            state &= ~SeparatorCountMask;
+            state |= (count << SeparatorCountShift) & SeparatorCountMask;
         }
 
-        public bool GetStringFlag(int state)
+        private static int GetParenDepth(int state)
         {
-            return GetScanInfo(ref state).stringFlag;
+            return (state & ParenDepthMask) >> ParenDepthShift;
+        }
+
+        private static void IncParenDepth(ref int state)
+        {
+            int depth = GetParenDepth(state);
+            state &= ~ParenDepthMask;
+            state |= ((depth + 1) << ParenDepthShift) & ParenDepthMask;
+        }
+
+        private static void DecParenDepth(ref int state)
+        {
+            int depth = GetParenDepth(state);
+            if (depth > 0)
+            {
+                state &= ~ParenDepthMask;
+                state |= ((depth - 1) << ParenDepthShift) & ParenDepthMask;
+            }
+        }
+
+        public static bool InsideParens(int state)
+        {
+            return GetParenDepth(state) > 0;
+        }
+
+        private static int GetVariableDepth(int state)
+        {
+            return (state & VariableDepthMask) >> VariableDepthShift;
+        }
+
+        private static void SetVariableDepth(ref int state, int depth)
+        {
+            state &= ~VariableDepthMask;
+            state |= (depth << VariableDepthShift) & VariableDepthMask;
+        }
+
+        private static bool GetSubcommandParmsFlag(int state)
+        {
+            return (state & SubcommandParmsFlag) != 0;
+        }
+
+        private static void SetSubcommandParmsFlag(ref int state, bool flag)
+        {
+            if (flag)
+            {
+                state |= SubcommandParmsFlag;
+            }
+            else
+            {
+                state &= ~SubcommandParmsFlag;
+            }
+        }
+
+        private static bool GetNeedSubcommandFlag(int state)
+        {
+            return (state & NeedSubcommandFlag) != 0;
+        }
+        
+        private static void SetNeedSubcommandFlag(ref int state, bool flag)
+        {
+            if (flag)
+            {
+                state |= NeedSubcommandFlag;
+            }
+            else
+            {
+                state &= ~NeedSubcommandFlag;
+            }
+        }
+
+        private static bool GetNoSeparatorFlag(int state)
+        {
+            return (state & NoSeparatorFlag) != 0;
+        }
+        
+        private static void SetNoSeparatorFlag(ref int state, bool flag)
+        {
+            if (flag)
+            {
+                state |= NoSeparatorFlag;
+            }
+            else
+            {
+                state &= ~NoSeparatorFlag;
+            }
+        }
+
+        public static bool GetStringFlag(int state)
+        {
+            return (state & StringFlag) != 0;
+        }
+
+        private static void SetStringFlag(ref int state, bool flag)
+        {
+            uint unsignedState = (uint)state;
+            if (flag)
+            {
+                unsignedState |= StringFlag;
+            }
+            else
+            {
+                unsignedState &= ~StringFlag;
+            }
+            state = (int)unsignedState;
         }
     }
 }

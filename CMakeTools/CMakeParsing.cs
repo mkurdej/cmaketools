@@ -336,7 +336,7 @@ namespace CMakeTools
                         // We found the variable name.  For the SET command, remember it
                         // and look for the CACHE keyword.  For the OPTION command, just
                         // go ahead and add it.
-                        if (scanner.GetLastCommand(scannerState) == CMakeCommandId.Set)
+                        if (CMakeScanner.GetLastCommand(scannerState) == CMakeCommandId.Set)
                         {
                             possibleVariable = tokenText;
                             state = VariableParseState.NeedCache;
@@ -613,7 +613,7 @@ namespace CMakeTools
                     {
                         if (tokenInfo.StartIndex == startIndex)
                         {
-                            return scanner.GetLastCommand(state);
+                            return CMakeScanner.GetLastCommand(state);
                         }
                     }
                 }
@@ -822,7 +822,7 @@ namespace CMakeTools
                     tokenInfo.Token == (int)CMakeToken.Identifier)
                 {
                     // Handle commands and subcommands.
-                    if (!scanner.InsideParens(state))
+                    if (!CMakeScanner.InsideParens(state))
                     {
                         lastCommandSpan.iStartLine = lineNum;
                         lastCommandSpan.iStartIndex = tokenInfo.StartIndex;
@@ -847,7 +847,7 @@ namespace CMakeTools
                         // Otherwise, the opening parenthesis marks the beginning of the
                         // parameters.
                         if (CMakeSubcommandMethods.HasSubcommands(
-                            scanner.GetLastCommand(state)))
+                            CMakeScanner.GetLastCommand(state)))
                         {
                             subcommandText = null;
                             needSubcommand = true;
@@ -1012,7 +1012,7 @@ namespace CMakeTools
                     case FunctionParseState.InsideFunctionArgs:
                     case FunctionParseState.InsideMacroArgs:
                         if (tokenInfo.Token == (int)CMakeToken.CloseParen &&
-                            !scanner.InsideParens(scannerState))
+                            !CMakeScanner.InsideParens(scannerState))
                         {
                             state = (state == FunctionParseState.InsideMacroArgs) ?
                                 FunctionParseState.InsideMacro :
@@ -1064,7 +1064,7 @@ namespace CMakeTools
                     case FunctionParseState.InsideEndFunctionArgs:
                     case FunctionParseState.InsideEndMacroArgs:
                         if (tokenInfo.Token == (int)CMakeToken.CloseParen &&
-                            !scanner.InsideParens(scannerState))
+                            !CMakeScanner.InsideParens(scannerState))
                         {
                             state = FunctionParseState.NotInFunction;
                             results.Add(new TextSpan()
@@ -1293,7 +1293,7 @@ namespace CMakeTools
                             return tokenText;
                         }
                         else if (tokenInfo.Token == (int)CMakeToken.Identifier &&
-                            !scanner.InsideParens(state))
+                            !CMakeScanner.InsideParens(state))
                         {
                             isVariable = false;
                             return tokenText;
@@ -1372,11 +1372,11 @@ namespace CMakeTools
                 while (scanner.ScanTokenAndProvideInfoAboutIt(tokenData.TokenInfo,
                     ref state))
                 {
-                    tokenData.InParens = scanner.InsideParens(state);
+                    tokenData.InParens = CMakeScanner.InsideParens(state);
                     if (tokenData.InParens)
                     {
                         CMakeToken token = (CMakeToken)tokenData.TokenInfo.Token;
-                        tokenData.Command = scanner.GetLastCommand(state);
+                        tokenData.Command = CMakeScanner.GetLastCommand(state);
                         if (token != CMakeToken.WhiteSpace &&
                             token != CMakeToken.Comment &&
                             token != CMakeToken.OpenParen)
@@ -1556,13 +1556,14 @@ namespace CMakeTools
                 }
                 else
                 {
-                    if (scanner.InsideParens(state) ||
-                        scanner.GetStringFlag(state))
+                    if (CMakeScanner.InsideParens(state) ||
+                        CMakeScanner.GetStringFlag(state))
                     {
                         return false;
                     }
                     while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
-                    return scanner.InsideParens(state) && !scanner.GetStringFlag(state);
+                    return CMakeScanner.InsideParens(state) &&
+                        !CMakeScanner.GetStringFlag(state);
                 }
                 i++;
             }
@@ -1596,30 +1597,30 @@ namespace CMakeTools
                 scanner.SetSource(line, 0);
                 if (i < lineNum)
                 {
-                    bool wasInParens = scanner.InsideParens(state);
-                    bool wasInString = scanner.GetStringFlag(state);
+                    bool wasInParens = CMakeScanner.InsideParens(state);
+                    bool wasInString = CMakeScanner.GetStringFlag(state);
                     while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
-                    if (!wasInParens && scanner.InsideParens(state))
+                    if (!wasInParens && CMakeScanner.InsideParens(state))
                     {
                         openParenLine = i;
                     }
-                    if (!wasInString && scanner.GetStringFlag(state))
+                    if (!wasInString && CMakeScanner.GetStringFlag(state))
                     {
                         openStringLine = i;
                     }
                 }
                 else
                 {
-                    bool wasInParens = scanner.InsideParens(state);
-                    bool wasInString = scanner.GetStringFlag(state);
+                    bool wasInParens = CMakeScanner.InsideParens(state);
+                    bool wasInString = CMakeScanner.GetStringFlag(state);
                     while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
-                    if (scanner.GetStringFlag(state))
+                    if (CMakeScanner.GetStringFlag(state))
                     {
                         // Inside multiline strings, always unindent all the way.
                         lineToMatch = -1;
                         return true;
                     }
-                    if (wasInParens && !scanner.InsideParens(state))
+                    if (wasInParens && !CMakeScanner.InsideParens(state))
                     {
                         lineToMatch = openParenLine;
                         return true;
@@ -1903,7 +1904,7 @@ namespace CMakeTools
                         }
                         break;
                     case BadCommandParseState.InsideParens:
-                        if (!scanner.InsideParens(scannerState))
+                        if (!CMakeScanner.InsideParens(scannerState))
                         {
                             state = BadCommandParseState.AfterParen;
                         }
