@@ -1924,6 +1924,24 @@ namespace CMakeTools
                         break;
                     }
                 }
+                if (state == BadCommandParseState.BeforeParen)
+                {
+                    // If we reached the end of a line while looking for the opening
+                    // parenthesis, show an error, since it must appear on the same line
+                    // as the command name to not have a syntax error.
+                    results.Add(new CMakeErrorInfo()
+                    {
+                        ErrorCode = CMakeError.ExpectedOpenParen,
+                        Span = new TextSpan()
+                        {
+                            iStartLine = lineNum,
+                            iStartIndex = tokenInfo.EndIndex + 1,
+                            iEndLine = lineNum,
+                            iEndIndex = tokenInfo.EndIndex + 2
+                        }
+                    });
+                    state = BadCommandParseState.BeforeCommand;
+                }
                 lineNum++;
             }
             return results;
