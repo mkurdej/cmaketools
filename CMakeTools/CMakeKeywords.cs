@@ -31,6 +31,7 @@ namespace CMakeTools
         AuxSourceDirectory,
         Break,
         BuildCommand,
+        BuildName,
         CMakeMinimumRequired,
         CMakePolicy,
         ConfigureFile,
@@ -45,6 +46,7 @@ namespace CMakeTools
         EndIf,
         EndMacro,
         EndWhile,
+        ExecProgram,
         ExecuteProcess,
         Export,
         File,
@@ -74,6 +76,7 @@ namespace CMakeTools
         LoadCache,
         LoadCommand,
         Macro,
+        MakeDirectory,
         MarkAsAdvanced,
         Math,
         Message,
@@ -81,6 +84,7 @@ namespace CMakeTools
         Project,
         QtWrapCpp,
         QtWrapUi,
+        Remove,
         RemoveDefinitions,
         Return,
         SeparateArguments,
@@ -97,8 +101,10 @@ namespace CMakeTools
         TryCompile,
         TryRun,
         Unset,
+        UseMangledMesa,
         VariableWatch,
         While,
+        WriteFile,
         CommandCount
     }
 
@@ -121,6 +127,7 @@ namespace CMakeTools
             "aux_source_directory",
             "break",
             "build_command",
+            "build_name",
             "cmake_minimum_required",
             "cmake_policy",
             "configure_file",
@@ -135,6 +142,7 @@ namespace CMakeTools
             "endif",
             "endmacro",
             "endwhile",
+            "exec_program",
             "execute_process",
             "export",
             "file",
@@ -164,6 +172,7 @@ namespace CMakeTools
             "load_cache",
             "load_command",
             "macro",
+            "make_directory",
             "mark_as_advanced",
             "math",
             "message",
@@ -171,6 +180,7 @@ namespace CMakeTools
             "project",
             "qt_wrap_cpp",
             "qt_wrap_ui",
+            "remove",
             "remove_definitions",
             "return",
             "separate_arguments",
@@ -187,8 +197,10 @@ namespace CMakeTools
             "try_compile",
             "try_run",
             "unset",
+            "use_mangled_mesa",
             "variable_watch",
-            "while"
+            "while",
+            "write_file"
         };
 
         // Array of keywords used with the ADD_CUSTOM_COMMAND command.
@@ -323,6 +335,14 @@ namespace CMakeTools
         private static readonly string[] _enableLanguageKeywords = new string[]
         {
             "OPTIONAL"
+        };
+
+        // Array of keywords used with the EXEC_PROGRAM command.
+        private static readonly string[] _execProgramKeywords = new string[]
+        {
+            "ARGS",
+            "OUTPUT_VARIABLE",
+            "RETURN_VALUE"
         };
 
         // Array of keywords used with the EXECUTE_PROCESS command.
@@ -789,11 +809,18 @@ namespace CMakeTools
             "CACHE"
         };
 
+        // Array of keywords used with the WRITE_FILE command.
+        private static readonly string[] _writeFileKeywords = new string[]
+        {
+            "APPEND"
+        };
+
         // Dummy arrays for commands that have no associated keywords.
         private static readonly string[] _addDefinitionsKeywords = null;
         private static readonly string[] _addDependenciesKeywords = null;
         private static readonly string[] _auxSourceDirectoriesKeywords = null;
         private static readonly string[] _breakKeywords = null;
+        private static readonly string[] _buildNameKeywords = null;
         private static readonly string[] _enableTestingKeywords = null;
         private static readonly string[] _endFunctionKeywords = null;
         private static readonly string[] _endMacroKeywords = null;
@@ -807,13 +834,16 @@ namespace CMakeTools
         private static readonly string[] _includeRegularExpressionKeywords = null;
         private static readonly string[] _linkDirectoryiesKeywords = null;
         private static readonly string[] _macroKeywords = null;
+        private static readonly string[] _makeDirectoryKeywords = null;
         private static readonly string[] _mathKeywords = null;
         private static readonly string[] _projectKeywords = null;
         private static readonly string[] _qtWrapCppKeywords = null;
         private static readonly string[] _qtWrapUiKeywords = null;
+        private static readonly string[] _removeKeywords = null;
         private static readonly string[] _removeDefinitionsKeywords = null;
         private static readonly string[] _returnKeywords = null;
         private static readonly string[] _siteNameKeywords = null;
+        private static readonly string[] _useMangledMesaKeywords = null;
         private static readonly string[] _variableWatchKeywords = null;
 
         // Arrays of keywords that appear in parentheses after other keywords.
@@ -832,6 +862,7 @@ namespace CMakeTools
             _auxSourceDirectoriesKeywords,
             _breakKeywords,
             _buildCommandKeywords,
+            _buildNameKeywords,
             _cmakeMinimumRequiredKeywords,
             _cmakePolicyKeywords,
             _configureFileKeywords,
@@ -846,6 +877,7 @@ namespace CMakeTools
             _endIfKeywords,
             _endMacroKeywords,
             _endWhileKeywords,
+            _execProgramKeywords,
             _executeProcessKeywords,
             _exportKeywords,
             _fileKeywords,
@@ -875,6 +907,7 @@ namespace CMakeTools
             _loadCacheKeywords,
             _loadCommandKeywords,
             _macroKeywords,
+            _makeDirectoryKeywords,
             _markAsAdvancedKeywords,
             _mathKeywords,
             _messageKeywords,
@@ -882,6 +915,7 @@ namespace CMakeTools
             _projectKeywords,
             _qtWrapCppKeywords,
             _qtWrapUiKeywords,
+            _removeKeywords,
             _removeDefinitionsKeywords,
             _returnKeywords,
             _separateArgumentsKeywords,
@@ -898,8 +932,10 @@ namespace CMakeTools
             _tryCompileKeywords,
             _tryRunKeywords,
             _unsetKeywords,
+            _useMangledMesaKeywords,
             _variableWatchKeywords,
-            _whileKeywords
+            _whileKeywords,
+            _writeFileKeywords
         };
 
         // Array of Booleans indicating whether a command should trigger member
