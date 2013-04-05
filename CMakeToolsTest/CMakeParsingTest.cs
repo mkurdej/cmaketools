@@ -1533,6 +1533,15 @@ namespace CMakeTools
             Assert.AreEqual(4, info[0].Span.iStartIndex);
             Assert.AreEqual(0, info[0].Span.iEndLine);
             Assert.AreEqual(7, info[0].Span.iEndIndex);
+            lines.Clear();
+            lines.Add("SET");
+            info = CMakeParsing.ParseForBadCommands(lines);
+            Assert.AreEqual(1, info.Count);
+            Assert.AreEqual(CMakeError.ExpectedOpenParen, info[0].ErrorCode);
+            Assert.AreEqual(0, info[0].Span.iStartLine);
+            Assert.AreEqual(3, info[0].Span.iStartIndex);
+            Assert.AreEqual(0, info[0].Span.iEndLine);
+            Assert.AreEqual(4, info[0].Span.iEndIndex);
         }
     }
 }
