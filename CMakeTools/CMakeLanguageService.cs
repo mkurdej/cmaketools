@@ -37,7 +37,8 @@ namespace CMakeTools
         {
             CMakeParsing.ParseForBadVariableRefs,
             CMakeParsing.ParseForUnmatchedParens,
-            CMakeParsing.ParseForBadCommands
+            CMakeParsing.ParseForBadCommands,
+            CMakeParsing.ParseForDeprecatedCommands
         };
 
         // Map from error codes to text strings.
@@ -48,7 +49,8 @@ namespace CMakeTools
             { CMakeError.UnmatchedParen,        CMakeStrings.UnmatchedParen },
             { CMakeError.ExpectedCommand,       CMakeStrings.ExpectedCommand },
             { CMakeError.ExpectedEOL,           CMakeStrings.ExpectedEOL },
-            { CMakeError.ExpectedOpenParen,     CMakeStrings.ExpectedOpenParen }
+            { CMakeError.ExpectedOpenParen,     CMakeStrings.ExpectedOpenParen },
+            { CMakeError.DeprecatedCommand,     CMakeStrings.DeprecatedCommand }
         };
 
         public override string GetFormatFilterList()

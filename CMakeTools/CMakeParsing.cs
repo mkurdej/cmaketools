@@ -1949,5 +1949,43 @@ namespace CMakeTools
             }
             return results;
         }
+        
+        /// <summary>
+        /// Parse for uses of deprecated commands.
+        /// </summary>
+        /// <param name="lines">A collection of lines to parse.</param>
+        /// <returns>A list of error information.</returns>
+        public static List<CMakeErrorInfo> ParseForDeprecatedCommands(
+            IEnumerable<string> lines)
+        {
+            List<CMakeErrorInfo> results = new List<CMakeErrorInfo>();
+            CMakeScanner scanner = new CMakeScanner();
+            TokenInfo tokenInfo = new TokenInfo();
+            int state = 0;
+            int lineNum = 0;
+            foreach (string line in lines)
+            {
+                scanner.SetSource(line, 0);
+                while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state))
+                {
+                    if (!CMakeScanner.InsideParens(state) &&
+                        tokenInfo.Token == (int)CMakeToken.Keyword)
+                    {
+                        string tokenText = line.ExtractToken(tokenInfo);
+                        CMakeCommandId id = CMakeKeywords.GetCommandId(tokenText);
+                        if (CMakeKeywords.IsDeprecated(id))
+                        {
+                            results.Add(new CMakeErrorInfo()
+                            {
+                                ErrorCode = CMakeError.DeprecatedCommand,
+                                Span = tokenInfo.ToTextSpan(lineNum)
+                            });
+                        }
+                    }
+                }
+                lineNum++;
+            }
+            return results;
+        }
     }
 }

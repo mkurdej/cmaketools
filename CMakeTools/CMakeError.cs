@@ -23,7 +23,8 @@ namespace CMakeTools
         UnmatchedParen,
         ExpectedCommand,
         ExpectedEOL,
-        ExpectedOpenParen
+        ExpectedOpenParen,
+        DeprecatedCommand
     }
 
     /// <summary>

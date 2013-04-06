@@ -1109,5 +1109,15 @@ namespace CMakeTools
             }
             return _commands;
         }
+
+        /// <summary>
+        /// Check if the specified command is deprecated.
+        /// </summary>
+        /// <param name="id">Identifier of the command to check.</param>
+        /// <returns>True if the command is deprecated or false otherwise.</returns>
+        public static bool IsDeprecated(CMakeCommandId id)
+        {
+            return _deprecatedIds.Contains(id);
+        }
     }
 }

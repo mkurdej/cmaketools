@@ -129,6 +129,9 @@
   <data name="CMakeSnippet" xml:space="preserve">
     <value>CMake Snippet</value>
   </data>
+  <data name="DeprecatedCommand" xml:space="preserve">
+    <value>Command is deprecated.</value>
+  </data>
   <data name="ExpectedCommand" xml:space="preserve">
     <value>Expected: command or function call.</value>
   </data>
