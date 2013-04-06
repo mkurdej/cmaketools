@@ -65,6 +65,16 @@ namespace CMakeTools
         public bool CommandsLower { get; set; }
 
         /// <summary>
+        /// Flag indicating whether to show deprecated commands in the member selection
+        /// list.
+        /// </summary>
+        [DisplayName("Show Deprecated Commands")]
+        [Description("Show deprecated commands in the member selection list.")]
+        [DefaultValue(false)]
+        [TypeConverter(typeof(YesNoConverter))]
+        public bool ShowDeprecated { get; set; }
+
+        /// <summary>
         /// Setting indicating whether to show all subdirectories or just those with
         /// CMakeLists.txt.
         /// </summary>

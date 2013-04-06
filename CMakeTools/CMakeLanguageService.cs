@@ -160,7 +160,8 @@ namespace CMakeTools
                     if (!tokenData.InParens)
                     {
                         CMakeItemDeclarations decls = new CMakeItemDeclarations();
-                        IEnumerable<string> commands = CMakeKeywords.GetAllCommands();
+                        IEnumerable<string> commands = CMakeKeywords.GetAllCommands(
+                            CMakePackage.Instance.CMakeOptionPage.ShowDeprecated);
                         if (!CMakePackage.Instance.CMakeOptionPage.CommandsLower)
                         {
                             commands = commands.Select(x => x.ToUpper());

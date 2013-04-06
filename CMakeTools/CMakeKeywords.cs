@@ -11,6 +11,8 @@
  * **************************************************************************/
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CMakeTools
 {
@@ -113,6 +115,17 @@ namespace CMakeTools
     /// </summary>
     public static class CMakeKeywords
     {
+        // Array of CMake command identifiers for commands that are deprecated.  These
+        // must be in alphabetical order.
+        private static readonly CMakeCommandId[] _deprecatedIds = new CMakeCommandId[]
+        {
+            CMakeCommandId.BuildName,
+            CMakeCommandId.ExecProgram,
+            CMakeCommandId.MakeDirectory,
+            CMakeCommandId.Remove,
+            CMakeCommandId.WriteFile
+        };
+
         // Array of CMake commands.  These should be in alphabetical order.
         private static readonly string[] _commands = new string[]
         {
@@ -1079,9 +1092,21 @@ namespace CMakeTools
         /// <summary>
         /// Get the names of all CMake commands.
         /// </summary>
-        /// <returns>An array of all CMake commands.</returns>
-        public static string[] GetAllCommands()
+        /// <param name="includeDeprecated">
+        /// Boolean value indicating whether deprecated commands should be included.
+        /// </param>
+        /// <returns>A collection of all CMake commands.</returns>
+        public static IEnumerable<string> GetAllCommands(bool includeDeprecated)
         {
+            if (!includeDeprecated)
+            {
+                List<string> commands = new List<string>(_commands);
+                foreach(CMakeCommandId id in _deprecatedIds.Reverse())
+                {
+                    commands.RemoveAt((int)id);
+                }
+                return commands;
+            }
             return _commands;
         }
     }
