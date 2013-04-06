@@ -1978,7 +1978,8 @@ namespace CMakeTools
                             results.Add(new CMakeErrorInfo()
                             {
                                 ErrorCode = CMakeError.DeprecatedCommand,
-                                Span = tokenInfo.ToTextSpan(lineNum)
+                                Span = tokenInfo.ToTextSpan(lineNum),
+                                Warning = true
                             });
                         }
                     }

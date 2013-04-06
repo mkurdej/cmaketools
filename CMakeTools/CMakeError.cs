@@ -41,5 +41,10 @@ namespace CMakeTools
         /// A text span specifying where the error was detected.
         /// </summary>
         public TextSpan Span { get; set; }
+
+        /// <summary>
+        /// Boolean value indicating is the error is a warning.
+        /// </summary>
+        public bool Warning { get; set; }
     }
 }

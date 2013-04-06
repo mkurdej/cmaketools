@@ -272,7 +272,7 @@ namespace CMakeTools
                         {
                             req.Sink.AddError(req.FileName,
                                 _errorStrings[item.ErrorCode], item.Span,
-                                Severity.Error);
+                                item.Warning ? Severity.Warning : Severity.Error);
                         }
                     }
                 }
