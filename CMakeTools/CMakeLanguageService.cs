@@ -31,6 +31,9 @@ namespace CMakeTools
         private delegate List<CMakeErrorInfo> ParseForErrorMethod(
             IEnumerable<string> lines);
 
+        // Delegate whether an error is enabled.
+        private delegate bool ErrorEnabledMethod();
+
         // Array of error parsing methods.
         private readonly ParseForErrorMethod[] _parseForErrorMethods =
             new ParseForErrorMethod[]
@@ -51,6 +54,13 @@ namespace CMakeTools
             { CMakeError.ExpectedEOL,           CMakeStrings.ExpectedEOL },
             { CMakeError.ExpectedOpenParen,     CMakeStrings.ExpectedOpenParen },
             { CMakeError.DeprecatedCommand,     CMakeStrings.DeprecatedCommand }
+        };
+
+        // Map from error codes to function checking if the errors are enabled.
+        private Dictionary<CMakeError, ErrorEnabledMethod> _enabledMethods =
+            new Dictionary<CMakeError, ErrorEnabledMethod>()
+        {
+            { CMakeError.DeprecatedCommand,     CMakePackage.IsDeprecatedWarningEnabled }
         };
 
         public override string GetFormatFilterList()
@@ -268,10 +278,11 @@ namespace CMakeTools
                     List<CMakeErrorInfo> info = method(source.GetLines());
                     foreach (CMakeErrorInfo item in info)
                     {
-                        if (_errorStrings.ContainsKey(item.ErrorCode))
+                        CMakeError err = item.ErrorCode;
+                        if (_errorStrings.ContainsKey(err) &&
+                            (!_enabledMethods.ContainsKey(err) || _enabledMethods[err]()))
                         {
-                            req.Sink.AddError(req.FileName,
-                                _errorStrings[item.ErrorCode], item.Span,
+                            req.Sink.AddError(req.FileName, _errorStrings[err], item.Span,
                                 item.Warning ? Severity.Warning : Severity.Error);
                         }
                     }

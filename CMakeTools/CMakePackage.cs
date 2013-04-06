@@ -238,6 +238,11 @@ namespace CMakeTools
             }
         }
 
+        internal static bool IsDeprecatedWarningEnabled()
+        {
+            return Instance.CMakeOptionPage.ShowDeprecatedWarning;
+        }
+
         // The implementation of IOleComponent is boilerplate code that every language
         // service package must provide in order for the language service's OnIdle
         // method to be called.  The implementation FDoIdle manually calls OnIdle on the

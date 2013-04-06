@@ -75,6 +75,15 @@ namespace CMakeTools
         public bool ShowDeprecated { get; set; }
 
         /// <summary>
+        /// Flag indicating whether to show a warning when a deprecated command is used.
+        /// </summary>
+        [DisplayName("Show Deprecated Command Warning")]
+        [Description("Show a warning if a deprecated command is used.")]
+        [DefaultValue(true)]
+        [TypeConverter(typeof(YesNoConverter))]
+        public bool ShowDeprecatedWarning { get; set; }
+
+        /// <summary>
         /// Setting indicating whether to show all subdirectories or just those with
         /// CMakeLists.txt.
         /// </summary>
