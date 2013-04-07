@@ -262,6 +262,11 @@ namespace CMakeTools
                         // its parameters.
                         List<string> parameters = CMakeParsing.ParseForParameterNames(
                             source.GetLines(), result.CommandName);
+                        if (parameters == null)
+                        {
+                            parameters = source.GetParametersFromIncludeCache(
+                                result.CommandName);
+                        }
                         if (parameters != null)
                         {
                             scope.SetMethods(new CMakeUserMethods(result.CommandName,

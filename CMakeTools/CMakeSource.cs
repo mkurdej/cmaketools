@@ -126,7 +126,7 @@ namespace CMakeTools
                         string[] includeLines = File.ReadAllLines(path);
                         _includeCache[include] = new IncludeCacheEntry()
                         {
-                            FileName = include,
+                            FileName = path,
                             Variables = CMakeParsing.ParseForVariables(includeLines),
                             EnvVariables = CMakeParsing.ParseForEnvVariables(
                                 includeLines),
@@ -200,6 +200,42 @@ namespace CMakeTools
                 variables.AddRange(func(entry));
             }
             return variables;
+        }
+
+        /// <summary>
+        /// Get the parameters to a specified function defined in a file in the include
+        /// cache.
+        /// </summary>
+        /// <param name="function">
+        /// The name of the function for which to find parameters.
+        /// </param>
+        /// <returns>
+        /// A list of the function's parameters or null if the function could not be
+        /// found.
+        /// </returns>
+        public List<string> GetParametersFromIncludeCache(string function)
+        {
+            string fileName = null;
+            IEnumerable<IncludeCacheEntry> entries = _includeCache.Values.Where(
+                x => x.Functions.Contains(function) || x.Macros.Contains(function));
+            foreach (IncludeCacheEntry entry in entries)
+            {
+                fileName = entry.FileName;
+                break;
+            }
+            if (fileName != null)
+            {
+                try
+                {
+                    string[] includeLines = File.ReadAllLines(fileName);
+                    return CMakeParsing.ParseForParameterNames(includeLines, function);
+                }
+                catch (IOException)
+                {
+                    // Just ignore any errors.
+                }
+            }
+            return null;
         }
     }
 }
