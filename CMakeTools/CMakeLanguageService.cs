@@ -157,15 +157,21 @@ namespace CMakeTools
                 {
                     List<string> vars = CMakeParsing.ParseForEnvVariables(
                         source.GetLines());
-                    scope.SetDeclarations(new CMakeVariableDeclarations(vars,
-                        CMakeVariableType.EnvVariable));
+                    CMakeVariableDeclarations decls = new CMakeVariableDeclarations(vars,
+                        CMakeVariableType.EnvVariable);
+                    decls.AddItems(source.GetIncludeCacheEnvVariables(),
+                        CMakeItemDeclarations.ItemType.Variable);
+                    scope.SetDeclarations(decls);
                 }
                 else if (token == CMakeToken.VariableStartCache)
                 {
                     List<string> vars = CMakeParsing.ParseForCacheVariables(
                         source.GetLines());
-                    scope.SetDeclarations(new CMakeVariableDeclarations(vars,
-                        CMakeVariableType.CacheVariable));
+                    CMakeVariableDeclarations decls = new CMakeVariableDeclarations(vars,
+                        CMakeVariableType.CacheVariable);
+                    decls.AddItems(source.GetIncludeCacheCacheVariables(),
+                        CMakeItemDeclarations.ItemType.Variable);
+                    scope.SetDeclarations(decls);
                 }
                 else if (token == CMakeToken.Identifier)
                 {
@@ -187,6 +193,10 @@ namespace CMakeTools
                             CMakeItemDeclarations.ItemType.Function);
                         decls.AddItems(
                             CMakeParsing.ParseForFunctionNames(source.GetLines(), true),
+                            CMakeItemDeclarations.ItemType.Macro);
+                        decls.AddItems(source.GetIncludeCacheFunctions(),
+                            CMakeItemDeclarations.ItemType.Function);
+                        decls.AddItems(source.GetIncludeCacheMacros(),
                             CMakeItemDeclarations.ItemType.Macro);
                         scope.SetDeclarations(decls);
                     }

@@ -10,8 +10,10 @@
  * 
  * **************************************************************************/
 
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
 
@@ -26,6 +28,10 @@ namespace CMakeTools
         {
             public string FileName { get; set; }
             public List<string> Variables { get; set; }
+            public List<string> EnvVariables { get; set; }
+            public List<string> CacheVariables { get; set; }
+            public List<string> Functions { get; set; }
+            public List<string> Macros { get; set; }
         }
 
         private Dictionary<string, IncludeCacheEntry> _includeCache;
@@ -121,7 +127,15 @@ namespace CMakeTools
                         _includeCache[include] = new IncludeCacheEntry()
                         {
                             FileName = include,
-                            Variables = CMakeParsing.ParseForVariables(includeLines)
+                            Variables = CMakeParsing.ParseForVariables(includeLines),
+                            EnvVariables = CMakeParsing.ParseForEnvVariables(
+                                includeLines),
+                            CacheVariables = CMakeParsing.ParseForCacheVariables(
+                                includeLines),
+                            Functions = CMakeParsing.ParseForFunctionNames(includeLines,
+                                false),
+                            Macros = CMakeParsing.ParseForFunctionNames(includeLines,
+                                true)
                         };
                     }
                     catch (IOException)
@@ -138,10 +152,52 @@ namespace CMakeTools
         /// <returns>A list of variables.</returns>
         public List<string> GetIncludeCacheVariables()
         {
+            return GetIncludeCacheItems(x => x.Variables);
+        }
+
+        /// <summary>
+        /// Get the environment variables in the include cache.
+        /// </summary>
+        /// <returns>A list of environment variables.</returns>
+        public List<string> GetIncludeCacheEnvVariables()
+        {
+            return GetIncludeCacheItems(x => x.EnvVariables);
+        }
+
+        /// <summary>
+        /// Get the cache variables in the include cache.
+        /// </summary>
+        /// <returns>A list of cache variables.</returns>
+        public List<string> GetIncludeCacheCacheVariables()
+        {
+            return GetIncludeCacheItems(x => x.CacheVariables);
+        }
+
+        /// <summary>
+        /// Get the functions in the include cache.
+        /// </summary>
+        /// <returns>A list of functions.</returns>
+        public List<string> GetIncludeCacheFunctions()
+        {
+            return GetIncludeCacheItems(x => x.Functions);
+        }
+
+        /// <summary>
+        /// Get the macros in the include macro.
+        /// </summary>
+        /// <returns>A list of macros.</returns>
+        public List<string> GetIncludeCacheMacros()
+        {
+            return GetIncludeCacheItems(x => x.Macros);
+        }
+
+        private List<string> GetIncludeCacheItems(
+            Func<IncludeCacheEntry, IEnumerable<string>> func)
+        {
             List<string> variables = new List<string>();
             foreach (IncludeCacheEntry entry in _includeCache.Values)
             {
-                variables.AddRange(entry.Variables);
+                variables.AddRange(func(entry));
             }
             return variables;
         }
