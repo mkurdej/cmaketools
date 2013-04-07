@@ -79,7 +79,7 @@ namespace CMakeTools
         public override AuthoringScope ParseSource(ParseRequest req)
         {
             CMakeAuthoringScope scope = new CMakeAuthoringScope();
-            Source source = GetSource(req.FileName);
+            CMakeSource source = (CMakeSource)GetSource(req.FileName);
             if (req.Sink.HiddenRegions)
             {
                 req.Sink.ProcessHiddenRegions = true;
@@ -147,8 +147,11 @@ namespace CMakeTools
                 {
                     List<string> vars = CMakeParsing.ParseForVariables(
                         source.GetLines());
-                    scope.SetDeclarations(new CMakeVariableDeclarations(vars,
-                        CMakeVariableType.Variable));
+                    CMakeVariableDeclarations decls = new CMakeVariableDeclarations(vars,
+                        CMakeVariableType.Variable);
+                    decls.AddItems(source.GetIncludeCacheVariables(),
+                        CMakeItemDeclarations.ItemType.Variable);
+                    scope.SetDeclarations(decls);
                 }
                 else if (token == CMakeToken.VariableStartEnv)
                 {
@@ -287,6 +290,7 @@ namespace CMakeTools
                         }
                     }
                 }
+                source.BuildIncludeCache(source.GetLines());
             }
             return scope;
         }

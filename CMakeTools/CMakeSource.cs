@@ -22,10 +22,18 @@ namespace CMakeTools
     /// </summary>
     class CMakeSource : Source
     {
+        private struct IncludeCacheEntry
+        {
+            public string FileName { get; set; }
+            public List<string> Variables { get; set; }
+        }
+
+        private Dictionary<string, IncludeCacheEntry> _includeCache;
+
         public CMakeSource(LanguageService service, IVsTextLines textLines,
             Colorizer colorizer) : base(service, textLines, colorizer)
         {
-            // Just call the base class.
+            _includeCache = new Dictionary<string, IncludeCacheEntry>();
         }
 
         public override CommentInfo GetCommentFormat()
@@ -82,6 +90,60 @@ namespace CMakeTools
                 }
             }
             return !textFile;
+        }
+
+        /// <summary>
+        /// Update the include cache with information on the files referenced by the
+        /// specified lines.
+        /// </summary>
+        /// <param name="lines">A collection of lines.</param>
+        public void BuildIncludeCache(IEnumerable<string> lines)
+        {
+            List<string> includes = CMakeParsing.ParseForIncludes(lines);
+            foreach (string include in includes)
+            {
+                string curFileDir = Path.GetDirectoryName(GetFilePath());
+                string path = Path.Combine(curFileDir, include + ".cmake");
+                if (!File.Exists(path))
+                {
+                    path = Path.Combine(CMakePath.FindCMakeModules(),
+                        include + ".cmake");
+                    if (!File.Exists(path))
+                    {
+                        path = null;
+                    }
+                }
+                if (path != null)
+                {
+                    try
+                    {
+                        string[] includeLines = File.ReadAllLines(path);
+                        _includeCache[include] = new IncludeCacheEntry()
+                        {
+                            FileName = include,
+                            Variables = CMakeParsing.ParseForVariables(includeLines)
+                        };
+                    }
+                    catch (IOException)
+                    {
+                        // Just ignore any errors.
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get the variables in the include cache.
+        /// </summary>
+        /// <returns>A list of variables.</returns>
+        public List<string> GetIncludeCacheVariables()
+        {
+            List<string> variables = new List<string>();
+            foreach (IncludeCacheEntry entry in _includeCache.Values)
+            {
+                variables.AddRange(entry.Variables);
+            }
+            return variables;
         }
     }
 }
