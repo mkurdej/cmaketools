@@ -305,7 +305,14 @@ namespace CMakeTools
                         }
                     }
                 }
-                source.BuildIncludeCache(source.GetLines());
+                if (CMakePackage.Instance.CMakeOptionPage.ParseIncludedFiles)
+                {
+                    source.BuildIncludeCache(source.GetLines());
+                }
+                else
+                {
+                    source.ClearIncludeCache();
+                }
             }
             return scope;
         }

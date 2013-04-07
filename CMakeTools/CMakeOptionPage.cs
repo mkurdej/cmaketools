@@ -65,6 +65,15 @@ namespace CMakeTools
         public bool CommandsLower { get; set; }
 
         /// <summary>
+        /// Flag indicating whether to parse included files and build an include cache.
+        /// </summary>
+        [DisplayName("Parse Included Files")]
+        [Description("Parse included files for IntelliSense information.")]
+        [DefaultValue(true)]
+        [TypeConverter(typeof(YesNoConverter))]
+        public bool ParseIncludedFiles { get; set; }
+
+        /// <summary>
         /// Flag indicating whether to show deprecated commands in the member selection
         /// list.
         /// </summary>

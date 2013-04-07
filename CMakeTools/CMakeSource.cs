@@ -147,6 +147,14 @@ namespace CMakeTools
         }
 
         /// <summary>
+        /// Clear the include cache.
+        /// </summary>
+        public void ClearIncludeCache()
+        {
+            _includeCache.Clear();
+        }
+
+        /// <summary>
         /// Get the variables in the include cache.
         /// </summary>
         /// <returns>A list of variables.</returns>
