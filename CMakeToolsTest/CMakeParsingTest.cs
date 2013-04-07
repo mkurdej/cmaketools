@@ -1206,6 +1206,27 @@ namespace CMakeTools
         }
 
         /// <summary>
+        /// Test parsing for include files.
+        /// </summary>
+        [TestMethod]
+        public void TestParseForIncludes()
+        {
+            List<string> lines = new List<string>();
+            lines.Add("include(A)");
+            lines.Add("include ( B )");
+            lines.Add("include(");
+            lines.Add("  C)");
+            lines.Add("include( # comment");
+            lines.Add("  D)");
+            List<string> includes = CMakeParsing.ParseForIncludes(lines);
+            Assert.AreEqual(4, includes.Count);
+            Assert.AreEqual("A", includes[0]);
+            Assert.AreEqual("B", includes[1]);
+            Assert.AreEqual("C", includes[2]);
+            Assert.AreEqual("D", includes[3]);
+        }
+
+        /// <summary>
         /// Test parsing to determine whether a line should be indented.
         /// </summary>
         [TestMethod]

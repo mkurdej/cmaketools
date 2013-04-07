@@ -1540,13 +1540,18 @@ namespace CMakeTools
             InsideParens
         }
 
+        /// <summary>
+        /// Parse for all files include by the specified lines.
+        /// </summary>
+        /// <param name="lines">A collection of lines to parse.</param>
+        /// <returns>A list of include files.</returns>
         public static List<string> ParseForIncludes(IEnumerable<string> lines)
         {
             List<string> results = new List<string>();
             CMakeScanner scanner = new CMakeScanner();
             TokenInfo tokenInfo = new TokenInfo();
             int scannerState = 0;
-            IncludeParseState state = IncludeParseState.BeforeParen;
+            IncludeParseState state = IncludeParseState.BeforeCommand;
             foreach (string line in lines)
             {
                 scanner.SetSource(line, 0);
