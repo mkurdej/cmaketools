@@ -225,7 +225,10 @@ namespace CMakeTools
         {
             string fileName = null;
             IEnumerable<IncludeCacheEntry> entries = _includeCache.Values.Where(
-                x => x.Functions.Contains(function) || x.Macros.Contains(function));
+                x => x.Functions.Any(y => y.Equals(function,
+                    StringComparison.CurrentCultureIgnoreCase)) ||
+                x.Macros.Any(y => y.Equals(function,
+                    StringComparison.CurrentCultureIgnoreCase)));
             foreach (IncludeCacheEntry entry in entries)
             {
                 fileName = entry.FileName;
