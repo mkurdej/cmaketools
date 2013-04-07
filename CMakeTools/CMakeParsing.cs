@@ -1533,6 +1533,68 @@ namespace CMakeTools
             return pairs;
         }
 
+        private enum IncludeParseState
+        {
+            BeforeCommand,
+            BeforeParen,
+            InsideParens
+        }
+
+        public static List<string> ParseForIncludes(IEnumerable<string> lines)
+        {
+            List<string> results = new List<string>();
+            CMakeScanner scanner = new CMakeScanner();
+            TokenInfo tokenInfo = new TokenInfo();
+            int scannerState = 0;
+            IncludeParseState state = IncludeParseState.BeforeParen;
+            foreach (string line in lines)
+            {
+                scanner.SetSource(line, 0);
+                while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo,
+                    ref scannerState))
+                {
+                    switch (state)
+                    {
+                    case IncludeParseState.BeforeCommand:
+                        if (!CMakeScanner.InsideParens(scannerState) &&
+                            tokenInfo.Token == (int)CMakeToken.Keyword)
+                        {
+                            CMakeCommandId id = CMakeKeywords.GetCommandId(
+                                line.ExtractToken(tokenInfo));
+                            if (id == CMakeCommandId.Include)
+                            {
+                                state = IncludeParseState.BeforeParen;
+                            }
+                        }
+                        break;
+                    case IncludeParseState.BeforeParen:
+                        if (tokenInfo.Token == (int)CMakeToken.OpenParen)
+                        {
+                            state = IncludeParseState.InsideParens;
+                        }
+                        else if (tokenInfo.Token != (int)CMakeToken.WhiteSpace)
+                        {
+                            state = IncludeParseState.BeforeCommand;
+                        }
+                        break;
+                    case IncludeParseState.InsideParens:
+                        if (tokenInfo.Token == (int)CMakeToken.Identifier ||
+                            tokenInfo.Token == (int)CMakeToken.FileName)
+                        {
+                            results.Add(line.ExtractToken(tokenInfo));
+                        }
+                        else if (tokenInfo.Token != (int)CMakeToken.WhiteSpace &&
+                            tokenInfo.Token != (int)CMakeToken.Comment)
+                        {
+                            state = IncludeParseState.BeforeCommand;
+                        }
+                        break;
+                    }
+                }
+            }
+            return results;
+        }
+
         /// <summary>
         /// Check whether the line following the specified line should be indented.
         /// </summary>
