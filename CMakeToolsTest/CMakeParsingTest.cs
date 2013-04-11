@@ -1218,12 +1218,14 @@ namespace CMakeTools
             lines.Add("  C)");
             lines.Add("include( # comment");
             lines.Add("  D)");
+            lines.Add("find_package(Foo)");
             List<string> includes = CMakeParsing.ParseForIncludes(lines);
-            Assert.AreEqual(4, includes.Count);
+            Assert.AreEqual(5, includes.Count);
             Assert.AreEqual("A", includes[0]);
             Assert.AreEqual("B", includes[1]);
             Assert.AreEqual("C", includes[2]);
             Assert.AreEqual("D", includes[3]);
+            Assert.AreEqual("FindFoo", includes[4]);
         }
 
         /// <summary>

@@ -1537,7 +1537,9 @@ namespace CMakeTools
         {
             BeforeCommand,
             BeforeParen,
-            InsideParens
+            BeforeParenPackage,
+            InsideParens,
+            InsideParensPackage
         }
 
         /// <summary>
@@ -1570,12 +1572,19 @@ namespace CMakeTools
                             {
                                 state = IncludeParseState.BeforeParen;
                             }
+                            else if (id == CMakeCommandId.FindPackage)
+                            {
+                                state = IncludeParseState.BeforeParenPackage;
+                            }
                         }
                         break;
                     case IncludeParseState.BeforeParen:
+                    case IncludeParseState.BeforeParenPackage:
                         if (tokenInfo.Token == (int)CMakeToken.OpenParen)
                         {
-                            state = IncludeParseState.InsideParens;
+                            state = (state == IncludeParseState.BeforeParenPackage) ?
+                                IncludeParseState.InsideParensPackage :
+                                IncludeParseState.InsideParens;
                         }
                         else if (tokenInfo.Token != (int)CMakeToken.WhiteSpace)
                         {
@@ -1583,10 +1592,14 @@ namespace CMakeTools
                         }
                         break;
                     case IncludeParseState.InsideParens:
+                    case IncludeParseState.InsideParensPackage:
                         if (tokenInfo.Token == (int)CMakeToken.Identifier ||
                             tokenInfo.Token == (int)CMakeToken.FileName)
                         {
-                            results.Add(line.ExtractToken(tokenInfo));
+                            string prefix =
+                                (state == IncludeParseState.InsideParensPackage) ?
+                                "Find" : "";
+                            results.Add(prefix + line.ExtractToken(tokenInfo));
                         }
                         else if (tokenInfo.Token != (int)CMakeToken.WhiteSpace &&
                             tokenInfo.Token != (int)CMakeToken.Comment)
