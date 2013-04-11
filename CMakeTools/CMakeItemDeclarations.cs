@@ -64,7 +64,11 @@ namespace CMakeTools
         /// <param name="type">The item type</param>
         public void AddItem(string name, ItemType type)
         {
-            _items.Add(new Item() { Name = name, Type = type });
+            if (!CMakePackage.Instance.CMakeOptionPage.HideUnderscorePrefix ||
+                !name.StartsWith("_"))
+            {
+                _items.Add(new Item() { Name = name, Type = type });
+            }
         }
 
         /// <summary>
@@ -75,6 +79,10 @@ namespace CMakeTools
         public void AddItems(IEnumerable<string> names, ItemType type)
         {
             // Convert a list of names to a list of items of the specified type.
+            if (CMakePackage.Instance.CMakeOptionPage.HideUnderscorePrefix)
+            {
+                names = names.Where(x => !x.StartsWith("_"));
+            }
             _items.AddRange(names.Select(
                 name => new Item() { Name = name, Type = type }));
             _sorted = false;

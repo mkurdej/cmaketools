@@ -65,6 +65,16 @@ namespace CMakeTools
         public bool CommandsLower { get; set; }
 
         /// <summary>
+        /// Flag indicating whether to hide underscore-prefixed names.
+        /// </summary>
+        [DisplayName("Hide Underscore-Prefixed Names")]
+        [Description("Hide names that begin with underscores in the IntelliSense " +
+            "list box.")]
+        [DefaultValue(true)]
+        [TypeConverter(typeof(YesNoConverter))]
+        public bool HideUnderscorePrefix { get; set; }
+
+        /// <summary>
         /// Flag indicating whether to parse included files and build an include cache.
         /// </summary>
         [DisplayName("Parse Included Files")]
