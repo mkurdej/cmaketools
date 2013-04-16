@@ -109,14 +109,23 @@ namespace CMakeTools
             foreach (string include in includes)
             {
                 string curFileDir = Path.GetDirectoryName(GetFilePath());
-                string path = Path.Combine(curFileDir, include + ".cmake");
-                if (!File.Exists(path))
+                string path;
+                if (_includeCache.ContainsKey(include) &&
+                    File.Exists(_includeCache[include].FileName))
                 {
-                    path = Path.Combine(CMakePath.FindCMakeModules(),
-                        include + ".cmake");
+                    path = _includeCache[include].FileName;
+                }
+                else
+                {
+                    path = Path.Combine(curFileDir, include + ".cmake");
                     if (!File.Exists(path))
                     {
-                        path = null;
+                        path = Path.Combine(CMakePath.FindCMakeModules(),
+                            include + ".cmake");
+                        if (!File.Exists(path))
+                        {
+                            path = null;
+                        }
                     }
                 }
                 if (path != null)
