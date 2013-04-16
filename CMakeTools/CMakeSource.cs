@@ -27,6 +27,7 @@ namespace CMakeTools
         private struct IncludeCacheEntry
         {
             public string FileName { get; set; }
+            public DateTime TimeStamp { get; set; }
             public List<string> Variables { get; set; }
             public List<string> EnvVariables { get; set; }
             public List<string> CacheVariables { get; set; }
@@ -108,49 +109,57 @@ namespace CMakeTools
             List<string> includes = CMakeParsing.ParseForIncludes(lines);
             foreach (string include in includes)
             {
-                string curFileDir = Path.GetDirectoryName(GetFilePath());
-                string path;
-                if (_includeCache.ContainsKey(include) &&
-                    File.Exists(_includeCache[include].FileName))
+                UpdateIncludeCacheItem(include);
+            }
+        }
+
+        private void UpdateIncludeCacheItem(string include)
+        {
+            string curFileDir = Path.GetDirectoryName(GetFilePath());
+            string path = null;
+            bool needUpdate = true;
+            if (_includeCache.ContainsKey(include) &&
+                File.Exists(_includeCache[include].FileName))
+            {
+                path = _includeCache[include].FileName;
+                needUpdate =
+                    (File.GetLastWriteTime(path) != _includeCache[include].TimeStamp);
+            }
+            else
+            {
+                path = Path.Combine(curFileDir, include + ".cmake");
+                if (!File.Exists(path))
                 {
-                    path = _includeCache[include].FileName;
-                }
-                else
-                {
-                    path = Path.Combine(curFileDir, include + ".cmake");
+                    path = Path.Combine(CMakePath.FindCMakeModules(),
+                        include + ".cmake");
                     if (!File.Exists(path))
                     {
-                        path = Path.Combine(CMakePath.FindCMakeModules(),
-                            include + ".cmake");
-                        if (!File.Exists(path))
-                        {
-                            path = null;
-                        }
+                        path = null;
                     }
                 }
-                if (path != null)
+            }
+            if (path != null && needUpdate)
+            {
+                try
                 {
-                    try
+                    string[] includeLines = File.ReadAllLines(path);
+                    _includeCache[include] = new IncludeCacheEntry()
                     {
-                        string[] includeLines = File.ReadAllLines(path);
-                        _includeCache[include] = new IncludeCacheEntry()
-                        {
-                            FileName = path,
-                            Variables = CMakeParsing.ParseForVariables(includeLines),
-                            EnvVariables = CMakeParsing.ParseForEnvVariables(
-                                includeLines),
-                            CacheVariables = CMakeParsing.ParseForCacheVariables(
-                                includeLines),
-                            Functions = CMakeParsing.ParseForFunctionNames(includeLines,
-                                false),
-                            Macros = CMakeParsing.ParseForFunctionNames(includeLines,
-                                true)
-                        };
-                    }
-                    catch (IOException)
-                    {
-                        // Just ignore any errors.
-                    }
+                        FileName = path,
+                        Variables = CMakeParsing.ParseForVariables(includeLines),
+                        EnvVariables = CMakeParsing.ParseForEnvVariables(
+                            includeLines),
+                        CacheVariables = CMakeParsing.ParseForCacheVariables(
+                            includeLines),
+                        Functions = CMakeParsing.ParseForFunctionNames(includeLines,
+                            false),
+                        Macros = CMakeParsing.ParseForFunctionNames(includeLines,
+                            true)
+                    };
+                }
+                catch (IOException)
+                {
+                    // Just ignore any errors.
                 }
             }
         }
