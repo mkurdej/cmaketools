@@ -24,15 +24,18 @@ namespace CMakeTools
     /// </summary>
     class CMakeSource : Source
     {
-        private struct IncludeCacheEntry
+        private class IncludeCacheEntry
         {
             public string FileName { get; set; }
             public DateTime TimeStamp { get; set; }
+            public bool RootRef { get; set; }
+            public bool Used { get; set; }
             public List<string> Variables { get; set; }
             public List<string> EnvVariables { get; set; }
             public List<string> CacheVariables { get; set; }
             public List<string> Functions { get; set; }
             public List<string> Macros { get; set; }
+            public List<string> Dependencies { get; set; }
         }
 
         private Dictionary<string, IncludeCacheEntry> _includeCache;
@@ -106,10 +109,15 @@ namespace CMakeTools
         /// <param name="lines">A collection of lines.</param>
         public void BuildIncludeCache(IEnumerable<string> lines)
         {
+            foreach (IncludeCacheEntry entry in _includeCache.Values)
+            {
+                entry.RootRef = false;
+            }
             List<string> includes = CMakeParsing.ParseForIncludes(lines);
             foreach (string include in includes)
             {
                 UpdateIncludeCacheItem(include);
+                _includeCache[include].RootRef = true;
             }
         }
 
@@ -156,10 +164,13 @@ namespace CMakeTools
                 try
                 {
                     string[] includeLines = File.ReadAllLines(path);
+                    bool rootRef = _includeCache.ContainsKey(include) &&
+                        _includeCache[include].RootRef;
                     _includeCache[include] = new IncludeCacheEntry()
                     {
                         FileName = path,
                         TimeStamp = File.GetLastWriteTime(path),
+                        RootRef = rootRef,
                         Variables = CMakeParsing.ParseForVariables(includeLines),
                         EnvVariables = CMakeParsing.ParseForEnvVariables(
                             includeLines),
@@ -168,13 +179,54 @@ namespace CMakeTools
                         Functions = CMakeParsing.ParseForFunctionNames(includeLines,
                             false),
                         Macros = CMakeParsing.ParseForFunctionNames(includeLines,
-                            true)
+                            true),
+                        Dependencies = CMakeParsing.ParseForIncludes(includeLines)
                     };
-                    BuildIncludeCache(includeLines);
+                    foreach (string dependency in _includeCache[include].Dependencies)
+                    {
+                        UpdateIncludeCacheItem(dependency);
+                    }
                 }
                 catch (IOException)
                 {
                     // Just ignore any errors.
+                }
+            }
+        }
+
+        /// <summary>
+        /// Remove from the include cache any files that are no longer used.
+        /// </summary>
+        public void PruneIncludeCache()
+        {
+            foreach (IncludeCacheEntry entry in _includeCache.Values)
+            {
+                entry.Used = false;
+            }
+            foreach (string include in _includeCache.Keys)
+            {
+                if (_includeCache[include].RootRef)
+                {
+                    UpdateUsageStatus(include);
+                }
+            }
+            List<string> unusedIncludes =
+                _includeCache.Keys.Where(x => !_includeCache[x].Used).ToList();
+            foreach (string unusedInclude in unusedIncludes)
+            {
+                _includeCache.Remove(unusedInclude);
+            }
+        }
+
+        private void UpdateUsageStatus(string include)
+        {
+            IncludeCacheEntry entry = _includeCache[include];
+            if (!entry.Used)
+            {
+                entry.Used = true;
+                foreach (string dependency in entry.Dependencies)
+                {
+                    UpdateUsageStatus(dependency);
                 }
             }
         }

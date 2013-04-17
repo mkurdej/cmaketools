@@ -309,6 +309,7 @@ namespace CMakeTools
                 {
                     source.BuildIncludeCache(source.GetLines());
                     source.UpdateIncludeCache();
+                    source.PruneIncludeCache();
                 }
                 else
                 {
