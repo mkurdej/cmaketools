@@ -308,6 +308,7 @@ namespace CMakeTools
                 if (CMakePackage.Instance.CMakeOptionPage.ParseIncludedFiles)
                 {
                     source.BuildIncludeCache(source.GetLines());
+                    source.UpdateIncludeCache();
                 }
                 else
                 {

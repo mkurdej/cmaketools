@@ -113,6 +113,19 @@ namespace CMakeTools
             }
         }
 
+        /// <summary>
+        /// Ensure that the include cache is updated for any files that have been
+        /// modified.
+        /// </summary>
+        public void UpdateIncludeCache()
+        {
+            List<string> includes = _includeCache.Keys.ToList();
+            foreach (string include in includes)
+            {
+                UpdateIncludeCacheItem(include);
+            }
+        }
+
         private void UpdateIncludeCacheItem(string include)
         {
             string curFileDir = Path.GetDirectoryName(GetFilePath());
@@ -146,6 +159,7 @@ namespace CMakeTools
                     _includeCache[include] = new IncludeCacheEntry()
                     {
                         FileName = path,
+                        TimeStamp = File.GetLastWriteTime(path),
                         Variables = CMakeParsing.ParseForVariables(includeLines),
                         EnvVariables = CMakeParsing.ParseForEnvVariables(
                             includeLines),
@@ -156,6 +170,7 @@ namespace CMakeTools
                         Macros = CMakeParsing.ParseForFunctionNames(includeLines,
                             true)
                     };
+                    BuildIncludeCache(includeLines);
                 }
                 catch (IOException)
                 {
