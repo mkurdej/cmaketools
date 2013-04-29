@@ -16,6 +16,10 @@
         <PropertyRef Id="VS2012DEVENV" />
 
         <CustomActionRef Id="VS2012Setup" />
+
+        <Condition Message="CMake Tools for Visual Studio requires either Visual Studio 2010 or Visual Studio 2012, neither of which was detected on your computer.">
+            VS2010DEVENV OR VS2012DEVENV
+        </Condition>
         
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Component Id="CMakeTools" Guid="a286eaec-129e-4e7b-b3dd-a2f0c46448d9">
