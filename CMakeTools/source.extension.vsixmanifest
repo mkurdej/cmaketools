@@ -4,7 +4,7 @@
         <Name>CMake Tools for Visual Studio</Name>
         <Author>David Golub</Author>
         <Version>1.0</Version>
-        <Description xml:space="preserve">Syntax highlighting for CMake in Visual Studio.</Description>
+        <Description xml:space="preserve">Syntax highlighting and IntelliSense for CMake in Visual Studio.</Description>
         <Locale>1033</Locale>
         <License>License.rtf</License>
         <Icon>CMakeLogo.ico</Icon>
