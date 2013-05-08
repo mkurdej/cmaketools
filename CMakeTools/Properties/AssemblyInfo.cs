@@ -18,6 +18,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("CMake Tools for Visual Studio")]
 [assembly: AssemblyProduct("CMake Tools for Visual Studio")]
 [assembly: AssemblyCopyright("Copyright (C) 2012-2013 by David Golub.  All rights reserved.")]
+[assembly: AssemblyTrademark("CMake is a trademark of Kitware, Inc.  Used with permission.")]
 [assembly: ComVisible(false)]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
