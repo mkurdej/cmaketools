@@ -20,12 +20,23 @@
         <Condition Message="CMake Tools for Visual Studio requires either Visual Studio 2010 or Visual Studio 2012, neither of which was detected on your computer.">
             VS2010DEVENV OR VS2012DEVENV
         </Condition>
-        
+
         <Directory Id="TARGETDIR" Name="SourceDir">
-            <Component Id="CMakeTools" Guid="a286eaec-129e-4e7b-b3dd-a2f0c46448d9">
-            </Component>
+            <Directory Id="ProgramMenuFolder" Name="Programs">
+                <Directory Id="ProgramMenuDir" Name="CMake Tools for Visual Studio">
+                    <Component Id="ProgramMenuDir" Guid="03f18875-55d2-4030-98d0-030c5bae7343">
+                        <RemoveFolder Id="ProgramMenuDir" On="uninstall" />
+                        <RegistryValue Root="HKCU" Key="Software\[ProductName]" Type="string" Value="" KeyPath="yes" />
+                    </Component>
+                </Directory>
+            </Directory>
             <Directory Id="ProgramFilesFolder">
                 <Directory Id="INSTALLLOCATION" Name="CMake Tools for Visual Studio">
+                    <Component Id="CMakeTools" Guid="a286eaec-129e-4e7b-b3dd-a2f0c46448d9">
+                        <File Id="Readme" Name="Readme.html" DiskId="1" Source="Readme.html" KeyPath="yes">
+                            <Shortcut Id="ReadmeShortcut" Directory="ProgramMenuDir" Name="Readme" Advertise="yes" />
+                        </File>
+                    </Component>
                 </Directory>
             </Directory>
             <?define VSVersion = 2010 ?>
@@ -73,6 +84,7 @@
             </Feature>
 
             <ComponentRef Id="CMakeTools" />
+            <ComponentRef Id="ProgramMenuDir" />
         </Feature>
 
         <InstallExecuteSequence>
