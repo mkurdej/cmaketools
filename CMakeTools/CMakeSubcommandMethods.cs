@@ -152,6 +152,13 @@ namespace CMakeTools
         // Parameters to the FILE(STRINGS) command.
         private static readonly string[] _fileStringsParams = _fileReadParams;
 
+        // Parameters to the FILE(TIMESTAMP) command.
+        private static readonly string[] _fileTimestampParams = new string[]
+        {
+            "filename",
+            "variable"
+        };
+
         // Parameters to the FILE(TO_CMAKE_PATH) command.
         private static readonly string[] _fileToCMakePathParams = new string[]
         {
@@ -193,6 +200,7 @@ namespace CMakeTools
             { "SHA384",         _fileSHA384Params },
             { "SHA512",         _fileSHA512Params },
             { "STRINGS",        _fileStringsParams },
+            { "TIMESTAMP",      _fileTimestampParams },
             { "TO_CMAKE_PATH",  _fileToCMakePathParams },
             { "TO_NATIVE_PATH", _fileToNativePathParams },
             { "UPLOAD",         _fileUploadParams },
@@ -370,6 +378,12 @@ namespace CMakeTools
             "output_variable"
         };
 
+        // Parameters to the STRING(TIMESTAMP) command.
+        private static readonly string[] _stringTimestampParams = new string[]
+        {
+            "output_variable"
+        };
+
         // Parameters to the STRING(TOLOWER) and STRING(TOUPPER) commands.
         private static readonly string[] _stringToLowerParams = _stringConfigureParams;
         private static readonly string[] _stringToUpperParams = _stringConfigureParams;
@@ -393,6 +407,7 @@ namespace CMakeTools
             { "SHA512",     _stringSHA512Params },
             { "STRIP",      _stringStripParams },
             { "SUBSTRING",  _stringSubstringParams },
+            { "TIMESTAMP",  _stringTimestampParams },
             { "TOLOWER",    _stringToLowerParams },
             { "TOUPPER",    _stringToUpperParams }
         };

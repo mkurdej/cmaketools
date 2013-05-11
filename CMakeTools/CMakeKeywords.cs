@@ -99,6 +99,8 @@ namespace CMakeTools
         SiteName,
         SourceGroup,
         String,
+        TargetCompileDefinitions,
+        TargetIncludeDirectories,
         TargetLinkLibraries,
         TryCompile,
         TryRun,
@@ -206,6 +208,8 @@ namespace CMakeTools
             "site_name",
             "source_group",
             "string",
+            "target_compile_definitions",
+            "target_include_directories",
             "target_link_libraries",
             "try_compile",
             "try_run",
@@ -443,10 +447,12 @@ namespace CMakeTools
             "STATUS",
             "STRINGS",
             "TIMEOUT",
+            "TIMESTAMP",
             "TO_CMAKE_PATH",
             "TO_NATIVE_PATH",
             "UPLOAD",
             "USE_SOURCE_PERMISSIONS",
+            "UTC",
             "WORLD_EXECUTE",
             "WORLD_READ",
             "WORLD_WRITE",
@@ -784,8 +790,27 @@ namespace CMakeTools
             "SHA512",
             "STRIP",
             "SUBSTRING",
+            "TIMESTAMP",
             "TOLOWER",
-            "TOUPPER"
+            "TOUPPER",
+            "UTC"
+        };
+
+        // Array of keywords used with the TARGET_COMPILE_DEFINITIONS command.
+        private static readonly string[] _targetCompileDefinitionsKeywords = new string[]
+        {
+            "INTERFACE",
+            "PRIVATE",
+            "PUBLIC"
+        };
+
+        // Array of keywords used with the TARGET_INCLUDE_DIRECTORIES command.
+        private static readonly string[] _targetIncludeDirectoriesKeywords = new string[]
+        {
+            "BEFORE",
+            "INTERFACE",
+            "PRIVATE",
+            "PUBLIC"
         };
 
         // Array of keywords used with the TARGET_LINK_LIBRARIES command.
@@ -941,6 +966,8 @@ namespace CMakeTools
             _siteNameKeywords,
             _sourceGroupKeywords,
             _stringKeywords,
+            _targetCompileDefinitionsKeywords,
+            _targetIncludeDirectoriesKeywords,
             _targetLinkLibrariesKeywords,
             _tryCompileKeywords,
             _tryRunKeywords,
