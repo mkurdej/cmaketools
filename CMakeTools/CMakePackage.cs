@@ -57,6 +57,10 @@ namespace CMakeTools
         "Templates\\NewItems", 10)]
     [ProvideFileFilter(VSConstants.CLSID.MiscellaneousFilesProject_string, "CMake",
         "CMake Files (*.cmake);*.cmake", 10)]
+    [ProvideEditorFactory(typeof(CMakeEditorFactory), 108)]
+    [ProvideEditorExtension(typeof(CMakeEditorFactory), ".cmake", 100)]
+    [ProvideFileExtensionMapping(CMakeGuids.guidCMakeFileExtensionMapping,
+        "CMake Editor", typeof(CMakeEditorFactory), CMakeGuids.guidCMakeTools, 100)]
     [Guid(CMakeGuids.guidCMakeTools)]
     public class CMakePackage : Package, IOleComponent
     {
@@ -76,6 +80,9 @@ namespace CMakeTools
         protected override void Initialize()
         {
             base.Initialize();
+
+            // Register the editor factory.
+            RegisterEditorFactory(new CMakeEditorFactory(this));
 
             // Register the language service.
             IServiceContainer container = this as IServiceContainer;

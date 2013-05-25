@@ -87,19 +87,8 @@ namespace CMakeTools
         /// <returns>True if the file is a CMake file or false otherwise.</returns>
         public static bool IsCMakeFile(string path)
         {
-            bool textFile = true;
-            if (Path.GetExtension(path).ToLower() == ".cmake")
-            {
-                textFile = false;
-            }
-            else if (Path.GetExtension(path).ToLower() == ".txt")
-            {
-                if (Path.GetFileName(path).ToLower() == "cmakelists.txt")
-                {
-                    textFile = false;
-                }
-            }
-            return !textFile;
+            return Path.GetExtension(path).ToLower() != ".txt" ||
+                Path.GetFileName(path).ToLower() == "cmakelists.txt";
         }
 
         /// <summary>

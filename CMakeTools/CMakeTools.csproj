@@ -40,6 +40,7 @@
     <Compile Include="CMakeAuthoringScope.cs" />
     <Compile Include="CMakeCmdIds.cs" />
     <Compile Include="CMakeDeclarationsFactory.cs" />
+    <Compile Include="CMakeEditorFactory.cs" />
     <Compile Include="CMakeError.cs" />
     <Compile Include="CMakeExpansionProvider.cs" />
     <Compile Include="CMakeIncludeDeclarations.cs" />
@@ -72,6 +73,7 @@
     <Compile Include="CMakeViewFilter.cs" />
     <Compile Include="EnumToDisplayNameConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ProvideFileExtensionMappingAttribute.cs" />
     <Compile Include="ProvideFileFilterAttribute.cs" />
     <Compile Include="StringHelpers.cs" />
     <Compile Include="ToCommandCaseExpansionFunction.cs" />

@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
@@ -23,6 +24,7 @@ namespace CMakeTools
     /// <summary>
     /// Language service for CMake.
     /// </summary>
+    [Guid(CMakeGuids.guidCMakeLanguageService)]
     public class CMakeLanguageService : LanguageService
     {
         private LanguagePreferences _preferences;
