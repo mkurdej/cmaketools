@@ -10,6 +10,7 @@
  * 
  * **************************************************************************/
 
+using System;
 using Microsoft.VisualStudio.Shell;
 
 namespace CMakeTools
@@ -21,33 +22,64 @@ namespace CMakeTools
     /// This class is loosely based on the class with the same name in Python Tools for
     /// Visual Studio.
     /// </remarks>
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
     class ProvideFileFilterAttribute : RegistrationAttribute
     {
-        private readonly string _guid;
-        private readonly string _name;
-        private readonly string _filter;
-        private readonly int _sortPriority;
-
-        public ProvideFileFilterAttribute(string guid, string name, string filter,
+        public ProvideFileFilterAttribute(object guid, string name, string filter,
             int sortPriority)
         {
-            _guid = guid;
-            _name = name;
-            _filter = filter;
-            _sortPriority = sortPriority;
+            if (guid is string)
+            {
+                Guid = new Guid((string)guid);
+            }
+            else if (guid is Type)
+            {
+                Guid = ((Type)guid).GUID;
+            }
+            else if (guid is Guid)
+            {
+                Guid = (Guid)guid;
+            }
+            else
+            {
+                throw new ArgumentException();
+            }
+            Name = name;
+            Filter = filter;
+            SortPriority = sortPriority;
         }
+
+        /// <summary>
+        /// GUID of the project type with which this file filter is associated.
+        /// </summary>
+        public Guid Guid { get; private set; }
+
+        /// <summary>
+        /// Name of this file filter.
+        /// </summary>
+        public string Name { get; private set; }
+
+        /// <summary>
+        /// The filter string.
+        /// </summary>
+        public string Filter { get; private set; }
+
+        /// <summary>
+        /// Sort priority of this file filter.
+        /// </summary>
+        public int SortPriority { get; private set; }
 
         private string GetKeyName()
         {
-            return string.Format("Projects\\{0}\\Filters\\{1}", _guid, _name);
+            return string.Format("Projects\\{0}\\Filters\\{1}", Guid.ToString("B"), Name);
         }
 
         public override void Register(RegistrationContext context)
         {
             using (Key key = context.CreateKey(GetKeyName()))
             {
-                key.SetValue("", _filter);
-                key.SetValue("SortPriority", _sortPriority);
+                key.SetValue("", Filter);
+                key.SetValue("SortPriority", SortPriority);
             }
         }
 
