@@ -51,7 +51,8 @@ namespace CMakeTools
         public override string GetDataTipText(int line, int col, out TextSpan span)
         {
             CMakeParsing.TokenData tokenData;
-            if (CMakeParsing.ParseForToken(_lines, line, col, out tokenData) &&
+            if (_lines != null &&
+                CMakeParsing.ParseForToken(_lines, line, col, out tokenData) &&
                 !tokenData.InParens)
             {
                 if (tokenData.TokenInfo.Token == (int)CMakeToken.Keyword)
@@ -105,8 +106,8 @@ namespace CMakeTools
         public override string Goto(VSConstants.VSStd97CmdID cmd, IVsTextView textView,
             int line, int col, out TextSpan span)
         {
-            if (cmd == VSConstants.VSStd97CmdID.GotoDefn ||
-                cmd == VSConstants.VSStd97CmdID.GotoDecl)
+            if (_lines != null && (cmd == VSConstants.VSStd97CmdID.GotoDefn ||
+                cmd == VSConstants.VSStd97CmdID.GotoDecl))
             {
                 // Parse for any identifier that may be at the cursor.  If the is one,
                 // find the variable or function definition for that identifier and jump

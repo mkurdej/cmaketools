@@ -81,6 +81,11 @@ namespace CMakeTools
         public override AuthoringScope ParseSource(ParseRequest req)
         {
             CMakeAuthoringScope scope = new CMakeAuthoringScope();
+            if (!CMakeSource.IsCMakeFile(req.FileName))
+            {
+                // Don't do IntelliSense parsing for ordinary text files.
+                return scope;
+            }
             CMakeSource source = (CMakeSource)GetSource(req.FileName);
             if (req.Sink.HiddenRegions)
             {
