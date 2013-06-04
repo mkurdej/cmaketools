@@ -55,6 +55,43 @@ namespace CMakeTools
             return info;
         }
 
+        public override TextSpan CommentLines(TextSpan span, string lineComment)
+        {
+            // If the cursor is at the beginning of a line, don't comment that line.
+            int startLine = span.iStartLine;
+            int endLine = span.iEndLine;
+            if (span.iEndIndex == 0)
+            {
+                endLine--;
+            }
+
+            // Find the minimum amount of whitespace at the beginning of a line among
+            // those to be commented.
+            int minWhitespace = ScanToNonWhitespaceChar(startLine);
+            for (int i = startLine + 1; i <= endLine; i++)
+            {
+                int whitespaceCount = ScanToNonWhitespaceChar(i);
+                if (whitespaceCount < minWhitespace)
+                {
+                    minWhitespace = whitespaceCount;
+                }
+            }
+
+            // Comment out each line.
+            for (int i = startLine; i <= endLine; i++)
+            {
+                SetText(i, minWhitespace, i, minWhitespace, lineComment);
+            }
+
+            // If the cursor was on the last line to be commented, then the entirety of
+            // that line should be included in the span returned.
+            if (endLine == span.iEndLine)
+            {
+                span.iEndIndex = GetLineLength(endLine);
+            }
+            return span;
+        }
+
         public override void Completion(IVsTextView textView, TokenInfo info,
             ParseReason reason)
         {
