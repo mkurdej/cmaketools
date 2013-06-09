@@ -59,6 +59,7 @@ namespace CMakeTools
         "CMake Files (*.cmake);*.cmake", 10)]
     [ProvideEditorFactory(typeof(CMakeEditorFactory), 108)]
     [ProvideEditorExtension(typeof(CMakeEditorFactory), ".cmake", 100)]
+    [ProvideEditorExtension(typeof(CMakeEditorFactory), ".*", 1)]
     [ProvideFileExtensionMapping(CMakeGuids.guidCMakeFileExtensionMapping,
         "CMake Editor", typeof(CMakeEditorFactory), CMakeGuids.guidCMakeTools, 100)]
     [Guid(CMakeGuids.guidCMakeTools)]
