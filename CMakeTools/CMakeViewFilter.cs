@@ -308,7 +308,7 @@ namespace CMakeTools
             int col;
             TextView.GetCaretPos(out line, out col);
             List<string> lines = Source.GetLines().ToList();
-            int prevLine = CMakeParsing.GetLastNonEmptyLine(lines, line);
+            int prevLine = CMakeParsing.GetLastNonEmptyLine(lines, line - 1);
             int level = CMakeParsing.GetIndentationLevel(lines[prevLine], indentChar);
             int lineToMatch;
             if (CMakeParsing.ShouldIndent(lines, prevLine))
@@ -326,7 +326,13 @@ namespace CMakeTools
                     level = CMakeParsing.GetIndentationLevel(lines[lineToMatch], indentChar);
                 }
             }
-            Source.SetText(line, 0, line, col, new string(indentChar, level));
+            int oldIndentLen = 0;
+            while (oldIndentLen < lines[line].Length &&
+                lines[line][oldIndentLen] == indentChar)
+            {
+                oldIndentLen++;
+            }
+            Source.SetText(line, 0, line, oldIndentLen, new string(indentChar, level));
             TextView.PositionCaretForEditing(line, level);
             return true;
         }
