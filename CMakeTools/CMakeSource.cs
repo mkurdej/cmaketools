@@ -143,7 +143,10 @@ namespace CMakeTools
             foreach (string include in includes)
             {
                 UpdateIncludeCacheItem(include);
-                _includeCache[include].RootRef = true;
+                if (_includeCache.ContainsKey(include))
+                {
+                    _includeCache[include].RootRef = true;
+                }
             }
         }
 
