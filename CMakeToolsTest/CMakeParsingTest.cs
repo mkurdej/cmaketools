@@ -1566,5 +1566,28 @@ namespace CMakeTools
             Assert.AreEqual(0, info[0].Span.iEndLine);
             Assert.AreEqual(4, info[0].Span.iEndIndex);
         }
+
+        /// <summary>
+        /// Test parsing for the current function name.
+        /// </summary>
+        [TestMethod]
+        public void TestParseForCurrentFunction()
+        {
+            List<string> lines = new List<string>();
+            lines.Add("SET(FOO)");
+            lines.Add("FUNCTION(ABC PARAM1 PARAM2)");
+            lines.Add("  ADD_EXECUTABLE(${PARAM1} ${PARAM2})");
+            lines.Add("ENDFUNCTION(ABC)");
+            lines.Add("SET(BAR)");
+            lines.Add("MACRO(DEF)");
+            lines.Add("  MESSAGE(STATUS \"Test\")");
+            lines.Add("ENDMACRO()");
+            lines.Add("SET(XYZ)");
+            Assert.IsNull(CMakeParsing.ParseForCurrentFunction(lines, 0));
+            Assert.AreEqual("ABC", CMakeParsing.ParseForCurrentFunction(lines, 2));
+            Assert.IsNull(CMakeParsing.ParseForCurrentFunction(lines, 4));
+            Assert.AreEqual("DEF", CMakeParsing.ParseForCurrentFunction(lines, 6));
+            Assert.IsNull(CMakeParsing.ParseForCurrentFunction(lines, 8));
+        }
     }
 }

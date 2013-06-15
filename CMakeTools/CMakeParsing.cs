@@ -2068,5 +2068,85 @@ namespace CMakeTools
             }
             return results;
         }
+
+        /// <summary>
+        /// Parse to find the name of the function that the specified line is part of.
+        /// </summary>
+        /// <param name="lines">A collection of lines to parse.</param>
+        /// <param name="lineNum">The line number of the line to check.</param>
+        /// <returns>
+        /// The name of the function or macro that the specified line is part of, or null
+        /// if the line is at global scope.
+        /// </returns>
+        public static string ParseForCurrentFunction(IEnumerable<string> lines,
+            int lineNum)
+        {
+            string result = null;
+            CMakeScanner scanner = new CMakeScanner();
+            TokenInfo tokenInfo = new TokenInfo();
+            FunctionNameParseState state = FunctionNameParseState.NeedKeyword;
+            int scannerState = 0;
+            int curLineNum = 0;
+            foreach (string line in lines)
+            {
+                if (curLineNum == lineNum)
+                {
+                    return result;
+                }
+                scanner.SetSource(line, 0);
+                while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo,
+                    ref scannerState))
+                {
+                    string tokenText = line.ExtractToken(tokenInfo);
+                    switch (state)
+                    {
+                    case FunctionNameParseState.NeedKeyword:
+                        if (tokenInfo.Token == (int)CMakeToken.Keyword)
+                        {
+                            CMakeCommandId id = CMakeKeywords.GetCommandId(tokenText);
+                            if (id == CMakeCommandId.Function ||
+                                id == CMakeCommandId.Macro)
+                            {
+                                state = FunctionNameParseState.NeedOpenParen;
+                            }
+                            else if (id == CMakeCommandId.EndFunction ||
+                                id == CMakeCommandId.EndMacro)
+                            {
+                                result = null;
+                            }
+                        }
+                        break;
+                    case FunctionNameParseState.NeedOpenParen:
+                        if (tokenInfo.Token == (int)CMakeToken.OpenParen)
+                        {
+                            state = FunctionNameParseState.NeedIdentifier;
+                        }
+                        else if (tokenInfo.Token != (int)CMakeToken.WhiteSpace &&
+                            tokenInfo.Token != (int)CMakeToken.Comment)
+                        {
+                            state = FunctionNameParseState.NeedKeyword;
+                        }
+                        break;
+                    case FunctionNameParseState.NeedIdentifier:
+                        if (tokenInfo.Token != (int)CMakeToken.WhiteSpace &&
+                            tokenInfo.Token != (int)CMakeToken.Comment)
+                        {
+                            result = tokenText;
+                        }
+                        state = FunctionNameParseState.NeedKeyword;
+                        break;
+                    }
+                }
+                if (state == FunctionNameParseState.NeedOpenParen)
+                {
+                    // A line break may not appear between the command and the opening
+                    // parenthesis that follows it.  If there is one, the function
+                    // definition is illegal and should be ignored.
+                    state = FunctionNameParseState.NeedKeyword;
+                }
+                curLineNum++;
+            }
+            return null;
+        }
     }
 }
