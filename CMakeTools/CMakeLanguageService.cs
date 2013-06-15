@@ -158,6 +158,15 @@ namespace CMakeTools
                         CMakeVariableType.Variable);
                     decls.AddItems(source.GetIncludeCacheVariables(),
                         CMakeItemDeclarations.ItemType.Variable);
+                    string functionName = CMakeParsing.ParseForCurrentFunction(
+                        source.GetLines(), req.Line);
+                    if (functionName != null)
+                    {
+                        List<string> paramNames = CMakeParsing.ParseForParameterNames(
+                            source.GetLines(), functionName);
+                        decls.AddItems(paramNames,
+                            CMakeItemDeclarations.ItemType.Variable);
+                    }
                     scope.SetDeclarations(decls);
                 }
                 else if (token == CMakeToken.VariableStartEnv)
