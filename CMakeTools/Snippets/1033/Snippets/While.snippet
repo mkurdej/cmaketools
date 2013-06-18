@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+    <CodeSnippet Format="1.0">
+        <Header>
+            <Title>WHILE</Title>
+            <Shortcut>WHILE</Shortcut>
+            <Description>A WHILE loop</Description>
+            <Author>David Golub</Author>
+            <SnippetTypes>
+                <SnippetType>Expansion</SnippetType>
+            </SnippetTypes>
+        </Header>
+        <Snippet>
+            <Declarations>
+                <Literal Editable="false">
+                    <ID>While</ID>
+                    <Function>ToCommandCase(WHILE)</Function>
+                    <Default>WHILE</Default>
+                </Literal>
+                <Literal Editable="false">
+                    <ID>EndWhile</ID>
+                    <Function>ToCommandCase(ENDWHILE)</Function>
+                    <Default>ENDWHILE</Default>
+                </Literal>
+                <Literal>
+                    <ID>Condition</ID>
+                    <ToolTip>The condition for the WHILE loop</ToolTip>
+                    <Default>Condition</Default>
+                </Literal>
+            </Declarations>
+            <Code Language="CMake">
+                <![CDATA[$While$($Condition$)
+
+$EndWhile$($Condition$)]]>
+            </Code>
+        </Snippet>
+    </CodeSnippet>
+</CodeSnippets>
