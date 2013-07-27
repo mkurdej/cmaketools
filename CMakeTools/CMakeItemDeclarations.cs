@@ -188,10 +188,10 @@ namespace CMakeTools
                 // selection and continue after any text already typed.
                 return textSoFar;
             }
-            if (commitCharacter == '}' && index < 0)
+            if (index < 0)
             {
-                // If the user completes a variable reference that doesn't match anything
-                // in the member selection list, still insert the closing curly brace.
+                // If the text entered so far doesn't match anything in the member
+                // selection list, still insert the commit character.
                 return textSoFar + commitCharacter;
             }
             if (string.IsNullOrEmpty(textSoFar) && commitCharacter == ' ')
