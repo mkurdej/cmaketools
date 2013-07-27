@@ -35,6 +35,9 @@
                         <Verb Id="open" Command="Open" TargetProperty="VS$(var.VSVersion)DEVENV" Argument='"%1"' />
                     </Extension>
                 </ProgId>
+                <Registry Root="HKCR" Key="CMakeTools.cmake.$(var.VSMajorVersion).0\shell\open\ddeexec" Type="string" Value='Open("%1")' />
+                <Registry Root="HKCR" Key="CMakeTools.cmake.$(var.VSMajorVersion).0\shell\open\ddeexec\Application" Type="string" Value="VisualStudio.$(var.VSMajorVersion).0" />
+                <Registry Root="HKCR" Key="CMakeTools.cmake.$(var.VSMajorVersion).0\shell\open\ddeexec\Topic" Type="string" Value="System" />
             </Component>
             <Directory Id="Templates$(var.VSVersion)" Name="Templates">
                 <Directory Id="NewItems$(var.VSVersion)" Name="NewItems">
