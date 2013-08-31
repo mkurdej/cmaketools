@@ -184,9 +184,11 @@ namespace CMakeTools
             new Dictionary<string, string[]>
         {
             { "APPEND",         _fileAppendParams },
+            { "COPY",           null },
             { "DOWNLOAD",       _fileDownloadParams },
             { "GLOB",           _fileGlobParams },
             { "GLOB_RECURSE",   _fileGlobRecurseParams },
+            { "INSTALL",        null },
             { "MAKE_DIRECTORY", _fileMakeDirectoryParams },
             { "MD5",            _fileMD5Params },
             { "READ",           _fileReadParams },
