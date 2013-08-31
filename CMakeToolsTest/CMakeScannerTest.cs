@@ -159,6 +159,27 @@ namespace CMakeTools
             Assert.AreEqual(CMakeToken.VariableEnd, (CMakeToken)tokenInfo.Token);
             Assert.AreEqual(TokenTriggers.MatchBraces, tokenInfo.Trigger);
             Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+
+            // Test that a line ending with a backslash doesn't crash the scanner.
+            scanner.SetSource("FOO\\", 0);
+            state = 0;
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(0, tokenInfo.StartIndex);
+            Assert.AreEqual(3, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.FileName, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+            Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+
+            // Test that the logic to handle a backslash at the end of a line doesn't
+            // break handling of other strings with backslashes in them.
+            scanner.SetSource("FOO\\BAR", 0);
+            state = 0;
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(0, tokenInfo.StartIndex);
+            Assert.AreEqual(6, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.FileName, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+            Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
         }
 
         /// <summary>

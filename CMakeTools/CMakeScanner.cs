@@ -504,7 +504,10 @@ namespace CMakeTools
             if (ch == '\\')
             {
                 // Skip over escape sequences.
-                _offset++;
+                if (_offset + 2 < _source.Length)
+                {
+                    _offset++;
+                }
                 return true;
             }
             else if (ch == '~' || ch == '`' || ch == '!' || ch == '%' || ch == '^' ||
