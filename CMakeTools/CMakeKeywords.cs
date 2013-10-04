@@ -607,6 +607,14 @@ namespace CMakeTools
             "SYSTEM"
         };
 
+        // Array of keywords used with the INCLUDE_EXTERNAL_MSPROJECT command.
+        private static readonly string[] _includeExternalMsProjectKeywords = new string[]
+        {
+            "GUID",
+            "PLATFORM",
+            "TYPE"
+        };
+
         // Array of keywords used with the INSTALL command.
         private static readonly string[] _installKeywords = new string[]
         {
@@ -868,7 +876,6 @@ namespace CMakeTools
         private static readonly string[] _getSourceFilePropertyKeywords = null;
         private static readonly string[] _getTargetPropertyKeywords = null;
         private static readonly string[] _getTestPropertyKeywords = null;
-        private static readonly string[] _includeExternalMsProjectKeywords = null;
         private static readonly string[] _includeRegularExpressionKeywords = null;
         private static readonly string[] _linkDirectoryiesKeywords = null;
         private static readonly string[] _macroKeywords = null;
