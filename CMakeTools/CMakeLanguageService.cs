@@ -164,6 +164,7 @@ namespace CMakeTools
                     {
                         List<string> paramNames = CMakeParsing.ParseForParameterNames(
                             source.GetLines(), functionName);
+                        paramNames.Add("ARGN");
                         decls.AddItems(paramNames,
                             CMakeItemDeclarations.ItemType.Variable);
                     }
