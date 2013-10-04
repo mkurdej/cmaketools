@@ -121,7 +121,7 @@
     <value>CMake Tools for Visual Studio</value>
   </data>
   <data name="101" xml:space="preserve">
-    <value>Syntax highlighting for CMake in Visual Studio.</value>
+    <value>Syntax highlighting and IntelliSense for CMake in Visual Studio.</value>
   </data>
   <data name="102" xml:space="preserve">
     <value>CMake</value>
