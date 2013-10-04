@@ -111,5 +111,16 @@ namespace CMakeTools
             "IntelliSense list box or only those containing a CMakeLists.txt file.")]
         [DefaultValue(SubdirectorySetting.AllSubdirectories)]
         public SubdirectorySetting ShowSubdirectories { get; set; }
+
+        /// <summary>
+        /// The path where CMake is installed on the computer.
+        /// </summary>
+        [DisplayName("Path to CMake")]
+        [Description("The path where CMake is installed on the computer.  This " +
+            "option only needs to be set when CMake is installed manually by " +
+            "extracting the contents of the zip file to a directory.  If CMake is " +
+            "installed using the setup program, CMake Tools for Visual Studio will " +
+            "be able to automatically look up the path to CMake in the registry.")]
+        public string PathToCMake { get; set; }
     }
 }
