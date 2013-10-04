@@ -153,7 +153,7 @@ namespace CMakeTools
                 if (token == CMakeToken.VariableStart)
                 {
                     List<string> vars = CMakeParsing.ParseForVariables(
-                        source.GetLines());
+                        source.GetLines(), req.Line);
                     CMakeVariableDeclarations decls = new CMakeVariableDeclarations(vars,
                         CMakeVariableType.Variable);
                     decls.AddItems(source.GetIncludeCacheVariables(),

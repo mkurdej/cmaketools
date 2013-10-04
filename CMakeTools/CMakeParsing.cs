@@ -72,22 +72,33 @@ namespace CMakeTools
         }
 
         /// <summary>
-        /// Parse to find all variables defined in the code.
+        /// Parse to find all variables defined in the code up to a specified line,
+        /// including local variables for the function that the line is part of but not
+        /// including local variables for other functions.
         /// </summary>
         /// <param name="code">The code to parse.</param>
+        /// <param name="lineNum">Line number up to which to parse.</param>
         /// <returns>A list containing all variables defined in the code.</returns>
-        public static List<string> ParseForVariables(IEnumerable<string> lines)
+        public static List<string> ParseForVariables(IEnumerable<string> lines,
+            int lineNum = -1)
         {
             CMakeScanner scanner = new CMakeScanner();
             List<string> vars = new List<string>();
+            List<string> localVars = new List<string>();
             TokenInfo tokenInfo = new TokenInfo();
             int scannerState = 0;
             VariableParseState state = VariableParseState.NeedCommand;
             bool advanceAtWhiteSpace = false;
+            bool insideFunction = false;
             int paramsBeforeVariable = 0;
             string possibleVariable = null;
+            int i = 0;
             foreach (string line in lines)
             {
+                if (i == lineNum)
+                {
+                    break;
+                }
                 scanner.SetSource(line, 0);
                 while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref scannerState))
                 {
@@ -103,6 +114,15 @@ namespace CMakeTools
                             state = VariableParseState.NeedParen;
                             advanceAtWhiteSpace = false;
                             paramsBeforeVariable = _paramsBeforeVariable[id];
+                        }
+                        else if (id == CMakeCommandId.Function)
+                        {
+                            insideFunction = true;
+                        }
+                        else if (id == CMakeCommandId.EndFunction)
+                        {
+                            insideFunction = false;
+                            localVars.Clear();
                         }
                     }
                     else if (state == VariableParseState.NeedParen &&
@@ -120,7 +140,8 @@ namespace CMakeTools
                         // We found the variable name.  Add it to the list if it's not
                         // already there and isn't a standard variable.
                         state = VariableParseState.NeedCommand;
-                        AddVariableToList(vars, possibleVariable);
+                        AddVariableToList(insideFunction ? localVars : vars,
+                            possibleVariable);
                         possibleVariable = null;
                     }
                     else if (state == VariableParseState.NeedVariable &&
@@ -184,7 +205,8 @@ namespace CMakeTools
                     // it.  Any tokens on the next line won't be considered part of the
                     // variable name.
                     state = VariableParseState.NeedCommand;
-                    AddVariableToList(vars, possibleVariable);
+                    AddVariableToList(insideFunction ? localVars : vars,
+                        possibleVariable);
                     possibleVariable = null;
                 }
                 else if (state == VariableParseState.NeedParen)
@@ -194,6 +216,13 @@ namespace CMakeTools
                     // the variable declaration shouldn't be recognized.
                     state = VariableParseState.NeedCommand;
                 }
+                i++;
+            }
+
+            // If we've finished and there are local variables, add them to the list.
+            foreach (string localVar in localVars)
+            {
+                AddVariableToList(vars, localVar);
             }
             return vars;
         }
