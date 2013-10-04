@@ -106,6 +106,24 @@ namespace CMakeTools
             vars = CMakeParsing.ParseForVariables(lines);
             Assert.AreEqual(1, vars.Count);
             Assert.AreEqual("8xy", vars[0]);
+
+            // Test parsing for local variables.
+            lines.Clear();
+            lines.Add("set(a)");
+            lines.Add("function(f)");
+            lines.Add("set(local1)");
+            lines.Add("set(local2)");
+            lines.Add("endfunction(f)");
+            lines.Add("set(b)");
+            vars = CMakeParsing.ParseForVariables(lines);
+            Assert.AreEqual(2, vars.Count);
+            Assert.AreEqual("a", vars[0]);
+            Assert.AreEqual("b", vars[1]);
+            vars = CMakeParsing.ParseForVariables(lines, 4);
+            Assert.AreEqual(3, vars.Count);
+            Assert.AreEqual("a", vars[0]);
+            Assert.AreEqual("local1", vars[1]);
+            Assert.AreEqual("local2", vars[2]);
         }
 
         /// <summary>
