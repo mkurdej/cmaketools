@@ -30,11 +30,14 @@ namespace CMakeTools
         public static string FindCMake()
         {
             // First try the location manually configured by the user.
-            string customPath = CMakePackage.Instance.CMakeOptionPage.PathToCMake;
-            if (customPath != null &&
-                File.Exists(Path.Combine(customPath, "bin\\cmake.exe")))
+            if (CMakePackage.Instance != null)
             {
-                return customPath;
+                string customPath = CMakePackage.Instance.CMakeOptionPage.PathToCMake;
+                if (customPath != null &&
+                    File.Exists(Path.Combine(customPath, "bin\\cmake.exe")))
+                {
+                    return customPath;
+                }
             }
 
             // If CMake couldn't be found at a manually configured path, look for it in
