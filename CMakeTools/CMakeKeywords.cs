@@ -22,7 +22,8 @@ namespace CMakeTools
     public enum CMakeCommandId
     {
         Unspecified = -1,
-        AddCustomCommand = 0,
+        AddCompileOptions = 0,
+        AddCustomCommand,
         AddCustomTarget,
         AddDefinitions,
         AddDependencies,
@@ -34,6 +35,7 @@ namespace CMakeTools
         Break,
         BuildCommand,
         BuildName,
+        CMakeHostSystemInformation,
         CMakeMinimumRequired,
         CMakePolicy,
         ConfigureFile,
@@ -100,6 +102,7 @@ namespace CMakeTools
         SourceGroup,
         String,
         TargetCompileDefinitions,
+        TargetCompileOptions,
         TargetIncludeDirectories,
         TargetLinkLibraries,
         TryCompile,
@@ -131,6 +134,7 @@ namespace CMakeTools
         // Array of CMake commands.  These should be in alphabetical order.
         private static readonly string[] _commands = new string[]
         {
+            "add_compile_options",
             "add_custom_command",
             "add_custom_target",
             "add_definitions",
@@ -143,6 +147,7 @@ namespace CMakeTools
             "break",
             "build_command",
             "build_name",
+            "cmake_host_system_information",
             "cmake_minimum_required",
             "cmake_policy",
             "configure_file",
@@ -209,6 +214,7 @@ namespace CMakeTools
             "source_group",
             "string",
             "target_compile_definitions",
+            "target_compile_options",
             "target_include_directories",
             "target_link_libraries",
             "try_compile",
@@ -291,6 +297,14 @@ namespace CMakeTools
             "CONFIGURATION",
             "PROJECT_NAME",
             "TARGET"
+        };
+
+        // Array of keywords used with the CMAKE_HOST_SYSTEM_INFORMATION command.
+        private static readonly string[] _cmakeHostSystemInformationKeywords =
+            new string[]
+        {
+            "QUERY",
+            "RESULT"
         };
 
         // Array of keywords used with the CMAKE_MINIMUM_REQUIRED command.
@@ -812,14 +826,17 @@ namespace CMakeTools
             "PUBLIC"
         };
 
-        // Array of keywords used with the TARGET_INCLUDE_DIRECTORIES command.
-        private static readonly string[] _targetIncludeDirectoriesKeywords = new string[]
+        // Array of keywords used with the TARGET_COMPILE_OPTIONS command.
+        private static readonly string[] _targetCompileOptionsKeywords = new string[]
         {
             "BEFORE",
             "INTERFACE",
             "PRIVATE",
             "PUBLIC"
         };
+
+        private static readonly string[] _targetIncludeDirectoriesKeywords =
+            _targetCompileOptionsKeywords;
 
         // Array of keywords used with the TARGET_LINK_LIBRARIES command.
         private static readonly string[] _targetLinkLibrariesKeywords = new string[]
@@ -862,6 +879,7 @@ namespace CMakeTools
         };
 
         // Dummy arrays for commands that have no associated keywords.
+        private static readonly string[] _addCompileOptionsKeywords = null;
         private static readonly string[] _addDefinitionsKeywords = null;
         private static readonly string[] _addDependenciesKeywords = null;
         private static readonly string[] _auxSourceDirectoriesKeywords = null;
@@ -896,6 +914,7 @@ namespace CMakeTools
         // keyword identifier in the CMakeKeywordId enumeration.
         private static readonly string[][] _keywordArrays = new string[][]
         {
+            _addCompileOptionsKeywords,
             _addCustomCommandKeywords,
             _addCustomTargetKeywords,
             _addDefinitionsKeywords,
@@ -908,6 +927,7 @@ namespace CMakeTools
             _breakKeywords,
             _buildCommandKeywords,
             _buildNameKeywords,
+            _cmakeHostSystemInformationKeywords,
             _cmakeMinimumRequiredKeywords,
             _cmakePolicyKeywords,
             _configureFileKeywords,
@@ -974,6 +994,7 @@ namespace CMakeTools
             _sourceGroupKeywords,
             _stringKeywords,
             _targetCompileDefinitionsKeywords,
+            _targetCompileOptionsKeywords,
             _targetIncludeDirectoriesKeywords,
             _targetLinkLibrariesKeywords,
             _tryCompileKeywords,
