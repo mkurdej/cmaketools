@@ -186,6 +186,7 @@ namespace CMakeTools
             { "APPEND",         _fileAppendParams },
             { "COPY",           null },
             { "DOWNLOAD",       _fileDownloadParams },
+            { "GENERATE",       null },
             { "GLOB",           _fileGlobParams },
             { "GLOB_RECURSE",   _fileGlobRecurseParams },
             { "INSTALL",        null },
@@ -386,6 +387,13 @@ namespace CMakeTools
             "output_variable"
         };
 
+        // Parameters to the STRING(MAKE_C_IDENTIFIER) command.
+        private static readonly string[] _stringMakeCIdentifierParams = new string[]
+        {
+            "input_string",
+            "output_variable"
+        };
+
         // Parameters to the STRING(TOLOWER) and STRING(TOUPPER) commands.
         private static readonly string[] _stringToLowerParams = _stringConfigureParams;
         private static readonly string[] _stringToUpperParams = _stringConfigureParams;
@@ -394,24 +402,25 @@ namespace CMakeTools
         private static readonly Dictionary<string, string[]> _stringSubcommands =
             new Dictionary<string, string[]>
         {
-            { "ASCII",      _stringAsciiParams },
-            { "CONFIGURE",  _stringConfigureParams },
-            { "FIND",       _stringFindParams },
-            { "LENGTH",     _stringLengthParams },
-            { "MD5",        _stringMD5Params },
-            { "RANDOM",     _stringRandomParams },
-            { "REGEX",      null },
-            { "REPLACE",    _stringReplaceParams },
-            { "SHA1",       _stringSHA1Params },
-            { "SHA224",     _stringSHA224Params },
-            { "SHA256",     _stringSHA256Params },
-            { "SHA384",     _stringSHA384Params },
-            { "SHA512",     _stringSHA512Params },
-            { "STRIP",      _stringStripParams },
-            { "SUBSTRING",  _stringSubstringParams },
-            { "TIMESTAMP",  _stringTimestampParams },
-            { "TOLOWER",    _stringToLowerParams },
-            { "TOUPPER",    _stringToUpperParams }
+            { "ASCII",              _stringAsciiParams },
+            { "CONFIGURE",          _stringConfigureParams },
+            { "FIND",               _stringFindParams },
+            { "LENGTH",             _stringLengthParams },
+            { "MAKE_C_IDENTIFIER",  _stringMakeCIdentifierParams },
+            { "MD5",                _stringMD5Params },
+            { "RANDOM",             _stringRandomParams },
+            { "REGEX",              null },
+            { "REPLACE",            _stringReplaceParams },
+            { "SHA1",               _stringSHA1Params },
+            { "SHA224",             _stringSHA224Params },
+            { "SHA256",             _stringSHA256Params },
+            { "SHA384",             _stringSHA384Params },
+            { "SHA512",             _stringSHA512Params },
+            { "STRIP",              _stringStripParams },
+            { "SUBSTRING",          _stringSubstringParams },
+            { "TIMESTAMP",          _stringTimestampParams },
+            { "TOLOWER",            _stringToLowerParams },
+            { "TOUPPER",            _stringToUpperParams }
         };
 
         // Map from commands to subcommands.
