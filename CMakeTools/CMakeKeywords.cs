@@ -854,9 +854,12 @@ namespace CMakeTools
         // Array of keywords used with the TARGET_LINK_LIBRARIES command.
         private static readonly string[] _targetLinkLibrariesKeywords = new string[]
         {
+            "INTERFACE",
             "LINK_INTERFACE_LIBRARIES",
             "LINK_PRIVATE",
-            "LINK_PUBLIC"
+            "LINK_PUBLIC",
+            "PRIVATE",
+            "PUBLIC"
         };
 
         // Array of keywords used with the TRY_COMPILE command.
