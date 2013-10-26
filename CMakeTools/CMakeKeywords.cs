@@ -53,6 +53,7 @@ namespace CMakeTools
         ExecProgram,
         ExecuteProcess,
         Export,
+        ExportLibraryDependencies,
         File,
         FindFile,
         FindLibrary,
@@ -75,7 +76,11 @@ namespace CMakeTools
         IncludeExternalMsProject,
         IncludeRegularExpression,
         Install,
+        InstallFiles,
+        InstallPrograms,
+        InstallTargets,
         LinkDirectories,
+        LinkLibraries,
         List,
         LoadCache,
         LoadCommand,
@@ -85,6 +90,7 @@ namespace CMakeTools
         Math,
         Message,
         Option,
+        OutputRequiredFiles,
         Project,
         QtWrapCpp,
         QtWrapUi,
@@ -101,6 +107,8 @@ namespace CMakeTools
         SiteName,
         SourceGroup,
         String,
+        SubdirDepends,
+        Subdirs,
         TargetCompileDefinitions,
         TargetCompileOptions,
         TargetIncludeDirectories,
@@ -109,6 +117,8 @@ namespace CMakeTools
         TryRun,
         Unset,
         UseMangledMesa,
+        UtilitySource,
+        VariableRequires,
         VariableWatch,
         While,
         WriteFile,
@@ -126,8 +136,19 @@ namespace CMakeTools
         {
             CMakeCommandId.BuildName,
             CMakeCommandId.ExecProgram,
+            CMakeCommandId.ExportLibraryDependencies,
+            CMakeCommandId.InstallFiles,
+            CMakeCommandId.InstallPrograms,
+            CMakeCommandId.InstallTargets,
+            CMakeCommandId.LinkLibraries,
             CMakeCommandId.MakeDirectory,
+            CMakeCommandId.OutputRequiredFiles,
             CMakeCommandId.Remove,
+            CMakeCommandId.SubdirDepends,
+            CMakeCommandId.Subdirs,
+            CMakeCommandId.UseMangledMesa,
+            CMakeCommandId.UtilitySource,
+            CMakeCommandId.VariableRequires,
             CMakeCommandId.WriteFile
         };
 
@@ -165,6 +186,7 @@ namespace CMakeTools
             "exec_program",
             "execute_process",
             "export",
+            "export_library_dependencies",
             "file",
             "find_file",
             "find_library",
@@ -187,7 +209,11 @@ namespace CMakeTools
             "include_external_msproject",
             "include_regular_expression",
             "install",
+            "install_files",
+            "install_programs",
+            "install_targets",
             "link_directories",
+            "link_libraries",
             "list",
             "load_cache",
             "load_command",
@@ -197,6 +223,7 @@ namespace CMakeTools
             "math",
             "message",
             "option",
+            "output_required_files",
             "project",
             "qt_wrap_cpp",
             "qt_wrap_ui",
@@ -213,6 +240,8 @@ namespace CMakeTools
             "site_name",
             "source_group",
             "string",
+            "subdir_depends",
+            "subdirs",
             "target_compile_definitions",
             "target_compile_options",
             "target_include_directories",
@@ -221,6 +250,8 @@ namespace CMakeTools
             "try_run",
             "unset",
             "use_mangled_mesa",
+            "utility_source",
+            "variable_requires",
             "variable_watch",
             "while",
             "write_file"
@@ -402,6 +433,13 @@ namespace CMakeTools
             "NAMESPACE",
             "PACKAGE",
             "TARGETS"
+        };
+
+        // Array of keywords used with the EXPORT_LIBRARY_DEPENDENCIES command.
+        private static readonly string[] _exportLibraryDependenciesKeywords =
+            new string[]
+        {
+            "APPEND"
         };
 
         // Array of keywords used with the FILE command.
@@ -681,6 +719,21 @@ namespace CMakeTools
             "WORLD_WRITE"
         };
 
+        // Array of keywords used with the INSTALL_FILES command.
+        private static readonly string[] _installFilesKeywords = new string[]
+        {
+            "FILES"
+        };
+
+        private static readonly string[] _installProgramsKeywords =
+            _installFilesKeywords;
+
+        // Array of keywords used with the INSTALL_TARGETS command.
+        private static readonly string[] _installTargetsKeywords =
+        {
+            "RUNTIME_DIRECTORY"
+        };
+
         // Array of keywords used with the LIST command.
         private static readonly string[] _listKeywords = new string[]
         {
@@ -824,6 +877,13 @@ namespace CMakeTools
             "UTC"
         };
 
+        // Array of keywords used with the SUBDIRS command.
+        private static readonly string[] _subdirsKeywords = new string[]
+        {
+            "EXCLUDE_FROM_ALL",
+            "PREORDER"
+        };
+
         // Array of keywords used with the TARGET_COMPILE_DEFINITIONS command.
         private static readonly string[] _targetCompileDefinitionsKeywords = new string[]
         {
@@ -915,9 +975,11 @@ namespace CMakeTools
         private static readonly string[] _getTestPropertyKeywords = null;
         private static readonly string[] _includeRegularExpressionKeywords = null;
         private static readonly string[] _linkDirectoryiesKeywords = null;
+        private static readonly string[] _linkLibrariesKeywords = null;
         private static readonly string[] _macroKeywords = null;
         private static readonly string[] _makeDirectoryKeywords = null;
         private static readonly string[] _mathKeywords = null;
+        private static readonly string[] _outputRequiredFilesKeywords = null;
         private static readonly string[] _projectKeywords = null;
         private static readonly string[] _qtWrapCppKeywords = null;
         private static readonly string[] _qtWrapUiKeywords = null;
@@ -925,7 +987,10 @@ namespace CMakeTools
         private static readonly string[] _removeDefinitionsKeywords = null;
         private static readonly string[] _returnKeywords = null;
         private static readonly string[] _siteNameKeywords = null;
+        private static readonly string[] _subdirDependsKeywords = null;
         private static readonly string[] _useMangledMesaKeywords = null;
+        private static readonly string[] _utilitySourceKeywords = null;
+        private static readonly string[] _variableRequiresKeywords = null;
         private static readonly string[] _variableWatchKeywords = null;
 
         // Arrays of keywords that appear in parentheses after other keywords.
@@ -964,6 +1029,7 @@ namespace CMakeTools
             _execProgramKeywords,
             _executeProcessKeywords,
             _exportKeywords,
+            _exportLibraryDependenciesKeywords,
             _fileKeywords,
             _findFileKeywords,
             _findLibraryKeywords,
@@ -986,7 +1052,11 @@ namespace CMakeTools
             _includeExternalMsProjectKeywords,
             _includeRegularExpressionKeywords,
             _installKeywords,
+            _installFilesKeywords,
+            _installProgramsKeywords,
+            _installTargetsKeywords,
             _linkDirectoryiesKeywords,
+            _linkLibrariesKeywords,
             _listKeywords,
             _loadCacheKeywords,
             _loadCommandKeywords,
@@ -996,6 +1066,7 @@ namespace CMakeTools
             _mathKeywords,
             _messageKeywords,
             _optionKeywords,
+            _outputRequiredFilesKeywords,
             _projectKeywords,
             _qtWrapCppKeywords,
             _qtWrapUiKeywords,
@@ -1012,6 +1083,8 @@ namespace CMakeTools
             _siteNameKeywords,
             _sourceGroupKeywords,
             _stringKeywords,
+            _subdirDependsKeywords,
+            _subdirsKeywords,
             _targetCompileDefinitionsKeywords,
             _targetCompileOptionsKeywords,
             _targetIncludeDirectoriesKeywords,
@@ -1020,6 +1093,8 @@ namespace CMakeTools
             _tryRunKeywords,
             _unsetKeywords,
             _useMangledMesaKeywords,
+            _utilitySourceKeywords,
+            _variableRequiresKeywords,
             _variableWatchKeywords,
             _whileKeywords,
             _writeFileKeywords
