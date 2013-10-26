@@ -841,8 +841,15 @@ namespace CMakeTools
             "PUBLIC"
         };
 
-        private static readonly string[] _targetIncludeDirectoriesKeywords =
-            _targetCompileOptionsKeywords;
+        // Array of keywords used with the TARGET_INCLUDE_DIRECTORIES commands.
+        private static readonly string[] _targetIncludeDirectoriesKeywords = new string[]
+        {
+            "BEFORE",
+            "INTERFACE",
+            "PRIVATE",
+            "PUBLIC",
+            "SYSTEM"
+        };
 
         // Array of keywords used with the TARGET_LINK_LIBRARIES command.
         private static readonly string[] _targetLinkLibrariesKeywords = new string[]
