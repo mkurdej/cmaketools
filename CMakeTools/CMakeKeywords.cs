@@ -858,7 +858,10 @@ namespace CMakeTools
             "CMAKE_FLAGS",
             "COMPILE_DEFINITIONS",
             "COPY_FILE",
-            "OUTPUT_VARIABLE"
+            "COPY_FILE_ERROR",
+            "LINK_LIBRARIES",
+            "OUTPUT_VARIABLE",
+            "SOURCES"
         };
 
         // Array of keywords used with the TRY_RUN command.
