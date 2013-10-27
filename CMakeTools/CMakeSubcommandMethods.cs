@@ -318,6 +318,17 @@ namespace CMakeTools
             { "EXPR",   _mathExprParams }
         };
 
+        // Map from subcommands of the MESSAGE command to parameters.
+        private static readonly Dictionary<string, string[]> _messageSubcommands =
+            new Dictionary<string, string[]>
+        {
+            { "AUTHOR_WARNING", null },
+            { "FATAL_ERROR",    null },
+            { "SEND_ERROR",     null },
+            { "STATUS",         null },
+            { "WARNING",        null }
+        };
+
         // Map from subcommands of the SET_PROPERTY command to parameters.
         private static readonly Dictionary<string, string[]> _setPropertySubcommands =
             new Dictionary<string, string[]>
@@ -448,6 +459,7 @@ namespace CMakeTools
             { CMakeCommandId.Install,           _installSubcommands },
             { CMakeCommandId.List,              _listSubcommands },
             { CMakeCommandId.Math,              _mathSubcommands },
+            { CMakeCommandId.Message,           _messageSubcommands },
             { CMakeCommandId.SetProperty,       _setPropertySubcommands },
             { CMakeCommandId.String,            _stringSubcommands }
         };
