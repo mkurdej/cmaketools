@@ -770,6 +770,12 @@ namespace CMakeTools
             "FORCE"
         };
 
+        // Array of keywords used with the MATH command.
+        private static readonly string[] _mathKeywords = new string[]
+        {
+            "EXPR"
+        };
+
         // Array of keywords used with the MESSAGE command.
         private static readonly string[] _messageKeywords = new string[]
         {
@@ -978,7 +984,6 @@ namespace CMakeTools
         private static readonly string[] _linkLibrariesKeywords = null;
         private static readonly string[] _macroKeywords = null;
         private static readonly string[] _makeDirectoryKeywords = null;
-        private static readonly string[] _mathKeywords = null;
         private static readonly string[] _outputRequiredFilesKeywords = null;
         private static readonly string[] _projectKeywords = null;
         private static readonly string[] _qtWrapCppKeywords = null;

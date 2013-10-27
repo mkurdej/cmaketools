@@ -304,6 +304,20 @@ namespace CMakeTools
             { "SORT",               _listSortParams }
         };
 
+        // Parameters to the MATH(EXPR) command.
+        private static readonly string[] _mathExprParams = new string[]
+        {
+            "output_variable",
+            "math_expression"
+        };
+
+        // Map from subcommands of the MATH command to parameters.
+        private static readonly Dictionary<string, string[]> _mathSubcommands =
+            new Dictionary<string, string[]>
+        {
+            { "EXPR",   _mathExprParams }
+        };
+
         // Map from subcommands of the SET_PROPERTY command to parameters.
         private static readonly Dictionary<string, string[]> _setPropertySubcommands =
             new Dictionary<string, string[]>
@@ -433,6 +447,7 @@ namespace CMakeTools
             { CMakeCommandId.File,              _fileSubcommands },
             { CMakeCommandId.Install,           _installSubcommands },
             { CMakeCommandId.List,              _listSubcommands },
+            { CMakeCommandId.Math,              _mathSubcommands },
             { CMakeCommandId.SetProperty,       _setPropertySubcommands },
             { CMakeCommandId.String,            _stringSubcommands }
         };
