@@ -268,7 +268,15 @@ namespace CMakeTools
                 case CMakeToken.Keyword:
                     if (!tokenData.InParens)
                     {
-                        htmlFile = "cmake-commands.html#command:" + text.ToLower();
+                        if (CMakeKeywords.IsDeprecated(CMakeKeywords.GetCommandId(text)))
+                        {
+                            htmlFile = "cmake-compatcommands.html#command:" +
+                                text.ToLower();
+                        }
+                        else
+                        {
+                            htmlFile = "cmake-commands.html#command:" + text.ToLower();
+                        }
                     }
                     break;
                 case CMakeToken.Variable:
