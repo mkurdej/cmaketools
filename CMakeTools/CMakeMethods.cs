@@ -73,6 +73,12 @@ namespace CMakeTools
         // Parameters to the ENDMACRO command.
         private static readonly string[] _endMacroParams = _endFunctionParams;
 
+        // Parameters to the EXPORT_LIBRARY_DEPENDENCIES command.
+        private static readonly string[] _exportLibraryDependenciesParams = new string[]
+        {
+            "file"
+        };
+
         // Parameters to the FIND_FILE command.
         private static readonly string[] _findFileParams = new string[]
         {
@@ -169,11 +175,39 @@ namespace CMakeTools
             "[regex_complain]"
         };
 
+        // Parameters to the INSTALL_FILES command.
+        private static readonly string[] _installFilesParams = new string[]
+        {
+            "directory",
+            "extension",
+            "file1 file2 ..."
+        };
+
+        // Parameters to the INSTALL_PROGRAMS command.
+        private static readonly string[] _installProgramsParams = new string[]
+        {
+            "directory",
+            "file1 file2 ..."
+        };
+
+        // Parameters to the INSTALL_TARGETS command.
+        private static readonly string[] _installTargetsParams = new string[]
+        {
+            "directory",
+            "target1 target2 ..."
+        };
+
         // Parameters to the LINK_DIRECTORIES command.
         private static readonly string[] _linkDirectoriesParams = _includeDirectoriesParams;
 
         // Parameters to the MACRO command.
         private static readonly string[] _macroParams = _functionParams;
+
+        // Parameters to the MAKE_DIRECTORY command.
+        private static readonly string[] _makeDirectoryParams = new string[]
+        {
+            "directory"
+        };
 
         // Parameters to the OPTION command.
         private static readonly string[] _optionParams = new string[]
@@ -183,11 +217,25 @@ namespace CMakeTools
             "[initial_value]"
         };
 
+        // Parameters to the OUTPUT_REQUIRED_FILES command.
+        private static readonly string[] _outputRequiredFilesParams = new string[]
+        {
+            "source_file",
+            "output_file"
+        };
+
         // Parameters to the PROJECT command.
         private static readonly string[] _projectParams = new string[]
         {
             "project_name",
             "[language1 language2 ...]"
+        };
+
+        // Parameters to the REMOVE command.
+        private static readonly string[] _removeParams = new string[]
+        {
+            "variable",
+            "value1 value2 ..."
         };
 
         // Parameters to the SET command.
@@ -203,6 +251,19 @@ namespace CMakeTools
             "name"
         };
 
+        // Parameters to the SUBDIR_DEPENDS command.
+        private static readonly string[] _subdirDependsParams = new string[]
+        {
+            "subdirectory",
+            "depenedency1 dependency2 ..."
+        };
+
+        // Parameters to the SUBDIRS command.
+        private static readonly string[] _subdirsParams = new string[]
+        {
+            "directory1 directory2 ..."
+        };
+
         // Parameters to the TARGET_LINK_LIBRARIES command.
         private static readonly string[] _targetLinkLibrariesParams = new string[]
         {
@@ -210,11 +271,42 @@ namespace CMakeTools
             "item1 item2 ..."
         };
 
+        // Parameters to the USE_MANGLED_MESA command.
+        private static readonly string[] _useManagledMesaParams = new string[]
+        {
+            "path_to_mesa",
+            "output_directory"
+        };
+
+        // Parameters to the UTILITY_SOURCE command.
+        private static readonly string[] _utilitySourceParams = new string[]
+        {
+            "cache_entry",
+            "executable_name",
+            "path_to_source",
+            "[file1 file2 ...]"
+        };
+
+        // Parameters to the VARIABLE_REQUIRES command.
+        private static readonly string[] _variableRequiresParams = new string[]
+        {
+            "test_variable",
+            "result_variable",
+            "required_variable1 required_variable2 ..."
+        };
+
         // Parameters to the VARIABLE_WATCH command.
         private static readonly string[] _variableWatchParams = new string[]
         {
             "variable",
             "[command]"
+        };
+
+        // Parameters to the WRITE_FILE command.
+        private static readonly string[] _writeFileParams = new string[]
+        {
+            "filename",
+            "message1 message2 ..."
         };
 
         // Parameters to commands that take a single expression.
@@ -242,6 +334,7 @@ namespace CMakeTools
             { CMakeCommandId.AuxSourceDirectory,        _auxSourceDirectoryParams },
             { CMakeCommandId.Break,                     _noParams },
             { CMakeCommandId.BuildCommand,              _variable },
+            { CMakeCommandId.BuildName,                 _variable },
             { CMakeCommandId.ConfigureFile,             _configureFileParams },
             { CMakeCommandId.Else,                      _optionalExpression },
             { CMakeCommandId.ElseIf,                    _expression },
@@ -252,6 +345,7 @@ namespace CMakeTools
             { CMakeCommandId.EndIf,                     _optionalExpression },
             { CMakeCommandId.EndMacro,                  _endMacroParams },
             { CMakeCommandId.EndWhile,                  _optionalExpression },
+            { CMakeCommandId.ExportLibraryDependencies, _exportLibraryDependenciesParams },
             { CMakeCommandId.FindFile,                  _findFileParams },
             { CMakeCommandId.FindPath,                  _findPathParams },
             { CMakeCommandId.FindProgram,               _findProgramParams },
@@ -268,18 +362,30 @@ namespace CMakeTools
             { CMakeCommandId.IncludeDirectories,        _includeDirectoriesParams },
             { CMakeCommandId.IncludeExternalMsProject,  _includeExternalMsProjectParams },
             { CMakeCommandId.IncludeRegularExpression,  _includeRegularExpressionParams },
+            { CMakeCommandId.InstallFiles,              _installFilesParams },
+            { CMakeCommandId.InstallPrograms,           _installProgramsParams },
+            { CMakeCommandId.InstallTargets,            _installTargetsParams },
             { CMakeCommandId.LinkDirectories,           _linkDirectoriesParams },
             { CMakeCommandId.Macro,                     _macroParams },
+            { CMakeCommandId.MakeDirectory,             _makeDirectoryParams },
             { CMakeCommandId.Option,                    _optionParams },
+            { CMakeCommandId.OutputRequiredFiles,       _outputRequiredFilesParams },
             { CMakeCommandId.Project,                   _projectParams },
+            { CMakeCommandId.Remove,                    _removeParams },
             { CMakeCommandId.Return,                    _noParams },
             { CMakeCommandId.Set,                       _setParams },
             { CMakeCommandId.SiteName,                  _variable },
             { CMakeCommandId.SourceGroup,               _sourceGroupParams },
+            { CMakeCommandId.SubdirDepends,             _subdirDependsParams },
+            { CMakeCommandId.Subdirs,                   _subdirsParams },
             { CMakeCommandId.TargetLinkLibraries,       _targetLinkLibrariesParams },
             { CMakeCommandId.Unset,                     _variable },
+            { CMakeCommandId.UseMangledMesa,            _useManagledMesaParams },
+            { CMakeCommandId.UtilitySource,             _utilitySourceParams },
+            { CMakeCommandId.VariableRequires,          _variableRequiresParams },
             { CMakeCommandId.VariableWatch,             _variableWatchParams },
-            { CMakeCommandId.While,                     _expression }
+            { CMakeCommandId.While,                     _expression },
+            { CMakeCommandId.WriteFile,                 _writeFileParams }
         };
 
         // The identifier of the command for which a given instance will provide
