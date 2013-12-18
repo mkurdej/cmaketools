@@ -6,7 +6,7 @@
     <ProductVersion>
     </ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{C2F9B23F-4944-4945-BEB2-2428C14B15FE}</ProjectGuid>
+    <ProjectGuid>@PROJECT_GUID@</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CMakeToolsTest</RootNamespace>
