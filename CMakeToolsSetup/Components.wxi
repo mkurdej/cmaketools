@@ -26,7 +26,7 @@
             <Component Id="CMakeTools$(var.VSVersion)" Guid="$(var.CMakeToolsGuid)">
                 <File Id="CMakeLogo$(var.VSVersion)" Name="CMakeLogo.ico" DiskId="1" Source="dist\CMakeLogo.ico" />
                 <File Id="CMakeLogoBig$(var.VSVersion)" Name="CMakeLogoBig.png" DiskId="1" Source="dist\CMakeLogoBig.png" />
-                <File Id="CMakeToolsDLL$(var.VSVersion)" Name="CMakeTools.dll" DiskId="1" Source="dist\CMakeTools.dll" KeyPath="yes" />
+                <File Id="CMakeToolsDLL$(var.VSVersion)" Name="CMakeTools.dll" DiskId="1" Source="dist\CMakeTools_VS$(var.VSMajorVersion).dll" KeyPath="yes" />
                 <File Id="CMakeToolsPkgDef$(var.VSVersion)" Name="CMakeTools.pkgdef" DiskId="1" Source="dist\CMakeTools.pkgdef" />
                 <File Id="License$(var.VSVersion)" Name="License.rtf" DiskId="1" Source="dist\License.rtf" />
                 <File Id="VSIXManifest$(var.VSVersion)" Name="extension.vsixmanifest" DiskId="1" Source="dist\extension.vsixmanifest" />
