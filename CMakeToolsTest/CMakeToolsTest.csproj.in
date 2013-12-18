@@ -10,7 +10,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CMakeToolsTest</RootNamespace>
-    <AssemblyName>CMakeToolsTest</AssemblyName>
+    <AssemblyName>CMakeToolsTest_VS@VS_VERSION@</AssemblyName>
     <TargetFrameworkVersion>v@DOTNET_VERSION@</TargetFrameworkVersion>
     <MinimumVisualStudioVersion>@TOOLS_VERSION@</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
@@ -21,6 +21,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug_VS@VS_VERSION@\</OutputPath>
+    <IntermediateOutputPath>obj\Debug_VS@VS_VERSION@\</IntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -29,6 +30,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release_VS@VS_VERSION@\</OutputPath>
+    <IntermediateOutputPath>obj\Release_VS@VS_VERSION@\</IntermediateOutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
