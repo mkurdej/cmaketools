@@ -121,13 +121,17 @@ namespace CMakeTools
         private static CMakeItemDeclarations CreateIncludeDeclarations(CMakeCommandId id,
             ParseRequest req, Source source, List<string> priorParameters)
         {
-            return new CMakeIncludeDeclarations(req.FileName);
+            CMakeIncludeDeclarations decls = new CMakeIncludeDeclarations(req.FileName);
+            decls.FindIncludeFiles();
+            return decls;
         }
 
         private static CMakeItemDeclarations CreatePackageDeclarations(CMakeCommandId id,
             ParseRequest req, Source source, List<string> priorParameters)
         {
-            return new CMakePackageDeclarations(req.FileName);
+            CMakePackageDeclarations decls = new CMakePackageDeclarations(req.FileName);
+            decls.FindIncludeFiles();
+            return decls;
         }
 
         private static CMakeItemDeclarations CreateSubdirectoryDeclarations(
@@ -137,14 +141,20 @@ namespace CMakeTools
             bool requireCMakeLists =
                 (CMakePackage.Instance.CMakeOptionPage.ShowSubdirectories ==
                 CMakeOptionPage.SubdirectorySetting.CMakeListsOnly);
-            return new CMakeSubdirectoryDeclarations(req.FileName, requireCMakeLists);
+            CMakeSubdirectoryDeclarations decls =
+                new CMakeSubdirectoryDeclarations(req.FileName, requireCMakeLists);
+            decls.FindIncludeFiles();
+            return decls;
         }
 
         private static CMakeItemDeclarations CreateLanguageDeclarations(
             CMakeCommandId id, ParseRequest req, Source source,
             List<string> priorParameters)
         {
-            return new CMakeLanguageDeclarations(req.FileName);
+            CMakeLanguageDeclarations decls =
+                new CMakeLanguageDeclarations(req.FileName);
+            decls.FindIncludeFiles();
+            return decls;
         }
 
         private static CMakeItemDeclarations CreateTargetDeclarations(CMakeCommandId id,
@@ -187,6 +197,7 @@ namespace CMakeTools
             ParseRequest req, Source source, List<string> priorParameters)
         {
             CMakeSourceDeclarations decls = new CMakeSourceDeclarations(req.FileName);
+            decls.FindIncludeFiles();
             if (_commandKeywords.ContainsKey(id))
             {
                 decls.AddItems(_commandKeywords[id],
