@@ -10,8 +10,10 @@
 # 
 # ****************************************************************************
 
+# Set the solution name.
 PROJECT(CMakeTools)
 
+# Detect the version of Visual Studio being used to build CMake Tools for Visual Studio.
 IF(MSVC12)
     SET(TOOLS_VERSION 12.0)
 ELSEIF(MSVC11)
@@ -23,6 +25,7 @@ ELSE()
         FATAL_ERROR "This project must be generated using VS 2010, VS 2012, or VS 2013")
 ENDIF()
 
+# Function to configure a C# project for a single version of Visual Studio.
 FUNCTION(ADD_CS_PROJECT PROJECT_NAME PROJECT_GUID VS_VERSION DOTNET_VERSION)
     FILE(TO_NATIVE_PATH ${CMAKE_SOURCE_DIR} NATIVE_SOURCE_DIR)
     CONFIGURE_FILE(
@@ -34,6 +37,7 @@ FUNCTION(ADD_CS_PROJECT PROJECT_NAME PROJECT_GUID VS_VERSION DOTNET_VERSION)
         TYPE {FAE04EC0-301F-11D3-BF4B-00C04F79EFBC})
 ENDFUNCTION(ADD_CS_PROJECT)
 
+# Function to configure a C# project for all supported versions of Visual Studio.
 FUNCTION(ADD_CS_PROJECT_ALL PROJECT_NAME)
     IF(MSVC10 OR MSVC11 OR MSVC12)
         LIST(GET ARGN 0 PROJECT_GUID)
@@ -49,6 +53,7 @@ FUNCTION(ADD_CS_PROJECT_ALL PROJECT_NAME)
     ENDIF(MSVC12)
 ENDFUNCTION(ADD_CS_PROJECT_ALL)
 
+# Function to configure a Windows Installer XML project.
 FUNCTION(ADD_WIX_PROJECT PROJECT_NAME)
     INCLUDE_EXTERNAL_MSPROJECT(
         ${PROJECT_NAME}
