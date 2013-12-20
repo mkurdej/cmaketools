@@ -10,6 +10,8 @@
 # 
 # ****************************************************************************
 
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
+
 # Set the solution name.
 PROJECT(CMakeTools)
 
