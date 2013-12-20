@@ -60,7 +60,8 @@ namespace CMakeTools
             { CMakeCommandId.SetTestsProperties,        CreateSetXPropertyDeclarations },
             { CMakeCommandId.SetDirectoryProperties,    CreateSetXPropertyDeclarations },
             { CMakeCommandId.GetProperty,               CreateGetPropertyDeclarations },
-            { CMakeCommandId.SetProperty,               CreateSetPropertyDeclarations }
+            { CMakeCommandId.SetProperty,               CreateSetPropertyDeclarations },
+            { CMakeCommandId.GetFileNameComponent,      CreateGetFileNameComponentDeclarations }
         };
 
         // Map from SET_*_PROPERTIES commands to factory methods to create declarations
@@ -90,6 +91,18 @@ namespace CMakeTools
             "MODULE",
             "SHARED",
             "STATIC"
+        };
+
+        // File name components for use with the GET_FILENAME_COMPONENT command.
+        private static readonly string[] _getFileNameComponentComponents = new string[]
+        {
+            "ABSOLUTE",
+            "DIRECTORY",
+            "EXT",
+            "NAME",
+            "NAME_WE",
+            "PATH",
+            "REALPATH"
         };
 
         // Keywords that can be used with the SET_PROPERTY command.
@@ -409,6 +422,20 @@ namespace CMakeTools
                 decls = new CMakeItemDeclarations();
                 decls.AddItems(properties, CMakeItemDeclarations.ItemType.Property);
             }
+            return decls;
+        }
+
+        private static CMakeItemDeclarations CreateGetFileNameComponentDeclarations(
+            CMakeCommandId id, ParseRequest req, Source source,
+            List<string> priorParameters)
+        {
+            if (priorParameters.Count != 2)
+            {
+                return null;
+            }
+            CMakeItemDeclarations decls = new CMakeItemDeclarations();
+            decls.AddItems(_getFileNameComponentComponents,
+                CMakeItemDeclarations.ItemType.Command);
             return decls;
         }
 
