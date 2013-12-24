@@ -560,7 +560,8 @@ namespace CMakeTools
         public static bool HasSubcommandParameters(CMakeCommandId id,
             string subcommand)
         {
-            return _allSubcommands.ContainsKey(id) &&
+            return subcommand != null &&
+                _allSubcommands.ContainsKey(id) &&
                 _allSubcommands[id].ContainsKey(subcommand) &&
                 _allSubcommands[id][subcommand] != null;
         }
@@ -576,7 +577,8 @@ namespace CMakeTools
         public static Methods GetSubcommandParameters(CMakeCommandId id,
             string subcommand)
         {
-            if (!_allSubcommands.ContainsKey(id) ||
+            if (subcommand == null ||
+                !_allSubcommands.ContainsKey(id) ||
                 !_allSubcommands[id].ContainsKey(subcommand) ||
                 _allSubcommands[id][subcommand] == null)
             {
@@ -618,7 +620,8 @@ namespace CMakeTools
         public static string GetSubcommandQuickInfoTip(CMakeCommandId id,
             string subcommand)
         {
-            if (!_allSubcommands.ContainsKey(id) ||
+            if (subcommand == null ||
+                !_allSubcommands.ContainsKey(id) ||
                 !_allSubcommands[id].ContainsKey(subcommand) ||
                 _allSubcommands[id][subcommand] == null)
             {
