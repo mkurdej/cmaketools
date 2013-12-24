@@ -43,7 +43,8 @@ namespace CMakeTools
             CMakeParsing.ParseForBadVariableRefs,
             CMakeParsing.ParseForUnmatchedParens,
             CMakeParsing.ParseForBadCommands,
-            CMakeParsing.ParseForDeprecatedCommands
+            CMakeParsing.ParseForDeprecatedCommands,
+            CMakeParsing.ParseForInvalidEscapeSequences
         };
 
         // Map from error codes to text strings.
@@ -55,7 +56,8 @@ namespace CMakeTools
             { CMakeError.ExpectedCommand,       CMakeStrings.ExpectedCommand },
             { CMakeError.ExpectedEOL,           CMakeStrings.ExpectedEOL },
             { CMakeError.ExpectedOpenParen,     CMakeStrings.ExpectedOpenParen },
-            { CMakeError.DeprecatedCommand,     CMakeStrings.DeprecatedCommand }
+            { CMakeError.DeprecatedCommand,     CMakeStrings.DeprecatedCommand },
+            { CMakeError.InvalidEscapeSequence, CMakeStrings.InvalidEscapeSequence }
         };
 
         // Map from error codes to function checking if the errors are enabled.

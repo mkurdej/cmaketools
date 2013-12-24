@@ -147,6 +147,9 @@
   <data name="FileNotFound" xml:space="preserve">
     <value>The file '{0}' could not be found.</value>
   </data>
+  <data name="InvalidEscapeSequence" xml:space="preserve">
+    <value>Invalid escape sequence.</value>
+  </data>
   <data name="InvalidVariableRef" xml:space="preserve">
     <value>Invalid variable reference.</value>
   </data>

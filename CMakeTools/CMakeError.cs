@@ -24,7 +24,8 @@ namespace CMakeTools
         ExpectedCommand,
         ExpectedEOL,
         ExpectedOpenParen,
-        DeprecatedCommand
+        DeprecatedCommand,
+        InvalidEscapeSequence
     }
 
     /// <summary>

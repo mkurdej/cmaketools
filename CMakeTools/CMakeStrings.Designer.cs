@@ -151,6 +151,15 @@ namespace CMakeTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid escape sequence..
+        /// </summary>
+        internal static string InvalidEscapeSequence {
+            get {
+                return ResourceManager.GetString("InvalidEscapeSequence", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid variable reference..
         /// </summary>
         internal static string InvalidVariableRef {

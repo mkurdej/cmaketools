@@ -2099,6 +2099,77 @@ namespace CMakeTools
         }
 
         /// <summary>
+        /// Parse for invalid escape sequences.
+        /// </summary>
+        /// <param name="lines">A collection of lines to parse.</param>
+        /// <returns>A list of error information.</returns>
+        public static List<CMakeErrorInfo> ParseForInvalidEscapeSequences(
+            IEnumerable<string> lines)
+        {
+            List<CMakeErrorInfo> results = new List<CMakeErrorInfo>();
+            CMakeScanner scanner = new CMakeScanner();
+            TokenInfo tokenInfo = new TokenInfo();
+            int state = 0;
+            int lineNum = 0;
+            foreach (string line in lines)
+            {
+                scanner.SetSource(line, 0);
+                while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state))
+                {
+                    if (tokenInfo.Token == (int)CMakeToken.String)
+                    {
+                        string tokenText = line.ExtractToken(tokenInfo);
+                        for (int i = 0; i < tokenText.Length - 1; i++)
+                        {
+                            if (tokenText[i] == '\\')
+                            {
+                                char nextChar = tokenText[i + 1];
+                                switch (nextChar)
+                                {
+                                case '\\':
+                                case '"':
+                                case ' ':
+                                case '#':
+                                case '(':
+                                case ')':
+                                case '$':
+                                case '@':
+                                case '^':
+                                case ';':
+                                case 't':
+                                case 'n':
+                                case 'r':
+                                case '0':
+                                    // It's one of the characters enumerated in
+                                    // cmCommandArgumentParserHelper.cxx in the CMake
+                                    // source code and there a valid escape sequence.
+                                    i++;
+                                    break;
+                                default:
+                                    // Otherwise, it's an invalid escape sequence.
+                                    results.Add(new CMakeErrorInfo()
+                                    {
+                                        ErrorCode = CMakeError.InvalidEscapeSequence,
+                                        Span = new TextSpan()
+                                        {
+                                            iStartLine = lineNum,
+                                            iStartIndex = tokenInfo.StartIndex + i,
+                                            iEndLine = lineNum,
+                                            iEndIndex = tokenInfo.StartIndex + i + 2
+                                        }
+                                    });
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                lineNum++;
+            }
+            return results;
+        }
+
+        /// <summary>
         /// Parse to find the name of the function that the specified line is part of.
         /// </summary>
         /// <param name="lines">A collection of lines to parse.</param>
