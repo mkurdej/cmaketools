@@ -1586,6 +1586,27 @@ namespace CMakeTools
         }
 
         /// <summary>
+        /// Test parsing for invalid escape sequences.
+        /// </summary>
+        [TestMethod]
+        public void TestParseForInvalidEscapeSequences()
+        {
+            List<string> lines = new List<string>();
+            lines.Add("\"\\\\\\\"\\ \\#\\(\\)\\$\\@\\^\\;\\t\\n\\r\\0\"");
+            lines.Add("\"\\\\a\"");
+            lines.Add("    \"\\a\"");
+            List<CMakeErrorInfo> info = CMakeParsing.ParseForInvalidEscapeSequences(
+                lines);
+            Assert.AreEqual(1, info.Count);
+            Assert.AreEqual(CMakeError.InvalidEscapeSequence, info[0].ErrorCode);
+            Assert.AreEqual(2, info[0].Span.iStartLine);
+            Assert.AreEqual(5, info[0].Span.iStartIndex);
+            Assert.AreEqual(2, info[0].Span.iEndLine);
+            Assert.AreEqual(7, info[0].Span.iEndIndex);
+            Assert.IsFalse(info[0].Warning);
+        }
+
+        /// <summary>
         /// Test parsing for the current function name.
         /// </summary>
         [TestMethod]
