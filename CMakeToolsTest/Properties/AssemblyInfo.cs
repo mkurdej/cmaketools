@@ -1,6 +1,6 @@
 ﻿/* ****************************************************************************
  * 
- * Copyright (C) 2012-2013 by David Golub.  All rights reserved.
+ * Copyright (C) 2012-2014 by David Golub.  All rights reserved.
  * 
  * This software is subject to the Microsoft Reciprocal License (Ms-RL).
  * A copy of the license can be found in the License.txt file included
@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("CMakeToolsTest")]
 [assembly: AssemblyDescription("CMake Tools for Visual Studio Unit Tests")]
 [assembly: AssemblyProduct("CMake Tools for Visual Studio")]
-[assembly: AssemblyCopyright("Copyright (C) 2012-2013 by David Golub.  All rights reserved.")]
+[assembly: AssemblyCopyright("Copyright (C) 2012-2014 by David Golub.  All rights reserved.")]
 [assembly: ComVisible(false)]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
