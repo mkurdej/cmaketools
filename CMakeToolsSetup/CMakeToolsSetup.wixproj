@@ -6,7 +6,7 @@
     <ProductVersion>3.5</ProductVersion>
     <ProjectGuid>{7b9f756f-f5e2-4e70-8fb7-1e8bb0774978}</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>CMakeToolsSetup-1.1</OutputName>
+    <OutputName>CMakeToolsSetup-1.1-RC1</OutputName>
     <OutputType>Package</OutputType>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
