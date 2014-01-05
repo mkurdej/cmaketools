@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-    <Product Id="1da9cbfe-c311-43ae-8310-d201ec1da835" Name="CMake Tools for Visual Studio 1.1 RC1" Language="1033" Version="1.1.0.0" Manufacturer="David Golub" UpgradeCode="38709d2b-9fe1-448d-8e5d-c55c1555c620">
+    <Product Id="cb0b2014-7d04-46c1-a658-e5d9464960b2" Name="CMake Tools for Visual Studio 1.1 RC1" Language="1033" Version="1.1.0.0" Manufacturer="David Golub" UpgradeCode="38709d2b-9fe1-448d-8e5d-c55c1555c620">
         <Package InstallerVersion="200" Compressed="yes" />
 
         <Media Id="1" Cabinet="CMakeTools.cab" EmbedCab="yes" />
@@ -8,6 +8,7 @@
         <Icon Id="CMakeLogo" SourceFile="dist\CMakeLogo.ico" />
         
         <Property Id="ARPPRODUCTICON" Value="CMakeLogo" />
+        <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
         <PropertyRef Id="VS2010_ROOT_FOLDER" />
         <PropertyRef Id="VS2010_EXTENSIONS_DIR" />
         <PropertyRef Id="VS2010DEVENV" />
@@ -25,6 +26,10 @@
             VS2010DEVENV OR VS2012DEVENV OR VS2013DEVENV
         </Condition>
 
+        <Upgrade Id="38709d2b-9fe1-448d-8e5d-c55c1555c620">
+            <UpgradeVersion Minimum="1.0.0.0" Maximum="1.1.0.0" Property="PREVIOUSVERSIONINSTALLED" IncludeMinimum="yes" IncludeMaximum="no" />
+        </Upgrade>
+      
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="ProgramMenuFolder" Name="Programs">
                 <Directory Id="ProgramMenuDir" Name="CMake Tools for Visual Studio">
@@ -112,6 +117,7 @@
         </Feature>
 
         <InstallExecuteSequence>
+            <RemoveExistingProducts After="InstallInitialize" />
             <Custom Action="VS2012Setup" Before="InstallFinalize">
                 <![CDATA[VS2012DEVENV AND (&CMakeTools2012 > 0)]]>
             </Custom>
