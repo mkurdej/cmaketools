@@ -8,11 +8,11 @@
         <p>
             CMake Tools for Visual Studio is an extension for Microsoft Visual Studio
             adding syntax highlighting and IntelliSense support for the CMake language.
-            It supports Visual Studio 2010 and Visual Studio 2012 and is distributed
-            under the Microsoft Reciprocal License, which allows unlimited free use of
-            the software and its source code, provided that any modification that you
-            make to the source code remain freely available under this license.  Features
-            include the following:
+            It supports Visual Studio 2010, Visual Studio 2012, and Visual Studio 2013
+            and is distributed under the Microsoft Reciprocal License, which allows
+            unlimited free use of the software and its source code, provided that any
+            modifications that you make to the source code remain freely available under
+            this license.  Features include the following:
         </p>
         <ul>
             <li>Syntax highlighting for CMake code</li>
@@ -55,5 +55,41 @@
             use CMake commands in lowercase, you may configure CMake Tools for Visual
             Studio to use lowercase instead.
         </p>
+        <h2>Version History</h2>
+        <h3>CMake Tools for Visual Studio 1.1</h3>
+        <ul>
+            <li>Added support for Visual Studio 2013.</li>
+            <li>Added support for CMake 2.8.12.</li>
+            <li>Fixed crash when a line ends with a backslash.</li>
+            <li>
+                Fixed omission of <code>FILE(COPY)</code> and <code>FILE(INSTALL)</code>
+                subcommands from IntelliSense list box.
+            </li>
+            <li>
+                Added syntax highlighting support for the
+                <code>INCLUDE_EXTERNAL_MSPROJECT</code> command.
+            </li>
+            <li>
+                Added configuration option to specify a custom path at which to look for
+                CMake.
+            </li>
+            <li>
+                Added <code>ARGN</code> variable to IntelliSense list box when inside a
+                function.
+            </li>
+            <li>Fixed handling of local variables.</li>
+            <li>Added support for all deprecated commands.</li>
+            <li>
+                Added IntelliSense support for the <code>MATH</code> and
+                <code>MESSAGE</code> commands.
+            </li>
+            <li>
+                Added IntelliSense error for invalid escape sequences.
+            </li>
+        </ul>
+        <h3>CMake Tools for Visual Studio 1.0</h3>
+        <ul>
+            <li>Initial version of CMake Tools for Visual Studio.</li>
+        </ul>
     </body>
 </html>
