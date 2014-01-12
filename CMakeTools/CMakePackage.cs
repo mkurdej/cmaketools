@@ -28,7 +28,7 @@ namespace CMakeTools
     /// Visual Studio package class for CMake Tools for Visual Studio.
     /// </summary>
     [PackageRegistration(UseManagedResourcesOnly = true)]
-    [InstalledProductRegistration("#100", "#101", "1.0", IconResourceID = 400)]
+    [InstalledProductRegistration("#100", "#101", "1.1", IconResourceID = 400)]
     [ProvideService(typeof(CMakeLanguageService),
         ServiceName = "CMake Language Service")]
     [ProvideLanguageService(typeof(CMakeLanguageService), "CMake", 102,
