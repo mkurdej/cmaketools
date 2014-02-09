@@ -8,6 +8,7 @@
         <Icon Id="CMakeLogo" SourceFile="dist\CMakeLogo.ico" />
         
         <Property Id="ARPPRODUCTICON" Value="CMakeLogo" />
+        <Property Id="ARPURLINFOABOUT" Value="http://cmaketools.codeplex.com" />
         <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
         <PropertyRef Id="VS2010_ROOT_FOLDER" />
         <PropertyRef Id="VS2010_EXTENSIONS_DIR" />
