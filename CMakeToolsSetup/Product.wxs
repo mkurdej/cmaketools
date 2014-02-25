@@ -9,7 +9,6 @@
         
         <Property Id="ARPPRODUCTICON" Value="CMakeLogo" />
         <Property Id="ARPURLINFOABOUT" Value="http://cmaketools.codeplex.com" />
-        <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
         <PropertyRef Id="VS2010_ROOT_FOLDER" />
         <PropertyRef Id="VS2010_EXTENSIONS_DIR" />
         <PropertyRef Id="VS2010DEVENV" />
@@ -28,7 +27,7 @@
         </Condition>
 
         <Upgrade Id="38709d2b-9fe1-448d-8e5d-c55c1555c620">
-            <UpgradeVersion Minimum="1.0.0.0" Maximum="1.1.0.0" Property="PREVIOUSVERSIONINSTALLED" IncludeMinimum="yes" IncludeMaximum="no" />
+            <UpgradeVersion Minimum="1.0.0.0" Maximum="1.1.0.0" Property="PREVIOUSFOUND" IncludeMinimum="yes" IncludeMaximum="no" />
         </Upgrade>
       
         <Directory Id="TARGETDIR" Name="SourceDir">
