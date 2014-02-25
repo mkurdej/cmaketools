@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Include>
+    <Directory Id="VS$(var.VSVersion)_ROOT_FOLDER" Name="VS$(var.VSVersion)ROOT">
+        <Directory Id="CMake$(var.VSVersion)" Name="CMake">
+            <Directory Id="CMakeSnippets$(var.VSVersion)" Name="Snippets">
+                <Directory Id="CMakeSnippetsLocale$(var.VSVersion)" Name="1033">
+                    <Component Id="CMakeSnippetsIndex$(var.VSVersion)" Guid="$(var.SnippetsIndexGuid)">
+                        <File Id="SnippetsIndex$(var.VSVersion)" Name="SnippetsIndex.xml" DiskId="1" Source="dist/Snippets/1033/SnippetsIndex.xml" />
+                    </Component>
+                    <Directory Id="CMakeSnippetsSubdir$(var.VSVersion)" Name="Snippets">
+                        <Component Id="CMakeSnippets$(var.VSVersion)" Guid="$(var.SnippetsGuid)">
+                            <File Id="ForEachSnippet$(var.VSVersion)" Name="ForEach.snippet" DiskId="1" Source="dist/Snippets/1033/Snippets/ForEach.snippet" />
+                            <File Id="FunctionSnippet$(var.VSVersion)" Name="Function.snippet" DiskId="1" Source="dist/Snippets/1033/Snippets/Function.snippet" />
+                            <File Id="IfSnippet$(var.VSVersion)" Name="If.snippet" DiskId="1" Source="dist/Snippets/1033/Snippets/If.snippet" />
+                            <File Id="IfElseSnippet$(var.VSVersion)" Name="IfElse.snippet" DiskId="1" Source="dist/Snippets/1033/Snippets/IfElse.snippet" />
+                            <File Id="MacroSnippet$(var.VSVersion)" Name="Macro.snippet" DiskId="1" Source="dist/Snippets/1033/Snippets/Macro.snippet" />
+                            <File Id="WhileSnippet$(var.VSVersion)" Name="While.snippet" DiskId="1" Source="dist/Snippets/1033/Snippets/While.snippet" />
+                        </Component>
+                    </Directory>
+                </Directory>
+            </Directory>
+        </Directory>
+    </Directory>
+    <Directory Id="VS$(var.VSVersion)_EXTENSIONS_DIR" Name="Extensions$(var.VSVersion)">
+        <Directory Id="CMakeExtensions$(var.VSVersion)" Name="CMake Tools for Visual Studio">
+            <Component Id="CMakeTools$(var.VSVersion)" Guid="$(var.CMakeToolsGuid)">
+                <File Id="CMakeLogo$(var.VSVersion)" Name="CMakeLogo.ico" DiskId="1" Source="dist\CMakeLogo.ico" />
+                <File Id="CMakeLogoBig$(var.VSVersion)" Name="CMakeLogoBig.png" DiskId="1" Source="dist\CMakeLogoBig.png" />
+                <File Id="CMakeToolsDLL$(var.VSVersion)" Name="CMakeTools_VS$(var.VSMajorVersion).dll" DiskId="1" Source="dist\CMakeTools_VS$(var.VSMajorVersion).dll" KeyPath="yes" />
+                <File Id="CMakeToolsPkgDef$(var.VSVersion)" Name="CMakeTools_VS$(var.VSMajorVersion).pkgdef" DiskId="1" Source="dist\CMakeTools_VS$(var.VSMajorVersion).pkgdef" />
+                <File Id="License$(var.VSVersion)" Name="License.rtf" DiskId="1" Source="dist\License.rtf" />
+                <File Id="VSIXManifest$(var.VSVersion)" Name="extension.vsixmanifest" DiskId="1" Source="dist\extension.vsixmanifest" />
+                <ProgId Id="CMakeTools.cmake.$(var.VSMajorVersion).0" Description="CMake File" Icon="CMakeLogo$(var.VSVersion)">
+                    <Extension Id="cmake" ContentType="text/plain">
+                        <Verb Id="open" Command="Open" TargetProperty="VS$(var.VSVersion)DEVENV" Argument='"%1"' />
+                    </Extension>
+                </ProgId>
+                <RegistryKey Root="HKCR" Key="CMakeTools.cmake.$(var.VSMajorVersion).0\shell\open\ddeexec">
+                    <RegistryValue Type="string" Value='Open("%1")' />
+                    <RegistryValue Key="Application" Type="string" Value="VisualStudio.$(var.VSMajorVersion).0" />
+                    <RegistryValue Key="Topic" Type="string" Value="System" />
+                </RegistryKey>
+            </Component>
+            <Directory Id="Templates$(var.VSVersion)" Name="Templates">
+                <Directory Id="NewItems$(var.VSVersion)" Name="NewItems">
+                    <Component Id="CMakeTemplates$(var.VSVersion)" Guid="$(var.CMakeTemplatesGuid)">
+                        <File Id="CMakeFile$(var.VSVersion)" Name="CMakeFile.cmake" DiskId="1" Source="dist\Templates\NewItems\CMakeFile.cmake" />
+                        <File Id="NewCMakeItems$(var.VSVersion)" Name="NewCMakeItems.vsdir" DiskId="1" Source="dist\Templates\NewItems\NewCMakeItems.vsdir" />
+                    </Component>
+                </Directory>
+            </Directory>
+        </Directory>
+    </Directory>
+</Include>

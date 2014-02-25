@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+    <CodeSnippet Format="1.0.0">
+        <Header>
+            <Title>FOREACH</Title>
+            <Shortcut>FOREACH</Shortcut>
+            <Description>A FOREACH loop</Description>
+            <Author>David Golub</Author>
+            <SnippetTypes>
+                <SnippetType>Expansion</SnippetType>
+            </SnippetTypes>
+        </Header>
+        <Snippet>
+            <Declarations>
+                <Literal Editable="false">
+                    <ID>ForEach</ID>
+                    <Function>ToCommandCase(FOREACH)</Function>
+                    <Default>FOREACH</Default>
+                </Literal>
+                <Literal Editable="false">
+                    <ID>EndForEach</ID>
+                    <Function>ToCommandCase(ENDFOREACH)</Function>
+                    <Default>ENDFOREACH</Default>
+                </Literal>
+                <Literal>
+                    <ID>Variable</ID>
+                    <ToolTip>The variable to use for enumeration</ToolTip>
+                    <Default>Variable</Default>
+                </Literal>
+                <Literal>
+                    <ID>Items</ID>
+                    <ToolTip>A list of items to enumerate</ToolTip>
+                    <Default>Items</Default>
+                </Literal>
+            </Declarations>
+            <Code Language="CMake">
+                <![CDATA[$ForEach$($Variable$ $Items$)
+
+$EndForEach$($Variable$)]]>
+            </Code>
+        </Snippet>
+    </CodeSnippet>
+</CodeSnippets>

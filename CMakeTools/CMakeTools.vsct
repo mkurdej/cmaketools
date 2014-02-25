@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable">
+    <Extern href="vsshlids.h" />
+    <Commands package="guidCMakeTools">
+        <Groups>
+            <Group guid="guidCMakeCmdSet" id="IDG_CMAKETOOLS_CMAKE" priority="0xFF40">
+                <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS" />
+            </Group>
+            <Group guid="guidCMakeCmdSet" id="IDG_CMAKETOOLS_CMAKE_HELP" priority="0x0100">
+                <Parent guid="guidCMakeCmdSet" id="IDM_CMAKETOOLS_CMAKE_HELP" />
+            </Group>
+            <Group guid="guidCMakeCmdSet" id="IDG_CMAKETOOLS_CMAKE_HELP_SPECIFIC" priority="0x0100">
+                <Parent guid="guidCMakeCmdSet" id="IDM_CMAKETOOLS_CMAKE_HELP" />
+            </Group>
+            <Group guid="guidCMakeCmdSet" id="IDG_CMAKETOOLS_CMAKE_HELP_EXTRA" priority="0x0100">
+                <Parent guid="guidCMakeCmdSet" id="IDM_CMAKETOOLS_CMAKE_HELP" />
+            </Group>
+            <Group guid="guidCMakeCmdSet" id="IDG_CMAKETOOLS_CMAKE_HELP_WEB" priority="0x0100">
+                <Parent guid="guidCMakeCmdSet" id="IDM_CMAKETOOLS_CMAKE_HELP" />
+            </Group>
+        </Groups>
+        <Menus>
+            <Menu guid="guidCMakeCmdSet" id="IDM_CMAKETOOLS_CMAKE_HELP" priority="0x0100" type="Menu">
+                <Parent guid="guidCMakeCmdSet" id="IDG_CMAKETOOLS_CMAKE" />
+                <Strings>
+                    <ButtonText>CMake Help</ButtonText>
+                    <CommandName>CMake Help</CommandName>
+                </Strings>
+            </Menu>
+        </Menus>
+        <Buttons>
+            <Button guid="guidCMakeCmdSet" id="cmdidCMake" priority="0x0100" type="Button">
+                <Parent guid="guidCMakeCmdSet" id="IDG_CMAKETOOLS_CMAKE" />
+                <Icon guid="guidImages" id="bmpCMakeLogo" />
+                <Strings>
+                    <CommandName>CMake GUI</CommandName>
+                    <ButtonText>CMake GUI</ButtonText>
+                </Strings>
+            </Button>
+            <Button guid="guidCMakeCmdSet" id="cmdidCMakeHelp" priority="0x0100" type="Button">
+                <Parent guid="guidCMakeCmdSet" id="IDG_CMAKETOOLS_CMAKE_HELP" />
+                <Strings>
+                    <CommandName>CMake Help</CommandName>
+                    <ButtonText>CMake Help</ButtonText>
+                </Strings>
+            </Button>
+            <Button guid="guidCMakeCmdSet" id="cmdidCMakeHelpCommands" priority="0x0100" type="Button">
+                <Parent guid="guidCMakeCmdSet" id="IDG_CMAKETOOLS_CMAKE_HELP_SPECIFIC" />
+                <Strings>
+                    <CommandName>CMake Commands Help</CommandName>
+                    <ButtonText>CMake Commands Help</ButtonText>
+                </Strings>
+            </Button>
+            <Button guid="guidCMakeCmdSet" id="cmdidCMakeHelpModules" priority="0x0100" type="Button">
+                <Parent guid="guidCMakeCmdSet" id="IDG_CMAKETOOLS_CMAKE_HELP_SPECIFIC" />
+                <Strings>
+                    <CommandName>CMake Modules Help</CommandName>
+                    <ButtonText>CMake Modules Help</ButtonText>
+                </Strings>
+            </Button>
+            <Button guid="guidCMakeCmdSet" id="cmdidCMakeHelpProperties" priority="0x0100" type="Button">
+                <Parent guid="guidCMakeCmdSet" id="IDG_CMAKETOOLS_CMAKE_HELP_SPECIFIC" />
+                <Strings>
+                    <CommandName>CMake Properties Help</CommandName>
+                    <ButtonText>CMake Properties Help</ButtonText>
+                </Strings>
+            </Button>
+            <Button guid="guidCMakeCmdSet" id="cmdidCMakeHelpVariables" priority="0x0100" type="Button">
+                <Parent guid="guidCMakeCmdSet" id="IDG_CMAKETOOLS_CMAKE_HELP_SPECIFIC" />
+                <Strings>
+                    <CommandName>CMake Variables Help</CommandName>
+                    <ButtonText>CMake Variables Help</ButtonText>
+                </Strings>
+            </Button>
+            <Button guid="guidCMakeCmdSet" id="cmdidCMakeHelpCPack" priority="0x0100" type="Button">
+                <Parent guid="guidCMakeCmdSet" id="IDG_CMAKETOOLS_CMAKE_HELP_EXTRA" />
+                <Strings>
+                    <CommandName>CPack Help</CommandName>
+                    <ButtonText>CPack Help</ButtonText>
+                </Strings>
+            </Button>
+            <Button guid="guidCMakeCmdSet" id="cmdidCMakeHelpCTest" priority="0x0100" type="Button">
+                <Parent guid="guidCMakeCmdSet" id="IDG_CMAKETOOLS_CMAKE_HELP_EXTRA" />
+                <Strings>
+                    <CommandName>CTest Help</CommandName>
+                    <ButtonText>CTest Help</ButtonText>
+                </Strings>
+            </Button>
+            <Button guid="guidCMakeCmdSet" id="cmdidCMakeHelpWebSite" priority="0x0100" type="Button">
+                <Parent guid="guidCMakeCmdSet" id="IDG_CMAKETOOLS_CMAKE_HELP_WEB" />
+                <Strings>
+                    <CommandName>CMake Web Site</CommandName>
+                    <ButtonText>CMake Web Site</ButtonText>
+                </Strings>
+            </Button>
+        </Buttons>
+        <Bitmaps>
+            <Bitmap guid="guidImages" href="Resources\CMakeLogo.bmp" usedList="bmpCMakeLogo" />
+        </Bitmaps>
+    </Commands>
+    <Symbols>
+        <GuidSymbol name="guidCMakeTools" value="{2986e95d-f97a-45a7-be3e-f07f1a931950}" />
+        <GuidSymbol name="guidCMakeCmdSet" value="{08dcf0dd-678f-4971-b890-05e25674e2fb}">
+            <IDSymbol name="cmdidCMake" value="0x0100" />
+            <IDSymbol name="cmdidCMakeHelp" value="0x0101" />
+            <IDSymbol name="cmdidCMakeHelpCommands" value="0x0102" />
+            <IDSymbol name="cmdidCMakeHelpModules" value="0x0103" />
+            <IDSymbol name="cmdidCMakeHelpProperties" value="0x0104" />
+            <IDSymbol name="cmdidCMakeHelpVariables" value="0x0105" />
+            <IDSymbol name="cmdidCMakeHelpCPack" value="0x0106" />
+            <IDSymbol name="cmdidCMakeHelpCTest" value="0x0107" />
+            <IDSymbol name="cmdidCMakeHelpWebSite" value="0x0108" />
+            <IDSymbol name="IDM_CMAKETOOLS_CMAKE_HELP" value="0x2000" />
+            <IDSymbol name="IDG_CMAKETOOLS_CMAKE" value="0x4000" />
+            <IDSymbol name="IDG_CMAKETOOLS_CMAKE_HELP" value="0x4001" />
+            <IDSymbol name="IDG_CMAKETOOLS_CMAKE_HELP_SPECIFIC" value="0x4002" />
+            <IDSymbol name="IDG_CMAKETOOLS_CMAKE_HELP_EXTRA" value="0x4003" />
+            <IDSymbol name="IDG_CMAKETOOLS_CMAKE_HELP_WEB" value="0x4004" />
+        </GuidSymbol>
+        <GuidSymbol name="guidImages" value="{04fe46f4-4747-486e-81ae-bb9fee1c2ad3}">
+            <IDSymbol name="bmpCMakeLogo" value="1" />
+        </GuidSymbol>
+    </Symbols>
+</CommandTable>

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Product Id="cb0b2014-7d04-46c1-a658-e5d9464960b2" Name="CMake Tools for Visual Studio 1.1" Language="1033" Version="1.1.0.0" Manufacturer="David Golub" UpgradeCode="38709d2b-9fe1-448d-8e5d-c55c1555c620">
+        <Package InstallerVersion="200" Compressed="yes" />
+
+        <Media Id="1" Cabinet="CMakeTools.cab" EmbedCab="yes" />
+
+        <Icon Id="CMakeLogo" SourceFile="dist\CMakeLogo.ico" />
+        
+        <Property Id="ARPPRODUCTICON" Value="CMakeLogo" />
+        <Property Id="ARPURLINFOABOUT" Value="http://cmaketools.codeplex.com" />
+        <PropertyRef Id="VS2010_ROOT_FOLDER" />
+        <PropertyRef Id="VS2010_EXTENSIONS_DIR" />
+        <PropertyRef Id="VS2010DEVENV" />
+        <PropertyRef Id="VS2012_ROOT_FOLDER" />
+        <PropertyRef Id="VS2012_EXTENSIONS_DIR" />
+        <PropertyRef Id="VS2012DEVENV" />
+        <PropertyRef Id="VS2013_ROOT_FOLDER" />
+        <PropertyRef Id="VS2013_EXTENSIONS_DIR" />
+        <PropertyRef Id="VS2013DEVENV" />
+
+        <CustomActionRef Id="VS2012Setup" />
+        <CustomActionRef Id="VS2013Setup" />
+
+        <Condition Message="CMake Tools for Visual Studio requires Visual Studio 2010, Visual Studio 2012 or Visual Studio 2013, none of which was detected on your computer.">
+            VS2010DEVENV OR VS2012DEVENV OR VS2013DEVENV
+        </Condition>
+
+        <Upgrade Id="38709d2b-9fe1-448d-8e5d-c55c1555c620">
+            <UpgradeVersion Minimum="1.0.0.0" Maximum="1.1.0.0" Property="PREVIOUSFOUND" IncludeMinimum="yes" IncludeMaximum="no" />
+        </Upgrade>
+      
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="ProgramMenuFolder" Name="Programs">
+                <Directory Id="ProgramMenuDir" Name="CMake Tools for Visual Studio">
+                    <Component Id="ProgramMenuDir" Guid="03f18875-55d2-4030-98d0-030c5bae7343">
+                        <RemoveFolder Id="ProgramMenuDir" On="uninstall" />
+                        <RegistryValue Root="HKCU" Key="Software\[ProductName]" Type="string" Value="" KeyPath="yes" />
+                    </Component>
+                </Directory>
+            </Directory>
+            <Directory Id="ProgramFilesFolder">
+                <Directory Id="INSTALLLOCATION" Name="CMake Tools for Visual Studio">
+                    <Component Id="CMakeTools" Guid="a286eaec-129e-4e7b-b3dd-a2f0c46448d9">
+                        <File Id="Readme" Name="Readme.html" DiskId="1" Source="Readme.html" KeyPath="yes">
+                            <Shortcut Id="ReadmeShortcut" Directory="ProgramMenuDir" Name="Readme" Advertise="yes" />
+                        </File>
+                    </Component>
+                </Directory>
+            </Directory>
+            <?define VSVersion = 2010 ?>
+            <?define VSMajorVersion = 10 ?>
+            <?define SnippetsIndexGuid = 78cfc6a9-87ad-4bbe-abf3-dc9efb10f8f4 ?>
+            <?define SnippetsGuid = 596d6079-3f57-41d8-9065-5b6487610b27 ?>
+            <?define CMakeToolsGuid = fcf7da9d-a549-47f7-b77d-de710efdab75 ?>
+            <?define CMakeTemplatesGuid = b75e11ae-033a-4011-88db-2e72b937bbba ?>
+            <?include Components.wxi ?>
+            <?undef VSVersion ?>
+            <?undef VSMajorVersion ?>
+            <?undef SnippetsIndexGuid ?>
+            <?undef SnippetsGuid ?>
+            <?undef CMakeToolsGuid ?>
+            <?undef CMakeTemplatesGuid ?>
+            <?define VSVersion = 2012 ?>
+            <?define VSMajorVersion = 11 ?>
+            <?define SnippetsIndexGuid = f88c7690-b6e0-424f-995d-e85e710dfbb5 ?>
+            <?define SnippetsGuid = 3fbf7d1d-e62f-4194-8af3-fd2b86f46f65 ?>
+            <?define CMakeToolsGuid = a2321ddb-a524-49f6-92fa-d339ac822ca7 ?>
+            <?define CMakeTemplatesGuid = e94d6685-484f-43e1-ae7f-cd14fe66ed22 ?>
+            <?include Components.wxi ?>
+            <?undef VSVersion ?>
+            <?undef VSMajorVersion ?>
+            <?undef SnippetsIndexGuid ?>
+            <?undef SnippetsGuid ?>
+            <?undef CMakeToolsGuid ?>
+            <?undef CMakeTemplatesGuid ?>
+            <?define VSVersion = 2013 ?>
+            <?define VSMajorVersion = 12 ?>
+            <?define SnippetsIndexGuid = f8165c13-9732-49b0-a0dd-d702bf127a7d ?>
+            <?define SnippetsGuid = ddd9c1f0-5add-4b3b-8e57-7008436b4c25 ?>
+            <?define CMakeToolsGuid = 6784943b-646c-4a44-b93a-8a91d3a5d5a8 ?>
+            <?define CMakeTemplatesGuid = 8f8d7d4b-846f-4b2d-9f99-8432ef6ce81c ?>
+            <?include Components.wxi ?>
+            <?undef VSVersion ?>
+            <?undef VSMajorVersion ?>
+            <?undef SnippetsIndexGuid ?>
+            <?undef SnippetsGuid ?>
+            <?undef CMakeToolsGuid ?>
+            <?undef CMakeTemplatesGuid ?>
+        </Directory>
+
+        <Feature Id="CMakeTools" Title="CMake Tools for Visual Studio" Description="Syntax highlighting and IntelliSense for CMake in Visual Studio." Level="1" AllowAdvertise="no">
+            <Feature Id="CMakeTools2010" Title="Visual Studio 2010 Extension" Description="Extension for Visual Studio 2010." Level="0" AllowAdvertise="no">
+                <Condition Level="1">VS2010DEVENV</Condition>
+                <ComponentRef Id="CMakeTools2010" />
+                <ComponentRef Id="CMakeTemplates2010" />
+                <ComponentRef Id="CMakeSnippets2010" />
+                <ComponentRef Id="CMakeSnippetsIndex2010" />
+            </Feature>
+            <Feature Id="CMakeTools2012" Title="Visual Studio 2012 Extension" Description="Extension for Visual Studio 2012." Level="0" AllowAdvertise="no">
+                <Condition Level="1">VS2012DEVENV</Condition>
+                <ComponentRef Id="CMakeTools2012" />
+                <ComponentRef Id="CMakeTemplates2012" />
+                <ComponentRef Id="CMakeSnippets2012" />
+                <ComponentRef Id="CMakeSnippetsIndex2012" />
+            </Feature>
+            <Feature Id="CMakeTools2013" Title="Visual Studio 2013 Extension" Description="Extension for Visual Studio 2013." Level="0" AllowAdvertise="no">
+                <Condition Level="1">VS2013DEVENV</Condition>
+                <ComponentRef Id="CMakeTools2013" />
+                <ComponentRef Id="CMakeTemplates2013" />
+                <ComponentRef Id="CMakeSnippets2013" />
+                <ComponentRef Id="CMakeSnippetsIndex2013" />
+            </Feature>
+
+            <ComponentRef Id="CMakeTools" />
+            <ComponentRef Id="ProgramMenuDir" />
+        </Feature>
+
+        <InstallExecuteSequence>
+            <RemoveExistingProducts After="InstallInitialize" />
+            <Custom Action="VS2012Setup" Before="InstallFinalize">
+                <![CDATA[VS2012DEVENV AND (&CMakeTools2012 > 0)]]>
+            </Custom>
+            <Custom Action="VS2013Setup" Before="InstallFinalize">
+                <![CDATA[VS2013DEVENV AND (&CMakeTools2013 > 0)]]>
+            </Custom>
+        </InstallExecuteSequence>
+
+        <UI>
+            <ProgressText Action="VS2012Setup" Template="[1]">Updating Visual Studio 2012 registration</ProgressText>
+            <ProgressText Action="VS2013Setup" Template="[1]">Updating Visual Studio 2013 registration</ProgressText>
+        </UI>
+        
+        <UIRef Id="WixUI_Mondo" />
+        <UIRef Id="WixUI_ErrorProgressText" />
+
+        <WixVariable Id="WixUILicenseRtf" Value="dist\License.rtf" />
+    </Product>
+</Wix>
