@@ -262,7 +262,7 @@ namespace CMakeTools
                 CMakeParsing.ParseForToken(Source.GetLines(), line, col, out tokenData))
             {
                 string text = Source.GetText(tokenData.TokenInfo.ToTextSpan(line));
-                string htmlFile = null;
+                string[] htmlFiles = null;
                 switch ((CMakeToken)tokenData.TokenInfo.Token)
                 {
                 case CMakeToken.Keyword:
@@ -270,12 +270,19 @@ namespace CMakeTools
                     {
                         if (CMakeKeywords.IsDeprecated(CMakeKeywords.GetCommandId(text)))
                         {
-                            htmlFile = "cmake-compatcommands.html#command:" +
-                                text.ToLower();
+                            htmlFiles = new string[]
+                            {
+                                "html\\command\\" + text.ToLower() + ".html",
+                                "cmake-compatcommands.html#command:" + text.ToLower()
+                            };
                         }
                         else
                         {
-                            htmlFile = "cmake-commands.html#command:" + text.ToLower();
+                            htmlFiles = new string[]
+                            {
+                                "html\\command\\" + text.ToLower() + ".html",
+                                "cmake-commands.html#command:" + text.ToLower()
+                            };
                         }
                     }
                     break;
@@ -283,23 +290,35 @@ namespace CMakeTools
                     if (CMakeVariableDeclarations.IsStandardVariable(text,
                         CMakeVariableType.Variable))
                     {
-                        htmlFile = "cmake-variables.html#variable:" + text;
+                        htmlFiles = new string[]
+                        {
+                            "html\\variable\\" + text + ".html",
+                            "cmake-variables.html#variable:" + text
+                        };
                     }
                     break;
                 case CMakeToken.Identifier:
                     if (tokenData.Command == CMakeCommandId.Include)
                     {
-                        htmlFile = "cmake-modules.html#module:" + text;
+                        htmlFiles = new string[]
+                        {
+                            "html\\module\\" + text + ".html",
+                            "cmake-modules.html#module:" + text
+                        };
                     }
                     else if (tokenData.Command == CMakeCommandId.FindPackage)
                     {
-                        htmlFile = "cmake-modules.html#module:Find" + text;
+                        htmlFiles = new string[]
+                        {
+                            "html\\module\\Find" + text + ".html",
+                            "cmake-modules.html#module:Find" + text
+                        };
                     }
                     break;
                 }
-                if (htmlFile != null)
+                if (htmlFiles != null)
                 {
-                    CMakePackage.Instance.OpenCMakeHelpPage(htmlFile);
+                    CMakePackage.Instance.OpenCMakeHelpPage(htmlFiles);
                 }
             }
         }

@@ -229,7 +229,10 @@ namespace CMakeTools
                 foreach (string fileName in fileNames)
                 {
                     string absolutePath = Path.Combine(location, fileName);
-                    if (File.Exists(absolutePath))
+                    int hashPos = absolutePath.IndexOf('#');
+                    string strippedPath =
+                        hashPos >= 0 ? absolutePath.Substring(0, hashPos) : absolutePath;
+                    if (File.Exists(strippedPath))
                     {
                         OpenWebPage(absolutePath);
                         break;
