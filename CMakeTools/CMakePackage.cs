@@ -95,19 +95,20 @@ namespace CMakeTools
             if (mcs != null)
             {
                 RegisterMenuCallback(mcs, CMakeCmdIds.cmdidCMake, CMakeMenuCallback);
-                RegisterHelpMenuCallback(mcs, CMakeCmdIds.cmdidCMakeHelp, "cmake.html");
+                RegisterHelpMenuCallback(mcs, CMakeCmdIds.cmdidCMakeHelp,
+                    "html\\index.html", "cmake.html");
                 RegisterHelpMenuCallback(mcs, CMakeCmdIds.cmdidCMakeHelpCommands,
-                    "cmake-commands.html");
+                    "html\\manual\\cmake-commands.7.html", "cmake-commands.html");
                 RegisterHelpMenuCallback(mcs, CMakeCmdIds.cmdidCMakeHelpModules,
-                    "cmake-modules.html");
+                    "html\\manual\\cmake-modules.7.html", "cmake-modules.html");
                 RegisterHelpMenuCallback(mcs, CMakeCmdIds.cmdidCMakeHelpProperties,
-                    "cmake-properties.html");
+                    "html\\manual\\cmake-properties.7.html", "cmake-properties.html");
                 RegisterHelpMenuCallback(mcs, CMakeCmdIds.cmdidCMakeHelpVariables,
-                    "cmake-variables.html");
+                    "html\\manual\\cmake-variables.7.html", "cmake-variables.html");
                 RegisterHelpMenuCallback(mcs, CMakeCmdIds.cmdidCMakeHelpCPack,
-                    "cpack.html");
+                    "html\\manual\\cpack.1.html", "cpack.html");
                 RegisterHelpMenuCallback(mcs, CMakeCmdIds.cmdidCMakeHelpCTest,
-                    "ctest.html");
+                    "html\\manual\\ctest.1.html", "ctest.html");
                 RegisterMenuCallback(mcs, CMakeCmdIds.cmdidCMakeHelpWebSite,
                     CMakeHelpWebSiteMenuCallback);
             }
@@ -143,11 +144,11 @@ namespace CMakeTools
         }
         
         private void RegisterHelpMenuCallback(OleMenuCommandService mcs, uint cmdid,
-            string htmlFile)
+            params string[] htmlFiles)
         {
             // Register a callback to open the specified HTML file in the CMake
             // documentation directory when the specified menu command is selected.
-            RegisterMenuCallback(mcs, cmdid, (sender, e) => OpenCMakeHelpPage(htmlFile));
+            RegisterMenuCallback(mcs, cmdid, (sender, e) => OpenCMakeHelpPage(htmlFiles));
         }
 
         private void CMakeMenuCallback(object sender, EventArgs e)
@@ -216,7 +217,7 @@ namespace CMakeTools
         /// browser.
         /// </summary>
         /// <param name="fileName">The name of HTML file to open.</param>
-        public void OpenCMakeHelpPage(string fileName)
+        public void OpenCMakeHelpPage(params string[] fileNames)
         {
             // Attempt to find CMake in the registry.
             string location = CMakePath.FindCMakeHelp();
@@ -225,8 +226,15 @@ namespace CMakeTools
             // Visual Studio's built-in web browser.
             if (location != null)
             {
-                string absolutePath = Path.Combine(location, fileName);
-                OpenWebPage(absolutePath);
+                foreach (string fileName in fileNames)
+                {
+                    string absolutePath = Path.Combine(location, fileName);
+                    if (File.Exists(absolutePath))
+                    {
+                        OpenWebPage(absolutePath);
+                        break;
+                    }
+                }
             }
             else
             {
