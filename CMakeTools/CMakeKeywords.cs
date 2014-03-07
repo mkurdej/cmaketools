@@ -291,7 +291,10 @@ namespace CMakeTools
         // Array of keywords used with the ADD_EXECUTABLE command.
         private static readonly string[] _addExecutableKeywords = new string[]
         {
+            "ALIAS",
             "EXCLUDE_FROM_ALL",
+            "GLOBAL",
+            "IMPORTED",
             "MACOSX_BUNDLE",
             "WIN32"
         };
@@ -299,9 +302,13 @@ namespace CMakeTools
         // Array of keywords used with the ADD_LIBRARY command.
         private static readonly string[] _addLibraryKeywords = new string[]
         {
+            "ALIAS",
             "EXCLUDE_FROM_ALL",
+            "GLOBAL",
             "IMPORTED",
+            "INTERFACE",
             "MODULE",
+            "OBJECT",
             "SHARED",
             "STATIC",
             "UNKNOWN"
@@ -429,6 +436,8 @@ namespace CMakeTools
         private static readonly string[] _exportKeywords = new string[]
         {
             "APPEND",
+            "EXPORT",
+            "EXPORT_LINK_INTERFACE_LIBRARIES",
             "FILE",
             "NAMESPACE",
             "PACKAGE",
@@ -544,9 +553,11 @@ namespace CMakeTools
         {
             "CMAKE_FIND_ROOT_PATH_BOTH",
             "COMPONENTS",
+            "CONFIG",
             "CONFIGS",
             "EXACT",
             "HINTS",
+            "MODULE",
             "NAMES",
             "NO_CMAKE_BUILDS_PATH",
             "NO_CMAKE_ENVIRONMENT_PATH",
@@ -560,6 +571,7 @@ namespace CMakeTools
             "NO_POLICY_SCOPE",
             "NO_SYSTEM_ENVIRONMENT_PATH",
             "ONLY_CMAKE_FIND_ROOT_PATH",
+            "OPTIONAL_COMPONENTS",
             "PATH_SUFFIXES",
             "PATHS",
             "QUIET",
@@ -685,6 +697,7 @@ namespace CMakeTools
             "DIRECTORY_PERMISSIONS",
             "EXCLUDE",
             "EXPORT",
+            "EXPORT_LINK_INTERFACE_LIBRARIES",
             "FILE",
             "FILE_PERMISSIONS",
             "FILES",
@@ -693,6 +706,7 @@ namespace CMakeTools
             "GROUP_EXECUTE",
             "GROUP_READ",
             "GROUP_WRITE",
+            "INCLUDES",
             "LIBRARY",
             "NAMELINK_ONLY",
             "NAMELINK_SKIP",
@@ -706,6 +720,7 @@ namespace CMakeTools
             "PRIVATE_HEADER",
             "PROGRAMS",
             "PUBLIC_HEADER",
+            "REGEX",
             "RENAME",
             "RESOURCE",
             "RUNTIME",
@@ -780,6 +795,7 @@ namespace CMakeTools
         private static readonly string[] _messageKeywords = new string[]
         {
             "AUTHOR_WARNING",
+            "DEPRECATION",
             "FATAL_ERROR",
             "SEND_ERROR",
             "STATUS",
@@ -791,6 +807,13 @@ namespace CMakeTools
         {
             "OFF",
             "ON"
+        };
+
+        // Array of keywords used with the PROJECT command.
+        private static readonly string[] _projectKeywords = new string[]
+        {
+            "LANGUAGES",
+            "VERSION"
         };
 
         // Array of keywords used with the SEPARATE_ARGUMENTS command.
@@ -954,7 +977,8 @@ namespace CMakeTools
         // Array of keywords used with the UNSET command.
         private static readonly string[] _unsetKeywords = new string[]
         {
-            "CACHE"
+            "CACHE",
+            "PARENT_SCOPE"
         };
 
         // Array of keywords used with the WRITE_FILE command.
@@ -985,7 +1009,6 @@ namespace CMakeTools
         private static readonly string[] _macroKeywords = null;
         private static readonly string[] _makeDirectoryKeywords = null;
         private static readonly string[] _outputRequiredFilesKeywords = null;
-        private static readonly string[] _projectKeywords = null;
         private static readonly string[] _qtWrapCppKeywords = null;
         private static readonly string[] _qtWrapUiKeywords = null;
         private static readonly string[] _removeKeywords = null;
