@@ -341,8 +341,16 @@ namespace CMakeTools
         private static readonly string[] _cmakeHostSystemInformationKeywords =
             new string[]
         {
+            "AVAILABLE_PHYSICAL_MEMORY",
+            "AVAILABLE_VIRTUAL_MEMORY",
+            "FQDN",
+            "HOSTNAME",
+            "NUMBER_OF_LOGICAL_CORES",
+            "NUMBER_OF_PHYSICAL_CORES",
             "QUERY",
-            "RESULT"
+            "RESULT",
+            "TOTAL_PHYSICAL_MEMORY",
+            "TOTAL_VIRTUAL_MEMORY"
         };
 
         // Array of keywords used with the CMAKE_MINIMUM_REQUIRED command.
