@@ -61,7 +61,9 @@ namespace CMakeTools
             { CMakeCommandId.SetDirectoryProperties,    CreateSetXPropertyDeclarations },
             { CMakeCommandId.GetProperty,               CreateGetPropertyDeclarations },
             { CMakeCommandId.SetProperty,               CreateSetPropertyDeclarations },
-            { CMakeCommandId.GetFileNameComponent,      CreateGetFileNameComponentDeclarations }
+            { CMakeCommandId.GetFileNameComponent,      CreateGetFileNameComponentDeclarations },
+            { CMakeCommandId.CMakeHostSystemInformation,
+                CreateCMakeHostSystemInformationDeclarations }
         };
 
         // Map from SET_*_PROPERTIES commands to factory methods to create declarations
@@ -91,6 +93,19 @@ namespace CMakeTools
             "MODULE",
             "SHARED",
             "STATIC"
+        };
+
+        // Keys for use with the CMAKE_HOST_SYSTEM_INFORMATION command.
+        private static readonly string[] _cmakeHostSystemInformationKeys = new string[]
+        {
+            "AVAILABLE_PHYSICAL_MEMORY",
+            "AVAILABLE_VIRTUAL_MEMORY",
+            "FQDN",
+            "HOSTNAME",
+            "NUMBER_OF_LOGICAL_CORES",
+            "NUMBER_OF_PHYSICAL_CORES",
+            "TOTAL_PHYSICAL_MEMORY",
+            "TOTAL_VIRTUAL_MEMORY"
         };
 
         // File name components for use with the GET_FILENAME_COMPONENT command.
@@ -435,6 +450,20 @@ namespace CMakeTools
             }
             CMakeItemDeclarations decls = new CMakeItemDeclarations();
             decls.AddItems(_getFileNameComponentComponents,
+                CMakeItemDeclarations.ItemType.Command);
+            return decls;
+        }
+
+        private static CMakeItemDeclarations CreateCMakeHostSystemInformationDeclarations(
+            CMakeCommandId id, ParseRequest req, Source source,
+            List<string> priorParameters)
+        {
+            if (priorParameters.Count != 3 || priorParameters[2] != "QUERY")
+            {
+                return null;
+            }
+            CMakeItemDeclarations decls = new CMakeItemDeclarations();
+            decls.AddItems(_cmakeHostSystemInformationKeys,
                 CMakeItemDeclarations.ItemType.Command);
             return decls;
         }
