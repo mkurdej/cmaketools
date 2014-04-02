@@ -1666,13 +1666,15 @@ namespace CMakeTools
                 else
                 {
                     if (CMakeScanner.InsideParens(state) ||
-                        CMakeScanner.GetStringFlag(state))
+                        CMakeScanner.GetStringFlag(state) ||
+                        CMakeScanner.GetBracketCommentFlag(state))
                     {
                         return false;
                     }
                     while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
                     return CMakeScanner.InsideParens(state) &&
-                        !CMakeScanner.GetStringFlag(state);
+                        !CMakeScanner.GetStringFlag(state) &&
+                        !CMakeScanner.GetBracketCommentFlag(state);
                 }
                 i++;
             }
@@ -1723,9 +1725,11 @@ namespace CMakeTools
                     bool wasInParens = CMakeScanner.InsideParens(state);
                     bool wasInString = CMakeScanner.GetStringFlag(state);
                     while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
-                    if (CMakeScanner.GetStringFlag(state))
+                    if (CMakeScanner.GetStringFlag(state) ||
+                        CMakeScanner.GetBracketCommentFlag(state))
                     {
-                        // Inside multiline strings, always unindent all the way.
+                        // Inside multiline strings and bracket comments, always unindent
+                        // all the way.
                         lineToMatch = -1;
                         return true;
                     }

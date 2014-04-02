@@ -98,6 +98,14 @@ namespace CMakeTools
                 _lastWhitespace = false;
                 return true;
             }
+            if (GetBracketCommentFlag(state) && _offset < _source.Length)
+            {
+                // If the line begins inside a bracket comment token, begin by scanning
+                // the rest of the bracket comment.
+                ScanBracketComment(tokenInfo, ref state);
+                _lastWhitespace = true;
+                return true;
+            }
 
             bool originalScannedNonWhitespace = _scannedNonWhitespace;
             bool originalLastWhitespace = _lastWhitespace;
@@ -138,7 +146,7 @@ namespace CMakeTools
                                         SetNeedSubcommandFlag(ref state, false);
                                         tokenInfo.Trigger = TokenTriggers.ParameterStart;
                                     }
-                                    else
+                                    else if (!originalLastWhitespace)
                                     {
                                         tokenInfo.Trigger = TokenTriggers.ParameterNext;
                                     }
@@ -147,8 +155,12 @@ namespace CMakeTools
                             else if (id == CMakeCommandId.Unspecified ||
                                 GetSeparatorCount(state) > 0)
                             {
-                                SetSeparatorCount(ref state, GetSeparatorCount(state) - 1);
-                                tokenInfo.Trigger = TokenTriggers.ParameterNext;
+                                if (!originalLastWhitespace)
+                                {
+                                    SetSeparatorCount(ref state,
+                                        GetSeparatorCount(state) - 1);
+                                    tokenInfo.Trigger = TokenTriggers.ParameterNext;
+                                }
                             }
                         }
                         if (CMakeKeywords.TriggersMemberSelection(id) ||
@@ -163,6 +175,23 @@ namespace CMakeTools
                 }
                 else if (_source[_offset] == '#')
                 {
+                    // Check if it's a bracket comment.  If so, handle it specially.
+                    if (_offset + 1 < _source.Length && _source[_offset + 1] == '[')
+                    {
+                        int i = _offset + 2;
+                        while (i < _source.Length && _source[i] == '=')
+                        {
+                            i++;
+                        }
+                        if (i < _source.Length && _source[i] == '[')
+                        {
+                            SetBracketCommentFlag(ref state, true);
+                            ScanBracketComment(tokenInfo, ref state);
+                            _lastWhitespace = true;
+                            return true;
+                        }
+                    }
+
                     // Scan a comment token.
                     tokenInfo.StartIndex = _offset;
                     int endPos = _source.IndexOf('\n', _offset);
@@ -495,6 +524,43 @@ namespace CMakeTools
             }
         }
 
+        private void ScanBracketComment(TokenInfo tokenInfo, ref int state)
+        {
+            // Scan until reaching the end of the bracket comment, delimited by a
+            // closing square bracket, followed by zero or more equals sign, followed by
+            // another closing square bracket.
+            tokenInfo.StartIndex = _offset;
+            tokenInfo.Color = TokenColor.Comment;
+            tokenInfo.Token = (int)CMakeToken.Comment;
+            bool hasFirstBracket = false;
+            while (_offset < _source.Length)
+            {
+                switch (_source[_offset])
+                {
+                case ']':
+                    if (!hasFirstBracket)
+                    {
+                        hasFirstBracket = true;
+                    }
+                    else
+                    {
+                        tokenInfo.EndIndex = _offset;
+                        _offset++;
+                        SetBracketCommentFlag(ref state, false);
+                        return;
+                    }
+                    break;
+                case '=':
+                    break;
+                default:
+                    hasFirstBracket = false;
+                    break;
+                }
+                _offset++;
+            }
+            tokenInfo.EndIndex = _offset;
+        }
+
         private bool ScanFileNameChar()
         {
             // Attempt to scan a single character that may be valid in a file name but
@@ -524,13 +590,14 @@ namespace CMakeTools
         private const int NoSeparatorFlag        = 0x40000000;
         private const int NeedSubcommandFlag     = 0x20000000;
         private const int SubcommandParmsFlag    = 0x10000000;
-        private const int VariableDepthMask      = 0x0F000000;
-        private const int ParenDepthMask         = 0x00F00000;
-        private const int SeparatorCountMask     = 0x000F0000;
-        private const int LastCommandMask        = 0x0000FFFF;
-        private const int VariableDepthShift     = 24;
-        private const int ParenDepthShift        = 20;
-        private const int SeparatorCountShift    = 16;
+        private const int BracketCommentFlag     = 0x08000000;
+        private const int VariableDepthMask      = 0x00F00000;
+        private const int ParenDepthMask         = 0x000F0000;
+        private const int SeparatorCountMask     = 0x0000F000;
+        private const int LastCommandMask        = 0x00000FFF;
+        private const int VariableDepthShift     = 20;
+        private const int ParenDepthShift        = 16;
+        private const int SeparatorCountShift    = 12;
 
         public static CMakeCommandId GetLastCommand(int state)
         {
@@ -595,6 +662,23 @@ namespace CMakeTools
         {
             state &= ~VariableDepthMask;
             state |= (depth << VariableDepthShift) & VariableDepthMask;
+        }
+
+        public static bool GetBracketCommentFlag(int state)
+        {
+            return (state & BracketCommentFlag) != 0;
+        }
+
+        private static void SetBracketCommentFlag(ref int state, bool flag)
+        {
+            if (flag)
+            {
+                state |= BracketCommentFlag;
+            }
+            else
+            {
+                state &= ~BracketCommentFlag;
+            }
         }
 
         private static bool GetSubcommandParmsFlag(int state)
