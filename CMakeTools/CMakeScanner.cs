@@ -558,7 +558,7 @@ namespace CMakeTools
                 }
                 _offset++;
             }
-            tokenInfo.EndIndex = _offset;
+            tokenInfo.EndIndex = _source.Length - 1;
         }
 
         private bool ScanFileNameChar()
