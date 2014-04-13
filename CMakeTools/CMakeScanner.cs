@@ -36,7 +36,8 @@ namespace CMakeTools
         VariableStartSetEnv,
         VariableEnd,
         OpenParen,
-        CloseParen
+        CloseParen,
+        BracketArgument
     }
 
     /// <summary>
@@ -98,11 +99,13 @@ namespace CMakeTools
                 _lastWhitespace = false;
                 return true;
             }
-            if (GetBracketCommentFlag(state) && _offset < _source.Length)
+            bool bracketComment = GetBracketCommentFlag(state);
+            bool bracketArgument = GetBracketArgumentFlag(state);
+            if ((bracketComment || bracketArgument) && _offset < _source.Length)
             {
                 // If the line begins inside a bracket comment token, begin by scanning
                 // the rest of the bracket comment.
-                ScanBracketComment(tokenInfo, ref state);
+                ScanBracketCommentOrArgument(tokenInfo, bracketComment, ref state);
                 _lastWhitespace = true;
                 return true;
             }
@@ -186,7 +189,7 @@ namespace CMakeTools
                         if (i < _source.Length && _source[i] == '[')
                         {
                             SetBracketCommentFlag(ref state, true);
-                            ScanBracketComment(tokenInfo, ref state);
+                            ScanBracketCommentOrArgument(tokenInfo, true, ref state);
                             _lastWhitespace = true;
                             return true;
                         }
@@ -459,6 +462,22 @@ namespace CMakeTools
                     _offset++;
                     return true;
                 }
+                else if (_source[_offset] == '[')
+                {
+                    // Scan a bracket argument, if it is one.
+                    int i = _offset + 1;
+                    while (i < _source.Length && _source[i] == '=')
+                    {
+                        i++;
+                    }
+                    if (i < _source.Length && _source[i] == '[')
+                    {
+                        SetBracketArgumentFlag(ref state, true);
+                        ScanBracketCommentOrArgument(tokenInfo, false, ref state);
+                        _lastWhitespace = false;
+                        return true;
+                    }
+                }
                 _offset++;
             }
             return false;
@@ -524,14 +543,16 @@ namespace CMakeTools
             }
         }
 
-        private void ScanBracketComment(TokenInfo tokenInfo, ref int state)
+        private void ScanBracketCommentOrArgument(TokenInfo tokenInfo, bool isComment,
+            ref int state)
         {
             // Scan until reaching the end of the bracket comment, delimited by a
             // closing square bracket, followed by zero or more equals sign, followed by
             // another closing square bracket.
             tokenInfo.StartIndex = _offset;
-            tokenInfo.Color = TokenColor.Comment;
-            tokenInfo.Token = (int)CMakeToken.Comment;
+            tokenInfo.Color = isComment ? TokenColor.Comment : TokenColor.String;
+            tokenInfo.Token = isComment ? (int)CMakeToken.Comment :
+                (int)CMakeToken.BracketArgument;
             bool hasFirstBracket = false;
             while (_offset < _source.Length)
             {
@@ -546,7 +567,14 @@ namespace CMakeTools
                     {
                         tokenInfo.EndIndex = _offset;
                         _offset++;
-                        SetBracketCommentFlag(ref state, false);
+                        if (isComment)
+                        {
+                            SetBracketCommentFlag(ref state, false);
+                        }
+                        else
+                        {
+                            SetBracketArgumentFlag(ref state, false);
+                        }
                         return;
                     }
                     break;
@@ -591,6 +619,7 @@ namespace CMakeTools
         private const int NeedSubcommandFlag     = 0x20000000;
         private const int SubcommandParmsFlag    = 0x10000000;
         private const int BracketCommentFlag     = 0x08000000;
+        private const int BracketArgumentFlag    = 0x04000000;
         private const int VariableDepthMask      = 0x00F00000;
         private const int ParenDepthMask         = 0x000F0000;
         private const int SeparatorCountMask     = 0x0000F000;
@@ -678,6 +707,23 @@ namespace CMakeTools
             else
             {
                 state &= ~BracketCommentFlag;
+            }
+        }
+
+        public static bool GetBracketArgumentFlag(int state)
+        {
+            return (state & BracketArgumentFlag) != 0;
+        }
+
+        private static void SetBracketArgumentFlag(ref int state, bool flag)
+        {
+            if (flag)
+            {
+                state |= BracketArgumentFlag;
+            }
+            else
+            {
+                state &= ~BracketArgumentFlag;
             }
         }
 
