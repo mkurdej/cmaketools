@@ -862,5 +862,52 @@ namespace CMakeTools
             Assert.AreEqual(CMakeToken.Comment, (CMakeToken)tokenInfo.Token);
             Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
         }
+
+        /// <summary>
+        /// Test scanning bracket arguments.
+        /// </summary>
+        [TestMethod]
+        public void TestBracketArguments()
+        {
+            CMakeScanner scanner = new CMakeScanner();
+            TokenInfo tokenInfo = new TokenInfo();
+            int state;
+
+            scanner.SetSource("[[foo]]", 0);
+            state = 0;
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(0, tokenInfo.StartIndex);
+            Assert.AreEqual(6, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.BracketArgument, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+
+            scanner.SetSource("[==[foo]==]", 0);
+            state = 0;
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(0, tokenInfo.StartIndex);
+            Assert.AreEqual(10, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.BracketArgument, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+
+            scanner.SetSource("[[foo", 0);
+            state = 0;
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(0, tokenInfo.StartIndex);
+            Assert.AreEqual(4, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.BracketArgument, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+            scanner.SetSource("abc def ghi", 0);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(0, tokenInfo.StartIndex);
+            Assert.AreEqual(10, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.BracketArgument, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+            scanner.SetSource("bar]]", 0);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(0, tokenInfo.StartIndex);
+            Assert.AreEqual(4, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.BracketArgument, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+        }
     }
 }
