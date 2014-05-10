@@ -126,7 +126,8 @@ namespace CMakeTools
                 }
             }
             if (req.Reason == ParseReason.MemberSelect ||
-                req.Reason == ParseReason.MemberSelectAndHighlightBraces)
+                req.Reason == ParseReason.MemberSelectAndHighlightBraces ||
+                req.Reason == ParseReason.CompleteWord)
             {
                 // Set an appropriate declarations object depending on the token that
                 // triggered member selection.
