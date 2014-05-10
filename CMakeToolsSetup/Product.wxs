@@ -23,7 +23,7 @@
         <CustomActionRef Id="VS2013Setup" />
 
         <Condition Message="CMake Tools for Visual Studio requires Visual Studio 2010, Visual Studio 2012 or Visual Studio 2013, none of which was detected on your computer.">
-            VS2010DEVENV OR VS2012DEVENV OR VS2013DEVENV
+            VS2010DEVENV OR VS2012DEVENV OR VS2013DEVENV OR Installed
         </Condition>
 
         <Upgrade Id="38709d2b-9fe1-448d-8e5d-c55c1555c620">
