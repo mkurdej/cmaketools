@@ -180,6 +180,17 @@ namespace CMakeTools
             Assert.AreEqual(CMakeToken.FileName, (CMakeToken)tokenInfo.Token);
             Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
             Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+
+            // Test that a file name starting with an escape sequence is handled
+            // correctly.
+            scanner.SetSource("\\\"foo.cpp\\\"", 0);
+            state = 0;
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(0, tokenInfo.StartIndex);
+            Assert.AreEqual(10, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.FileName, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+            Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
         }
 
         /// <summary>

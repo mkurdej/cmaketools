@@ -277,12 +277,19 @@ namespace CMakeTools
                     _offset++;
                     return true;
                 }
-                else if (char.IsLetter(_source[_offset]) || _source[_offset] == '_')
+                else if (char.IsLetter(_source[_offset]) || _source[_offset] == '_' ||
+                    (originalVariableDepth == 0 && _source[_offset] == '\\'))
                 {
                     // Scan a keyword, identifier, or file name token.
                     bool isFileName = false;
                     bool isNumeric = false;
                     tokenInfo.StartIndex = _offset;
+                    if (_source[_offset] == '\\' && _offset != _source.Length - 1)
+                    {
+                        // If the identifier starts with an escape sequence, skip over it.
+                        _offset++;
+                        isFileName = true;
+                    }
                     while (_offset < _source.Length - 1)
                     {
                         char ch = _source[_offset + 1];
