@@ -641,7 +641,9 @@ namespace CMakeTools
             lines.Add("function(");
             lines.Add("  foo");
             lines.Add("  a # first parameter");
-            lines.Add("  b # second parameter");
+            lines.Add("  b #[[ second parameter");
+            lines.Add("         bracket comment");
+            lines.Add("         end]]");
             lines.Add("  c)");
             result = CMakeParsing.ParseForParameterNames(lines, "foo");
             Assert.IsNotNull(result);
@@ -739,6 +741,24 @@ namespace CMakeTools
             Assert.AreEqual(38, result.EndSpan.Value.iStartIndex);
             Assert.AreEqual(0, result.EndSpan.Value.iEndLine);
             Assert.AreEqual(38, result.EndSpan.Value.iEndIndex);
+
+            // Test a command with a bracket comment in the middle.
+            lines.Clear();
+            lines.Add("add_executable(foo #[[bracket comment]] foo.cpp bar.cpp)");
+            result = CMakeParsing.ParseForParameterInfo(lines, 0, 55);
+            Assert.IsNotNull(result.CommandName);
+            Assert.AreEqual("add_executable", result.CommandName);
+            Assert.IsNull(result.SubcommandName);
+            Assert.IsTrue(result.CommandSpan.HasValue);
+            Assert.AreEqual(0, result.CommandSpan.Value.iStartLine);
+            Assert.AreEqual(0, result.CommandSpan.Value.iStartIndex);
+            Assert.AreEqual(0, result.CommandSpan.Value.iEndLine);
+            Assert.AreEqual(13, result.CommandSpan.Value.iEndIndex);
+            Assert.IsTrue(result.BeginSpan.HasValue);
+            Assert.AreEqual(0, result.BeginSpan.Value.iStartLine);
+            Assert.AreEqual(14, result.BeginSpan.Value.iStartIndex);
+            Assert.AreEqual(0, result.BeginSpan.Value.iEndLine);
+            Assert.AreEqual(14, result.BeginSpan.Value.iEndIndex);
 
             // Test a user-defined function.
             lines.Clear();
@@ -1052,6 +1072,14 @@ namespace CMakeTools
             Assert.AreEqual(1, targets.Count);
             Assert.AreEqual("foo", targets[0]);
 
+            // Test parsing a target with bracket comments in the middle.
+            lines.Clear();
+            lines.Add("add_executable(#[[comment]] foo #[[comment]] foo.cpp)");
+            targets = CMakeParsing.ParseForTargetNames(lines);
+            Assert.IsNotNull(targets);
+            Assert.AreEqual(1, targets.Count);
+            Assert.AreEqual("foo", targets[0]);
+
             // Test parsing a target with an illegal line break.  This should fail.
             lines.Clear();
             lines.Add("add_executable");
@@ -1236,14 +1264,16 @@ namespace CMakeTools
             lines.Add("  C)");
             lines.Add("include( # comment");
             lines.Add("  D)");
+            lines.Add("include(#[[comment]] E #[[comment]])");
             lines.Add("find_package(Foo)");
             List<string> includes = CMakeParsing.ParseForIncludes(lines);
-            Assert.AreEqual(5, includes.Count);
+            Assert.AreEqual(6, includes.Count);
             Assert.AreEqual("A", includes[0]);
             Assert.AreEqual("B", includes[1]);
             Assert.AreEqual("C", includes[2]);
             Assert.AreEqual("D", includes[3]);
-            Assert.AreEqual("FindFoo", includes[4]);
+            Assert.AreEqual("E", includes[4]);
+            Assert.AreEqual("FindFoo", includes[5]);
         }
 
         /// <summary>
@@ -1534,6 +1564,7 @@ namespace CMakeTools
             lines.Add("SET(FOO BAR)");
             lines.Add("# comment");
             lines.Add("SET(FOO) # comment");
+            lines.Add("SET(#[[comment]] FOO)");
             List<CMakeErrorInfo> info = CMakeParsing.ParseForBadCommands(lines);
             Assert.AreEqual(0, info.Count);
 
