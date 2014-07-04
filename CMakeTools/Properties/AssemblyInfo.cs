@@ -20,5 +20,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("Copyright (C) 2012-2014 by David Golub.  All rights reserved.")]
 [assembly: AssemblyTrademark("CMake is a trademark of Kitware, Inc.  Used with permission.")]
 [assembly: ComVisible(false)]
-[assembly: AssemblyVersion("1.1.0.0")]
-[assembly: AssemblyFileVersion("1.1.0.0")]
+[assembly: AssemblyVersion("1.2.0.0")]
+[assembly: AssemblyFileVersion("1.2.0.0")]

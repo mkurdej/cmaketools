@@ -19,5 +19,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct("CMake Tools for Visual Studio")]
 [assembly: AssemblyCopyright("Copyright (C) 2012-2014 by David Golub.  All rights reserved.")]
 [assembly: ComVisible(false)]
-[assembly: AssemblyVersion("1.1.0.0")]
-[assembly: AssemblyFileVersion("1.1.0.0")]
+[assembly: AssemblyVersion("1.2.0.0")]
+[assembly: AssemblyFileVersion("1.2.0.0")]
