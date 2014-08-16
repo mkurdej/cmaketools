@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<SnippetCollection>
+    <Language Lang="CMake" Guid="{2986e95d-f97a-45a7-be3e-f07f1a931950}">
+        <SnippetDir>
+            <OnOff>On</OnOff>
+            <Installed>true</Installed>
+            <Locale>1033</Locale>
+            <DirPath>%InstallRoot%\CMake\Snippets\%LCID%\Snippets\</DirPath>
+            <LocalizedName>Snippets</LocalizedName>
+        </SnippetDir>
+    </Language>
+</SnippetCollection>

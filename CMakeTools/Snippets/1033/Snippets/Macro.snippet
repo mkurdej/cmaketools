@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+    <CodeSnippet Format="1.0.0">
+        <Header>
+            <Title>MACRO</Title>
+            <Shortcut>MACRO</Shortcut>
+            <Description>A CMake macro</Description>
+            <Author>David Golub</Author>
+            <SnippetTypes>
+                <SnippetType>Expansion</SnippetType>
+            </SnippetTypes>
+        </Header>
+        <Snippet>
+            <Declarations>
+                <Literal Editable="false">
+                    <ID>Macro</ID>
+                    <Function>ToCommandCase(MACRO)</Function>
+                    <Default>MACRO</Default>
+                </Literal>
+                <Literal Editable="false">
+                    <ID>EndMacro</ID>
+                    <Function>ToCommandCase(ENDMACRO)</Function>
+                    <Default>ENDMACRO</Default>
+                </Literal>
+                <Literal>
+                    <ID>Name</ID>
+                    <ToolTip>The name of the macro</ToolTip>
+                    <Default>Name</Default>
+                </Literal>
+                <Literal>
+                    <ID>Parameters</ID>
+                    <ToolTip>The macro's parameters</ToolTip>
+                    <Default>Parameters</Default>
+                </Literal>
+            </Declarations>
+            <Code Language="CMake">
+                <![CDATA[$Macro$($Name$ $Parameters$)
+
+$EndMacro$($Name$)]]>
+            </Code>
+        </Snippet>
+    </CodeSnippet>
+</CodeSnippets>
