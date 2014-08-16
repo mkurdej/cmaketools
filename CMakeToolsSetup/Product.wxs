@@ -26,7 +26,7 @@
             VS2010DEVENV OR VS2012DEVENV OR VS2013DEVENV OR Installed
         </Condition>
 
-        <MajorUpgrade DowngradeErrorMessage="A later version of CMake Tools for Visual Studio has been detected on your system." />
+        <MajorUpgrade AllowSameVersionUpgrades="yes" DowngradeErrorMessage="A later version of CMake Tools for Visual Studio has been detected on your system." />
       
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="ProgramMenuFolder" Name="Programs">
