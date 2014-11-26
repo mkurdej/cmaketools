@@ -51,6 +51,8 @@ namespace CMakeTools
         private static readonly string[] _targetProperties = new string[]
         {
             "ALIASED_TARGET",
+            "ANDROID_API",
+            "ANDROID_GUI",
             "ARCHIVE_OUTPUT_DIRECTORY",
             "ARCHIVE_OUTPUT_NAME",
             "AUTOGEN_TARGET_DEPENDS",
@@ -68,8 +70,17 @@ namespace CMakeTools
             "COMPATIBLE_INTERFACE_NUMBER_MIN",
             "COMPATIBLE_INTERFACE_STRING",
             "COMPILE_DEFINITIONS",
+            "COMPILE_FEATURES",
             "COMPILE_FLAGS",
             "COMPILE_OPTIONS",
+            "COMPILE_PDB_NAME",
+            "COMPILE_PDB_OUTPUT_DIRECTORY",
+            "CXX_EXTENSIONS",
+            "CXX_STANDARD",
+            "CXX_STANDARD_REQUIRED",
+            "C_EXTENSIONS",
+            "C_STANDARD",
+            "C_STANDARD_REQUIRED",
             "DEBUG_POSTFIX",
             "DEFINE_SYMBOL",
             "ENABLE_EXPORTS",
@@ -103,10 +114,12 @@ namespace CMakeTools
             "INSTALL_RPATH_USE_LINK_PATH",
             "INTERFACE_AUTOUIC_OPTIONS",
             "INTERFACE_COMPILE_DEFINITIONS",
+            "INTERFACE_COMPILE_FEATURES",
             "INTERFACE_COMPILE_OPTIONS",
             "INTERFACE_INCLUDE_DEFINITIONS",
             "INTERFACE_LINK_LIBRARIES",
             "INTERFACE_POSITION_INDEPENDENT_CODE",
+            "INTERFACE_SOURCES",
             "INTERFACE_SYSTEM_INCLUDE_DIRECTORIES",
             "INTERPROCEDURAL_OPTIMIZATION",
             "JOB_POOL_COMPILE",
@@ -166,6 +179,7 @@ namespace CMakeTools
             "VS_SCC_LOCALPATH",
             "VS_SCC_PROJECTNAME",
             "VS_SCC_PROVIDER",
+            "VS_WINRT_COMPONENT",
             "VS_WINRT_EXTENSIONS",
             "VS_WINRT_REFERENCES",
             "WIN32_EXECUTABLE"
@@ -191,7 +205,11 @@ namespace CMakeTools
             "OBJECT_DEPENDS",
             "OBJECT_OUTPUTS",
             "SYMBOLIC",
-            "WRAP_EXCLUDE"
+            "VS_DEPLOYMENT_CONTENT",
+            "VS_SHADER_TYPE",
+            "WRAP_EXCLUDE",
+            "XCODE_EXPLICIT_FILE_TYPE",
+            "XCODE_LAST_KNOWN_FILE_TYPE"
         };
 
         // Array of CMake test properties.
@@ -274,6 +292,8 @@ namespace CMakeTools
             "ALLOW_DUPLICATE_CUSTOM_TARGETS",
             "AUTOGEN_TARGETS_FOLDER",
             "AUTOMOC_TARGETS_FOLDER",
+            "CMAKE_CXX_KNOWN_FEATURES",
+            "CMAKE_C_KNOWN_FEATURES",
             "DEBUG_CONFIGURATIONS",
             "DISABLED_FEATURES",
             "ECLIPSE_EXTRA_NATURES",
