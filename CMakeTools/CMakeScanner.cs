@@ -37,7 +37,10 @@ namespace CMakeTools
         VariableEnd,
         OpenParen,
         CloseParen,
-        BracketArgument
+        BracketArgument,
+        GeneratorStart,
+        GeneratorEnd,
+        Colon
     }
 
     /// <summary>
@@ -65,7 +68,8 @@ namespace CMakeTools
         {
             { CMakeToken.VariableStart,         "${" },
             { CMakeToken.VariableStartEnv,      "$ENV{" },
-            { CMakeToken.VariableStartCache,    "$CACHE{" }
+            { CMakeToken.VariableStartCache,    "$CACHE{" },
+            { CMakeToken.GeneratorStart,        "$<" }
         };
 
         public CMakeScanner(bool textFile = false)
@@ -466,6 +470,29 @@ namespace CMakeTools
                     tokenInfo.Trigger = TokenTriggers.MatchBraces;
                     SetVariableDepth(ref state, originalVariableDepth > 0 ?
                         originalVariableDepth - 1 : 0);
+                    _offset++;
+                    return true;
+                }
+                else if (_source[_offset] == '>')
+                {
+                    // Scan a generator expression end token.
+                    tokenInfo.StartIndex = _offset;
+                    tokenInfo.EndIndex = _offset;
+                    tokenInfo.Color = TokenColor.Identifier;
+                    tokenInfo.Token = (int)CMakeToken.GeneratorEnd;
+                    tokenInfo.Trigger = TokenTriggers.MatchBraces;
+                    SetVariableDepth(ref state, originalVariableDepth > 0 ?
+                        originalVariableDepth - 1 : 0);
+                    _offset++;
+                    return true;
+                }
+                else if (_source[_offset] == ':')
+                {
+                    // Scan a colon.
+                    tokenInfo.StartIndex = _offset;
+                    tokenInfo.EndIndex = _offset;
+                    tokenInfo.Color = TokenColor.Identifier;
+                    tokenInfo.Token = (int)CMakeToken.Colon;
                     _offset++;
                     return true;
                 }
