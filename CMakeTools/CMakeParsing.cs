@@ -1562,6 +1562,69 @@ namespace CMakeTools
             return pairs;
         }
 
+        /// <summary>
+        /// Parse for pairs of matching braces denoting generator expressions.
+        /// </summary>
+        /// <param name="lines">A collection of lines to parse.</param>
+        /// <param name="lineNum">
+        /// The number of the line on which to find the generator expression.
+        /// </param>
+        /// <returns>A list of pairs of matching braces.</returns>
+        public static List<SpanPair> ParseForGeneratorBraces(IEnumerable<string> lines,
+            int lineNum)
+        {
+            List<SpanPair> pairs = new List<SpanPair>();
+            Stack<TextSpan> stack = new Stack<TextSpan>();
+            CMakeScanner scanner = new CMakeScanner();
+            TokenInfo tokenInfo = new TokenInfo();
+            int state = 0;
+            int i = 0;
+            foreach (string line in lines)
+            {
+                scanner.SetSource(line, 0);
+                if (i < lineNum)
+                {
+                    while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+                }
+                else
+                {
+                    while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state))
+                    {
+                        switch ((CMakeToken)tokenInfo.Token)
+                        {
+                        case CMakeToken.GeneratorStart:
+                            stack.Push(tokenInfo.ToTextSpan(i));
+                            break;
+                        case CMakeToken.GeneratorEnd:
+                            if (stack.Count > 0)
+                            {
+                                pairs.Add(new SpanPair()
+                                {
+                                    First = stack.Pop(),
+                                    Second = tokenInfo.ToTextSpan(i)
+                                });
+                            }
+                            break;
+                        case CMakeToken.Colon:
+                        case CMakeToken.FileName:
+                        case CMakeToken.Identifier:
+                        case CMakeToken.Variable:
+                        case CMakeToken.VariableEnd:
+                        case CMakeToken.VariableStart:
+                        case CMakeToken.VariableStartCache:
+                        case CMakeToken.VariableStartEnv:
+                            break;
+                        default:
+                            stack.Clear();
+                            break;
+                        }
+                    }
+                }
+                i++;
+            }
+            return pairs;
+        }
+
         private enum IncludeParseState
         {
             BeforeCommand,
