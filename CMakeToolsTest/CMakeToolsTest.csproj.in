@@ -59,7 +59,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CMakeTools\CMakeTools_VS@VS_VERSION@.csproj">
       <Project>{678324F2-4B99-4601-A72A-58B24546A19F}</Project>
-      <Name>CMakeTools</Name>
+      <Name>CMakeTools_VS@VS_VERSION@</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
