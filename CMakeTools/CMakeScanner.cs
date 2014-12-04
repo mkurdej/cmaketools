@@ -450,7 +450,10 @@ namespace CMakeTools
                     _offset++;
                     if (varToken != CMakeToken.Unspecified)
                     {
-                        SetVariableDepth(ref state,  originalVariableDepth + 1);
+                        if (varToken != CMakeToken.GeneratorStart)
+                        {
+                            SetVariableDepth(ref state,  originalVariableDepth + 1);
+                        }
                         tokenInfo.Token = (int)varToken;
                         tokenInfo.Trigger =
                             TokenTriggers.MemberSelect | TokenTriggers.MatchBraces;
@@ -640,7 +643,7 @@ namespace CMakeTools
             }
             else if (ch == '~' || ch == '`' || ch == '!' || ch == '%' || ch == '^' ||
                 ch == '&' || ch == '*' || ch == '+' || ch == '=' || ch == '[' ||
-                ch == ']' || ch == '{' || ch == '}' || ch == ':' || ch == '\'' ||
+                ch == ']' || ch == '{' || ch == '}' || ch == '\'' ||
                 ch == ',' || ch == '.' || ch == '?' || ch == '/')
             {
                 return true;
