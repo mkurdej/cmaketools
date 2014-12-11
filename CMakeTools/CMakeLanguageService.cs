@@ -251,6 +251,10 @@ namespace CMakeTools
                         tokenData.ParameterIndex > 0 ? tokenData.PriorParameters : null);
                     scope.SetDeclarations(decls);
                 }
+                else if (token == CMakeToken.GeneratorStart)
+                {
+                    scope.SetDeclarations(new CMakeGeneratorDeclarations());
+                }
             }
             else if (req.Reason == ParseReason.MethodTip)
             {

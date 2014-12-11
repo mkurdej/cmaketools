@@ -46,6 +46,7 @@
     <Compile Include="CMakeEditorFactory.cs" />
     <Compile Include="CMakeError.cs" />
     <Compile Include="CMakeExpansionProvider.cs" />
+    <Compile Include="CMakeGeneratorDeclarations.cs" />
     <Compile Include="CMakeIncludeDeclarations.cs" />
     <Compile Include="CMakeItemDeclarations.cs" />
     <Compile Include="CMakeKeywords.cs" />
