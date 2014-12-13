@@ -1277,6 +1277,11 @@ namespace CMakeTools
             return results;
         }
 
+        /// <summary>
+        /// Parse for the names of all installed files in the given code.
+        /// </summary>
+        /// <param name="lines">A collection of lines of code to parse.</param>
+        /// <returns>A list of installed files.</returns>
         public static List<string> ParseForInstalledFiles(IEnumerable<string> lines)
         {
             List<string> results = new List<string>();

@@ -1090,6 +1090,21 @@ namespace CMakeTools
         }
 
         /// <summary>
+        /// Test parsing for installed files.
+        /// </summary>
+        [TestMethod]
+        public void TestParseForInstalledFiles()
+        {
+            List<string> lines = new List<string>();
+            lines.Add("install(FILES foo.txt bar.txt DESTINATION bin)");
+            List<string> installedFiles = CMakeParsing.ParseForInstalledFiles(lines);
+            Assert.IsNotNull(installedFiles);
+            Assert.AreEqual(2, installedFiles.Count);
+            Assert.AreEqual("foo.txt", installedFiles[0]);
+            Assert.AreEqual("bar.txt", installedFiles[1]);
+        }
+
+        /// <summary>
         /// Test parsing for matching pairs of parentheses.
         /// </summary>
         [TestMethod]
