@@ -24,6 +24,7 @@ namespace CMakeTools
         Cache = 0,
         Directory,
         Global,
+        Install,
         Source,
         Target,
         Test,
@@ -41,6 +42,7 @@ namespace CMakeTools
             "CACHE",
             "DIRECTORY",
             "GLOBAL",
+            "INSTALL",
             "SOURCE",
             "TARGET",
             "TEST",
@@ -270,6 +272,14 @@ namespace CMakeTools
             "TYPE",
             "VALUE"
         };
+        
+        // Array of CMake installed file properties.
+        private static readonly string[] _installedFileProperties = new string[]
+        {
+            "CPACK_NEVER_OVERWRITE",
+            "CPACK_PERMANENT",
+            "CPACK_WIX_ACL"
+        };
 
         // Array of CMake instance properties that are not also properties of
         // global scope.
@@ -339,6 +349,7 @@ namespace CMakeTools
             { CMakePropertyType.Cache,      _cacheProperties },
             { CMakePropertyType.Directory,  _directoryProperties },
             { CMakePropertyType.Global,     _globalProperties },
+            { CMakePropertyType.Install,    _installedFileProperties },
             { CMakePropertyType.Source,     _sourceFileProperties },
             { CMakePropertyType.Target,     _targetProperties },
             { CMakePropertyType.Test,       _testProperties }
