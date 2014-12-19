@@ -116,6 +116,11 @@ namespace CMakeTools
                     pairs = CMakeParsing.ParseForVariableBraces(source.GetLines(),
                         req.Line);
                     break;
+                case CMakeToken.GeneratorStart:
+                case CMakeToken.GeneratorEnd:
+                    pairs = CMakeParsing.ParseForGeneratorBraces(source.GetLines(),
+                        req.Line);
+                    break;
                 }
                 if (pairs != null)
                 {
@@ -245,6 +250,10 @@ namespace CMakeTools
                         tokenData.Command, req, source,
                         tokenData.ParameterIndex > 0 ? tokenData.PriorParameters : null);
                     scope.SetDeclarations(decls);
+                }
+                else if (token == CMakeToken.GeneratorStart)
+                {
+                    scope.SetDeclarations(new CMakeGeneratorDeclarations());
                 }
             }
             else if (req.Reason == ParseReason.MethodTip)

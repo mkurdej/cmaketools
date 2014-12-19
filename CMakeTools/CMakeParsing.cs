@@ -1127,7 +1127,8 @@ namespace CMakeTools
         {
             NeedKeyword,
             NeedOpenParen,
-            NeedIdentifier
+            NeedIdentifier,
+            NeedSubcommand
         }
 
         /// <summary>
@@ -1260,6 +1261,85 @@ namespace CMakeTools
                             {
                                 results.Add(tokenText);
                             }
+                            state = FunctionNameParseState.NeedKeyword;
+                        }
+                        break;
+                    }
+                }
+                if (state == FunctionNameParseState.NeedOpenParen)
+                {
+                    // A line break may not appear between the command and the opening
+                    // parenthesis that follows it.  If there is one, there is a syntax
+                    // error and the target should be ignored.
+                    state = FunctionNameParseState.NeedKeyword;
+                }
+            }
+            return results;
+        }
+
+        /// <summary>
+        /// Parse for the names of all installed files in the given code.
+        /// </summary>
+        /// <param name="lines">A collection of lines of code to parse.</param>
+        /// <returns>A list of installed files.</returns>
+        public static List<string> ParseForInstalledFiles(IEnumerable<string> lines)
+        {
+            List<string> results = new List<string>();
+            CMakeScanner scanner = new CMakeScanner();
+            TokenInfo tokenInfo = new TokenInfo();
+            FunctionNameParseState state = FunctionNameParseState.NeedKeyword;
+            int scannerState = 0;
+            foreach (string line in lines)
+            {
+                scanner.SetSource(line, 0);
+                while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo,
+                    ref scannerState))
+                {
+                    string tokenText = line.ExtractToken(tokenInfo);
+                    switch (state)
+                    {
+                    case FunctionNameParseState.NeedKeyword:
+                        if (tokenInfo.Token == (int)CMakeToken.Keyword)
+                        {
+                            CMakeCommandId id = CMakeKeywords.GetCommandId(tokenText);
+                            if (id == CMakeCommandId.Install)
+                            {
+                                state = FunctionNameParseState.NeedOpenParen;
+                            }
+                        }
+                        break;
+                    case FunctionNameParseState.NeedOpenParen:
+                        if (tokenInfo.Token == (int)CMakeToken.OpenParen)
+                        {
+                            state = FunctionNameParseState.NeedSubcommand;
+                        }
+                        else if (tokenInfo.Token != (int)CMakeToken.WhiteSpace &&
+                            tokenInfo.Token != (int)CMakeToken.Comment)
+                        {
+                            state = FunctionNameParseState.NeedKeyword;
+                        }
+                        break;
+                    case FunctionNameParseState.NeedSubcommand:
+                        if (tokenInfo.Token == (int)CMakeToken.Keyword &&
+                            tokenText == "FILES")
+                        {
+                            state = FunctionNameParseState.NeedIdentifier;
+                        }
+                        else if (tokenInfo.Token != (int)CMakeToken.WhiteSpace &&
+                            tokenInfo.Token != (int)CMakeToken.Comment)
+                        {
+                            state = FunctionNameParseState.NeedKeyword;
+                        }
+                        break;
+                    case FunctionNameParseState.NeedIdentifier:
+                        if (tokenInfo.Token == (int)CMakeToken.Identifier ||
+                            tokenInfo.Token == (int)CMakeToken.FileName)
+                        {
+                            results.Add(tokenText);
+                        }
+                        else if (tokenInfo.Token != (int)CMakeToken.WhiteSpace &&
+                            tokenInfo.Token != (int)CMakeToken.Comment)
+                        {
                             state = FunctionNameParseState.NeedKeyword;
                         }
                         break;
@@ -1550,6 +1630,69 @@ namespace CMakeTools
                             }
                             break;
                         case CMakeToken.Variable:
+                            break;
+                        default:
+                            stack.Clear();
+                            break;
+                        }
+                    }
+                }
+                i++;
+            }
+            return pairs;
+        }
+
+        /// <summary>
+        /// Parse for pairs of matching braces denoting generator expressions.
+        /// </summary>
+        /// <param name="lines">A collection of lines to parse.</param>
+        /// <param name="lineNum">
+        /// The number of the line on which to find the generator expression.
+        /// </param>
+        /// <returns>A list of pairs of matching braces.</returns>
+        public static List<SpanPair> ParseForGeneratorBraces(IEnumerable<string> lines,
+            int lineNum)
+        {
+            List<SpanPair> pairs = new List<SpanPair>();
+            Stack<TextSpan> stack = new Stack<TextSpan>();
+            CMakeScanner scanner = new CMakeScanner();
+            TokenInfo tokenInfo = new TokenInfo();
+            int state = 0;
+            int i = 0;
+            foreach (string line in lines)
+            {
+                scanner.SetSource(line, 0);
+                if (i < lineNum)
+                {
+                    while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+                }
+                else
+                {
+                    while (scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state))
+                    {
+                        switch ((CMakeToken)tokenInfo.Token)
+                        {
+                        case CMakeToken.GeneratorStart:
+                            stack.Push(tokenInfo.ToTextSpan(i));
+                            break;
+                        case CMakeToken.GeneratorEnd:
+                            if (stack.Count > 0)
+                            {
+                                pairs.Add(new SpanPair()
+                                {
+                                    First = stack.Pop(),
+                                    Second = tokenInfo.ToTextSpan(i)
+                                });
+                            }
+                            break;
+                        case CMakeToken.Colon:
+                        case CMakeToken.FileName:
+                        case CMakeToken.Identifier:
+                        case CMakeToken.Variable:
+                        case CMakeToken.VariableEnd:
+                        case CMakeToken.VariableStart:
+                        case CMakeToken.VariableStartCache:
+                        case CMakeToken.VariableStartEnv:
                             break;
                         default:
                             stack.Clear();

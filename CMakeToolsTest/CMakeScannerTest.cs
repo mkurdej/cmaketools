@@ -920,5 +920,46 @@ namespace CMakeTools
             Assert.AreEqual(CMakeToken.BracketArgument, (CMakeToken)tokenInfo.Token);
             Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
         }
+
+        /// <summary>
+        /// Test scanning generator expressions.
+        /// </summary>
+        [TestMethod]
+        public void TestGeneratorExpressions()
+        {
+            CMakeScanner scanner = new CMakeScanner();
+            TokenInfo tokenInfo = new TokenInfo();
+            int state;
+
+            scanner.SetSource("$<FOO:BAR>", 0);
+            state = 0;
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(0, tokenInfo.StartIndex);
+            Assert.AreEqual(1, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.GeneratorStart, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.MemberSelect | TokenTriggers.MatchBraces,
+                tokenInfo.Trigger);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(2, tokenInfo.StartIndex);
+            Assert.AreEqual(4, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.Identifier, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(5, tokenInfo.StartIndex);
+            Assert.AreEqual(5, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.Colon, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(6, tokenInfo.StartIndex);
+            Assert.AreEqual(8, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.Identifier, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.None, tokenInfo.Trigger);
+            Assert.IsTrue(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+            Assert.AreEqual(9, tokenInfo.StartIndex);
+            Assert.AreEqual(9, tokenInfo.EndIndex);
+            Assert.AreEqual(CMakeToken.GeneratorEnd, (CMakeToken)tokenInfo.Token);
+            Assert.AreEqual(TokenTriggers.MatchBraces, tokenInfo.Trigger);
+            Assert.IsFalse(scanner.ScanTokenAndProvideInfoAboutIt(tokenInfo, ref state));
+        }
     }
 }

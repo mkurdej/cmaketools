@@ -110,9 +110,11 @@ namespace CMakeTools
         SubdirDepends,
         Subdirs,
         TargetCompileDefinitions,
+        TargetCompileFeatures,
         TargetCompileOptions,
         TargetIncludeDirectories,
         TargetLinkLibraries,
+        TargetSources,
         TryCompile,
         TryRun,
         Unset,
@@ -243,9 +245,11 @@ namespace CMakeTools
             "subdir_depends",
             "subdirs",
             "target_compile_definitions",
+            "target_compile_features",
             "target_compile_options",
             "target_include_directories",
             "target_link_libraries",
+            "target_sources",
             "try_compile",
             "try_run",
             "unset",
@@ -627,6 +631,7 @@ namespace CMakeTools
             "DIRECTORY",
             "FULL_DOCS",
             "GLOBAL",
+            "INSTALL",
             "PROPERTY",
             "SET",
             "SOURCE",
@@ -865,6 +870,7 @@ namespace CMakeTools
             "CACHE",
             "DIRECTORY",
             "GLOBAL",
+            "INSTALL",
             "PROPERTY",
             "SOURCE",
             "TARGET",
@@ -928,6 +934,11 @@ namespace CMakeTools
             "PRIVATE",
             "PUBLIC"
         };
+
+        private static readonly string[] _targetCompileFeatures =
+            _targetCompileDefinitionsKeywords;
+        private static readonly string[] _targetSources =
+            _targetCompileDefinitionsKeywords;
 
         // Array of keywords used with the TARGET_COMPILE_OPTIONS command.
         private static readonly string[] _targetCompileOptionsKeywords = new string[]
@@ -1122,9 +1133,11 @@ namespace CMakeTools
             _subdirDependsKeywords,
             _subdirsKeywords,
             _targetCompileDefinitionsKeywords,
+            _targetCompileFeatures,
             _targetCompileOptionsKeywords,
             _targetIncludeDirectoriesKeywords,
             _targetLinkLibrariesKeywords,
+            _targetSources,
             _tryCompileKeywords,
             _tryRunKeywords,
             _unsetKeywords,

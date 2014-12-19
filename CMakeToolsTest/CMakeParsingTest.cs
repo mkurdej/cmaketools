@@ -1090,6 +1090,21 @@ namespace CMakeTools
         }
 
         /// <summary>
+        /// Test parsing for installed files.
+        /// </summary>
+        [TestMethod]
+        public void TestParseForInstalledFiles()
+        {
+            List<string> lines = new List<string>();
+            lines.Add("install(FILES foo.txt bar.txt DESTINATION bin)");
+            List<string> installedFiles = CMakeParsing.ParseForInstalledFiles(lines);
+            Assert.IsNotNull(installedFiles);
+            Assert.AreEqual(2, installedFiles.Count);
+            Assert.AreEqual("foo.txt", installedFiles[0]);
+            Assert.AreEqual("bar.txt", installedFiles[1]);
+        }
+
+        /// <summary>
         /// Test parsing for matching pairs of parentheses.
         /// </summary>
         [TestMethod]
@@ -1166,7 +1181,7 @@ namespace CMakeTools
         }
 
         /// <summary>
-        /// Test for matching pair of curly braces denoting variable references.
+        /// Test for matching pairs of curly braces denoting variable references.
         /// </summary>
         [TestMethod]
         public void TestParseForVariableBraces()
@@ -1247,6 +1262,66 @@ namespace CMakeTools
             lines.Clear();
             lines.Add("${FOO BAR}");
             pairs = CMakeParsing.ParseForVariableBraces(lines, 0);
+            Assert.IsNotNull(pairs);
+            Assert.AreEqual(0, pairs.Count);
+        }
+
+        /// <summary>
+        /// Test for matching pairs of angle bracket denoting generator expressions.
+        /// </summary>
+        [TestMethod]
+        public void TestParseForGeneratorBraces()
+        {
+            // Test a single pair.
+            List<string> lines = new List<string>();
+            lines.Add("$<FOO>");
+            List<CMakeParsing.SpanPair> pairs = CMakeParsing.ParseForGeneratorBraces(
+                lines, 0);
+            Assert.IsNotNull(pairs);
+            Assert.AreEqual(1, pairs.Count);
+            Assert.AreEqual(0, pairs[0].First.iStartLine);
+            Assert.AreEqual(0, pairs[0].First.iStartIndex);
+            Assert.AreEqual(0, pairs[0].First.iEndLine);
+            Assert.AreEqual(2, pairs[0].First.iEndIndex);
+            Assert.AreEqual(0, pairs[0].Second.iStartLine);
+            Assert.AreEqual(5, pairs[0].Second.iStartIndex);
+            Assert.AreEqual(0, pairs[0].Second.iEndLine);
+            Assert.AreEqual(6, pairs[0].Second.iEndIndex);
+
+            // Test two nested pairs.
+            lines.Clear();
+            lines.Add("$<FOO:$<BAR>>");
+            pairs = CMakeParsing.ParseForGeneratorBraces(lines, 0);
+            Assert.IsNotNull(pairs);
+            Assert.AreEqual(2, pairs.Count);
+            Assert.AreEqual(0, pairs[0].First.iStartLine);
+            Assert.AreEqual(6, pairs[0].First.iStartIndex);
+            Assert.AreEqual(0, pairs[0].First.iEndLine);
+            Assert.AreEqual(8, pairs[0].First.iEndIndex);
+            Assert.AreEqual(0, pairs[0].Second.iStartLine);
+            Assert.AreEqual(11, pairs[0].Second.iStartIndex);
+            Assert.AreEqual(0, pairs[0].Second.iEndLine);
+            Assert.AreEqual(12, pairs[0].Second.iEndIndex);
+            Assert.AreEqual(0, pairs[1].First.iStartLine);
+            Assert.AreEqual(0, pairs[1].First.iStartIndex);
+            Assert.AreEqual(0, pairs[1].First.iEndLine);
+            Assert.AreEqual(2, pairs[1].First.iEndIndex);
+            Assert.AreEqual(0, pairs[1].Second.iStartLine);
+            Assert.AreEqual(12, pairs[1].Second.iStartIndex);
+            Assert.AreEqual(0, pairs[1].Second.iEndLine);
+            Assert.AreEqual(13, pairs[1].Second.iEndIndex);
+
+            // Test an unmatched pair.
+            lines.Clear();
+            lines.Add("$<FOO");
+            pairs = CMakeParsing.ParseForGeneratorBraces(lines, 0);
+            Assert.IsNotNull(pairs);
+            Assert.AreEqual(0, pairs.Count);
+
+            // Test a matched pair with an illegal character in the middle.
+            lines.Clear();
+            lines.Add("$<FOO BAR>");
+            pairs = CMakeParsing.ParseForGeneratorBraces(lines, 0);
             Assert.IsNotNull(pairs);
             Assert.AreEqual(0, pairs.Count);
         }

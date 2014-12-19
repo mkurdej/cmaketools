@@ -39,7 +39,8 @@ namespace CMakeTools
             Language,
             Package,
             SourceFile,
-            Directory
+            Directory,
+            GeneratorExpression
         }
 
         private struct Item : IComparable<Item>
@@ -164,6 +165,9 @@ namespace CMakeTools
             case ItemType.Directory:
                 // Return the icon index for an open folder.
                 return 201;
+            case ItemType.GeneratorExpression:
+                // Return the icon index for a template.
+                return 114;
             default:
                 return -1;
             }

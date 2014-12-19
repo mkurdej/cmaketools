@@ -264,8 +264,43 @@ namespace CMakeTools
             "directory1 directory2 ..."
         };
 
+        // Parameters to the TARGET_COMPILE_DEFINITIONS command.
+        private static readonly string[] _targetCompileDefinitions = new string[]
+        {
+            "target",
+            "item1 item2 ..."
+        };
+
+        // Parameters to the TARGET_COMPILE_FEATURES command.
+        private static readonly string[] _targetCompileFeatures = new string[]
+        {
+            "target",
+            "feature1 feature2 ..."
+        };
+
+        // Parameters to the TARGET_COMPILE_OPTIONS command.
+        private static readonly string[] _targetCompileOptions = new string[]
+        {
+            "target",
+            "item1 item2 ..."
+        };
+
+        // Parameters to the TARGET_INCLUDE_DIRECTORIES command.
+        private static readonly string[] _targetIncludeDirectories = new string[]
+        {
+            "target",
+            "item1 item2 ..."
+        };
+
         // Parameters to the TARGET_LINK_LIBRARIES command.
         private static readonly string[] _targetLinkLibrariesParams = new string[]
+        {
+            "target",
+            "item1 item2 ..."
+        };
+
+        // Parameters to the TARGET_SOURCES command.
+        private static readonly string[] _targetSources = new string[]
         {
             "target",
             "item1 item2 ..."
@@ -378,7 +413,12 @@ namespace CMakeTools
             { CMakeCommandId.SourceGroup,               _sourceGroupParams },
             { CMakeCommandId.SubdirDepends,             _subdirDependsParams },
             { CMakeCommandId.Subdirs,                   _subdirsParams },
+            { CMakeCommandId.TargetCompileDefinitions,  _targetCompileDefinitions },
+            { CMakeCommandId.TargetCompileFeatures,     _targetCompileFeatures },
+            { CMakeCommandId.TargetCompileOptions,      _targetCompileOptions },
+            { CMakeCommandId.TargetIncludeDirectories,  _targetIncludeDirectories },
             { CMakeCommandId.TargetLinkLibraries,       _targetLinkLibrariesParams },
+            { CMakeCommandId.TargetSources,             _targetSources },
             { CMakeCommandId.Unset,                     _variable },
             { CMakeCommandId.UseMangledMesa,            _useManagledMesaParams },
             { CMakeCommandId.UtilitySource,             _utilitySourceParams },

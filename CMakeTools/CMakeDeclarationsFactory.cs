@@ -34,7 +34,12 @@ namespace CMakeTools
             { CMakeCommandId.AddSubdirectory,           CreateSubdirectoryDeclarations },
             { CMakeCommandId.EnableLanguage,            CreateLanguageDeclarations },
             { CMakeCommandId.AddDependencies,           CreateTargetDeclarations },
+            { CMakeCommandId.TargetCompileDefinitions,  CreateTargetDeclarations },
+            { CMakeCommandId.TargetCompileFeatures,     CreateTargetDeclarations },
+            { CMakeCommandId.TargetCompileOptions,      CreateTargetDeclarations },
+            { CMakeCommandId.TargetIncludeDirectories,  CreateTargetDeclarations },
             { CMakeCommandId.TargetLinkLibraries,       CreateTargetDeclarations },
+            { CMakeCommandId.TargetSources,             CreateTargetDeclarations },
             { CMakeCommandId.SetTargetProperties,       CreateSetXPropertyDeclarations },
             { CMakeCommandId.SetSourceFilesProperties,  CreateSetXPropertyDeclarations },
             { CMakeCommandId.SetTestsProperties,        CreateSetXPropertyDeclarations },
@@ -73,6 +78,7 @@ namespace CMakeTools
         {
             { CMakePropertyType.Cache,      CreateCacheVariableDeclarations },
             { CMakePropertyType.Directory,  CreateSubdirectoryDeclarations },
+            { CMakePropertyType.Install,    CreateInstalledFileDeclarations },
             { CMakePropertyType.Source,     CreateSourceDeclarations },
             { CMakePropertyType.Target,     CreateTargetDeclarations },
             { CMakePropertyType.Test,       CreateTestDeclarations }
@@ -172,6 +178,18 @@ namespace CMakeTools
             CMakeSubdirectoryDeclarations decls =
                 new CMakeSubdirectoryDeclarations(req.FileName, requireCMakeLists);
             decls.FindIncludeFiles();
+            return decls;
+        }
+
+        private static CMakeItemDeclarations CreateInstalledFileDeclarations(
+            CMakeCommandId id, ParseRequest req, Source source,
+            List<string> priorParameters)
+        {
+            List<string> installedFiles = CMakeParsing.ParseForInstalledFiles(
+                source.GetLines());
+            CMakeItemDeclarations decls = new CMakeItemDeclarations();
+            decls.AddItems(installedFiles, CMakeItemDeclarations.ItemType.SourceFile);
+            decls.ExcludeItems(priorParameters);
             return decls;
         }
 

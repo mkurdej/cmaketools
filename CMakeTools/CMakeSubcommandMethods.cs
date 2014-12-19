@@ -336,6 +336,7 @@ namespace CMakeTools
             { "CACHE",      null },
             { "DIRECTORY",  null },
             { "GLOBAL",     null },
+            { "INSTALL",    null },
             { "SOURCE",     null },
             { "TARGET",     null },
             { "TEST",       null }
