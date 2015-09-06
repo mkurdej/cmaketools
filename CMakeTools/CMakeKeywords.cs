@@ -39,6 +39,7 @@ namespace CMakeTools
         CMakeMinimumRequired,
         CMakePolicy,
         ConfigureFile,
+        Continue,
         CreateTestSourcelist,
         DefineProperty,
         Else,
@@ -174,6 +175,7 @@ namespace CMakeTools
             "cmake_minimum_required",
             "cmake_policy",
             "configure_file",
+            "continue",
             "create_test_sourcelist",
             "define_property",
             "else",
@@ -266,6 +268,7 @@ namespace CMakeTools
         {
             "APPEND",
             "ARGS",
+            "BYPRODUCTS",
             "COMMAND",
             "COMMENT",
             "DEPENDS",
@@ -276,6 +279,7 @@ namespace CMakeTools
             "PRE_BUILD",
             "PRE_LINK",
             "TARGET",
+            "USES_TERMINAL",
             "VERBATIM",
             "WORKING_DIRECTORY"
         };
@@ -284,10 +288,12 @@ namespace CMakeTools
         private static readonly string[] _addCustomTargetKeywords = new string[]
         {
             "ALL",
+            "BYPRODUCTS",
             "COMMAND",
             "COMMENT",
             "DEPENDS",
             "SOURCES",
+            "USES_TERMINAL",
             "VERBATIM",
             "WORKING_DIRECTORY"
         };
@@ -471,19 +477,25 @@ namespace CMakeTools
             "CONTENT",
             "COPY",
             "DESTINATION",
+            "DIRECTORY",
             "DIRECTORY_PERMISSIONS",
             "DOWNLOAD",
+            "ENCODING",
             "EXCLUDE",
+            "EXPECTED_HASH",
             "EXPECTED_MD5",
+            "FILE",
             "FILE_PERMISSIONS",
             "FILES_MATCHING",
             "FOLLOW_SYMLINKS",
+            "FUNCTION",
             "GENERATE",
             "GLOB",
             "GLOB_RECURSE",
             "GROUP_EXECUTE",
             "GROUP_READ",
             "GROUP_WRITE",
+            "GUARD",
             "HEX",
             "INACTIVITY_TIMEOUT",
             "INPUT",
@@ -494,6 +506,8 @@ namespace CMakeTools
             "LIMIT_COUNT",
             "LIMIT_INPUT",
             "LIMIT_OUTPUT",
+            "LIST_DIRECTORIES",
+            "LOCK",
             "LOG",
             "MAKE_DIRECTORY",
             "MD5",
@@ -507,13 +521,16 @@ namespace CMakeTools
             "OWNER_WRITE",
             "PATTERN",
             "PERMISSIONS",
+            "PROCESS",
             "READ",
             "REGEX",
             "RELATIVE",
             "RELATIVE_PATH",
+            "RELEASE",
             "REMOVE",
             "REMOVE_RECURSE",
             "RENAME",
+            "RESULT_VARIABLE",
             "SETGID",
             "SETUID",
             "SHA1",
@@ -526,6 +543,8 @@ namespace CMakeTools
             "STRINGS",
             "TIMEOUT",
             "TIMESTAMP",
+            "TLS_CAINFO",
+            "TLS_VERIFY",
             "TO_CMAKE_PATH",
             "TO_NATIVE_PATH",
             "UPLOAD",
@@ -613,6 +632,7 @@ namespace CMakeTools
         {
             "ABSOLUTE",
             "CACHE",
+            "DIRECTORY",
             "EXT",
             "NAME",
             "NAME_WE",
@@ -649,6 +669,7 @@ namespace CMakeTools
             "EQUAL",
             "EXISTS",
             "GREATER",
+            "IN_LIST",
             "IS_ABSOLUTE",
             "IS_DIRECTORY",
             "IS_NEWER_THAN",
@@ -721,6 +742,7 @@ namespace CMakeTools
             "GROUP_WRITE",
             "INCLUDES",
             "LIBRARY",
+            "MESSAGE_NEVER",
             "NAMELINK_ONLY",
             "NAMELINK_SKIP",
             "NAMESPACE",
@@ -890,10 +912,12 @@ namespace CMakeTools
             "ALPHABET",
             "ASCII",
             "COMPARE",
+            "CONCAT",
             "CONFIGURE",
             "EQUAL",
             "ESCAPE_QUOTES",
             "FIND",
+            "GENEX_STRIP",
             "GREATER",
             "LENGTH",
             "LESS",
@@ -901,6 +925,8 @@ namespace CMakeTools
             "MATCH",
             "MATCHALL",
             "MD5",
+            "NAME",
+            "NAMESPACE",
             "NOTEQUAL",
             "RANDOM",
             "RANDOM_SEED",
@@ -917,7 +943,10 @@ namespace CMakeTools
             "TIMESTAMP",
             "TOLOWER",
             "TOUPPER",
-            "UTC"
+            "TYPE",
+            "UPPER",
+            "UTC",
+            "UUID"
         };
 
         // Array of keywords used with the SUBDIRS command.
@@ -989,6 +1018,7 @@ namespace CMakeTools
             "CMAKE_FLAGS",
             "COMPILE_DEFINITIONS",
             "COMPILE_OUTPUT_VARIABLE",
+            "LINK_LIBRARIES",
             "OUTPUT_VARIABLE",
             "RUN_OUTPUT_VARIABLE"
         };
@@ -1013,6 +1043,7 @@ namespace CMakeTools
         private static readonly string[] _auxSourceDirectoriesKeywords = null;
         private static readonly string[] _breakKeywords = null;
         private static readonly string[] _buildNameKeywords = null;
+        private static readonly string[] _continueKeywords = null;
         private static readonly string[] _enableTestingKeywords = null;
         private static readonly string[] _endFunctionKeywords = null;
         private static readonly string[] _endMacroKeywords = null;
@@ -1062,6 +1093,7 @@ namespace CMakeTools
             _cmakeMinimumRequiredKeywords,
             _cmakePolicyKeywords,
             _configureFileKeywords,
+            _continueKeywords,
             _createTestSourcelistKeywords,
             _definePropertyKeywords,
             _elseKeywords,
