@@ -103,6 +103,12 @@ namespace CMakeTools
         // Parameters to the FILE(GLOB_RECURSE) command.
         private static readonly string[] _fileGlobRecurseParams = _fileGlobParams;
 
+        // Parameters to the FILE(LOCK) command.
+        private static readonly string[] _fileLockParams = new string[]
+        {
+            "path"
+        };
+
         // Parameters to the FILE(MAKE_DIRECTORY) command.
         private static readonly string[] _fileMakeDirectoryParams = new string[]
         {
@@ -190,6 +196,7 @@ namespace CMakeTools
             { "GLOB",           _fileGlobParams },
             { "GLOB_RECURSE",   _fileGlobRecurseParams },
             { "INSTALL",        null },
+            { "LOCK",           _fileLockParams },
             { "MAKE_DIRECTORY", _fileMakeDirectoryParams },
             { "MD5",            _fileMD5Params },
             { "READ",           _fileReadParams },
@@ -349,6 +356,13 @@ namespace CMakeTools
             "output_variable"
         };
 
+        // Parameters to the STRING(CONCAT) command.
+        private static readonly string[] _stringConcatParams = new string[]
+        {
+            "output_variable",
+            "input1 input2 ..."
+        };
+
         // Parameters to the STRING(CONFIGURE) command.
         private static readonly string[] _stringConfigureParams = new string[]
         {
@@ -361,6 +375,13 @@ namespace CMakeTools
         {
             "string",
             "substring",
+            "output_variable"
+        };
+
+        // Parameters to the STRING(GENEX_STRIP) command.
+        private static readonly string[] _stringGenexStripParams = new string[]
+        {
+            "input_string",
             "output_variable"
         };
 
@@ -429,8 +450,11 @@ namespace CMakeTools
             new Dictionary<string, string[]>
         {
             { "ASCII",              _stringAsciiParams },
+            { "COMPARE",            null },
+            { "CONCAT",             _stringConcatParams },
             { "CONFIGURE",          _stringConfigureParams },
             { "FIND",               _stringFindParams },
+            { "GENEX_STRIP",        _stringGenexStripParams },
             { "LENGTH",             _stringLengthParams },
             { "MAKE_C_IDENTIFIER",  _stringMakeCIdentifierParams },
             { "MD5",                _stringMD5Params },
@@ -446,7 +470,8 @@ namespace CMakeTools
             { "SUBSTRING",          _stringSubstringParams },
             { "TIMESTAMP",          _stringTimestampParams },
             { "TOLOWER",            _stringToLowerParams },
-            { "TOUPPER",            _stringToUpperParams }
+            { "TOUPPER",            _stringToUpperParams },
+            { "UUID",               null }
         };
 
         // Map from commands to subcommands.

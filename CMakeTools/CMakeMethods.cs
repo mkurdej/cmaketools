@@ -371,6 +371,7 @@ namespace CMakeTools
             { CMakeCommandId.BuildCommand,              _variable },
             { CMakeCommandId.BuildName,                 _variable },
             { CMakeCommandId.ConfigureFile,             _configureFileParams },
+            { CMakeCommandId.Continue,                  _noParams },
             { CMakeCommandId.Else,                      _optionalExpression },
             { CMakeCommandId.ElseIf,                    _expression },
             { CMakeCommandId.EnableLanguage,            _enableLanguageParams },
