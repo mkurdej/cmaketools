@@ -54,6 +54,7 @@ namespace CMakeTools
         {
             "ALIASED_TARGET",
             "ANDROID_API",
+            "ANDROID_API_MIN",
             "ANDROID_GUI",
             "ARCHIVE_OUTPUT_DIRECTORY",
             "ARCHIVE_OUTPUT_NAME",
@@ -77,6 +78,7 @@ namespace CMakeTools
             "COMPILE_OPTIONS",
             "COMPILE_PDB_NAME",
             "COMPILE_PDB_OUTPUT_DIRECTORY",
+            "CROSSCOMPILING_EMULATOR",
             "CXX_EXTENSIONS",
             "CXX_STANDARD",
             "CXX_STANDARD_REQUIRED",
@@ -208,7 +210,12 @@ namespace CMakeTools
             "OBJECT_OUTPUTS",
             "SYMBOLIC",
             "VS_DEPLOYMENT_CONTENT",
+            "VS_DEPLOYMENT_LOCATION",
+            "VS_SHADER_ENTRYPOINT",
+            "VS_SHADER_FLAGS",
+            "VS_SHADER_MODEL",
             "VS_SHADER_TYPE",
+            "VS_XAML_TYPE",
             "WRAP_EXCLUDE",
             "XCODE_EXPLICIT_FILE_TYPE",
             "XCODE_LAST_KNOWN_FILE_TYPE"
@@ -276,8 +283,11 @@ namespace CMakeTools
         // Array of CMake installed file properties.
         private static readonly string[] _installedFileProperties = new string[]
         {
+            "CPACK_DESKTOP_SHORTCUTS",
             "CPACK_NEVER_OVERWRITE",
             "CPACK_PERMANENT",
+            "CPACK_STARTUP_SHORTCUTS",
+            "CPACK_START_MENU_SHORTCUTS",
             "CPACK_WIX_ACL"
         };
 
