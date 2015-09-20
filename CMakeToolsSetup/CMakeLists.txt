@@ -11,4 +11,9 @@
 # ****************************************************************************
 
 ADD_WIX_PROJECT(CMakeToolsSetup)
-ADD_DEPENDENCIES(CMakeToolsSetup CMakeTools_VS10 CMakeTools_VS11 CMakeTools_VS12)
+ADD_DEPENDENCIES(
+    CMakeToolsSetup
+    CMakeTools_VS10
+    CMakeTools_VS11
+    CMakeTools_VS12
+    CMakeTools_VS14)

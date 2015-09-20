@@ -18,12 +18,16 @@
         <PropertyRef Id="VS2013_ROOT_FOLDER" />
         <PropertyRef Id="VS2013_EXTENSIONS_DIR" />
         <PropertyRef Id="VS2013DEVENV" />
+        <PropertyRef Id="VS2015_ROOT_FOLDER" />
+        <PropertyRef Id="VS2015_EXTENSIONS_DIR" />
+        <PropertyRef Id="VS2015DEVENV" />
 
         <CustomActionRef Id="VS2012Setup" />
         <CustomActionRef Id="VS2013Setup" />
+        <CustomActionRef Id="VS2015Setup" />
 
-        <Condition Message="CMake Tools for Visual Studio requires Visual Studio 2010, Visual Studio 2012 or Visual Studio 2013, none of which was detected on your computer.">
-            VS2010DEVENV OR VS2012DEVENV OR VS2013DEVENV OR Installed
+        <Condition Message="CMake Tools for Visual Studio requires Visual Studio 2010, Visual Studio 2012, Visual Studio 2013, or Visual Studio 2015, none of which was detected on your computer.">
+            VS2010DEVENV OR VS2012DEVENV OR VS2013DEVENV OR VS2015DEVENV OR Installed
         </Condition>
 
         <MajorUpgrade AllowSameVersionUpgrades="yes" DowngradeErrorMessage="A later version of CMake Tools for Visual Studio has been detected on your system." />
@@ -85,6 +89,19 @@
             <?undef SnippetsGuid ?>
             <?undef CMakeToolsGuid ?>
             <?undef CMakeTemplatesGuid ?>
+            <?define VSVersion = 2015 ?>
+            <?define VSMajorVersion = 14 ?>
+            <?define SnippetsIndexGuid = 887972f8-f6e4-4488-9e6e-fb4285f7eb4b ?>
+            <?define SnippetsGuid = 375aec82-151d-4adb-bb6b-cb1bd80d2021 ?>
+            <?define CMakeToolsGuid = 8aac2c0f-721e-4c86-b7db-0e130d474e8c ?>
+            <?define CMakeTemplatesGuid = 278f6f73-179b-430d-b720-075541a76853 ?>
+            <?include Components.wxi ?>
+            <?undef VSVersion ?>
+            <?undef VSMajorVersion ?>
+            <?undef SnippetsIndexGuid ?>
+            <?undef SnippetsGuid ?>
+            <?undef CMakeToolsGuid ?>
+            <?undef CMakeTemplatesGuid ?>
         </Directory>
 
         <Feature Id="CMakeTools" Title="CMake Tools for Visual Studio" Description="Syntax highlighting and IntelliSense for CMake in Visual Studio." Level="1" AllowAdvertise="no">
@@ -109,6 +126,13 @@
                 <ComponentRef Id="CMakeSnippets2013" />
                 <ComponentRef Id="CMakeSnippetsIndex2013" />
             </Feature>
+            <Feature Id="CMakeTools2015" Title="Visual Studio 2015 Extension" Description="Extension for Visual Studio 2015." Level="0" AllowAdvertise="no">
+                <Condition Level="1">VS2015DEVENV</Condition>
+                <ComponentRef Id="CMakeTools2015" />
+                <ComponentRef Id="CMakeTemplates2015" />
+                <ComponentRef Id="CMakeSnippets2015" />
+                <ComponentRef Id="CMakeSnippetsIndex2015" />
+            </Feature>
 
             <ComponentRef Id="CMakeTools" />
             <ComponentRef Id="ProgramMenuDir" />
@@ -121,11 +145,15 @@
             <Custom Action="VS2013Setup" Before="InstallFinalize">
                 <![CDATA[VS2013DEVENV AND (&CMakeTools2013 > 0)]]>
             </Custom>
+            <Custom Action="VS2015Setup" Before="InstallFinalize">
+                <![CDATA[VS2015DEVENV AND (&CMakeTools2015 > 0)]]>
+            </Custom>
         </InstallExecuteSequence>
 
         <UI>
             <ProgressText Action="VS2012Setup" Template="[1]">Updating Visual Studio 2012 registration</ProgressText>
             <ProgressText Action="VS2013Setup" Template="[1]">Updating Visual Studio 2013 registration</ProgressText>
+            <ProgressText Action="VS2015Setup" Template="[1]">Updating Visual Studio 2015 registration</ProgressText>
         </UI>
         
         <UIRef Id="WixUI_Mondo" />
